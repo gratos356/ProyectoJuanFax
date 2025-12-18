@@ -4,13 +4,22 @@
     box-sizing: border-box;
 }
 
+:root{
+    --FondoPrincipal:#030C1A;
+    --FondoSecundario:#0D1117;
+    --ColorBotonesDeAccionDorado:#C9A227;
+    --ColorBotonesDeAccionGris:#2A2A2A;
+    --ColorCards:#3c3c3c39;
+    --ColorLetra:#FFFFFF;
+}
+
 .container{
     overflow: auto;
     display: flex;
     flex-direction: column;
+    background-color: var(--FondoSecundario);
     align-items: center;
     gap: 76px;
-    background-color: #0D1117;
     height: 100%;
     width: 100%;
 }
@@ -18,7 +27,7 @@
 .secciones{
     height: 100vh;
     width: 90%;
-    background-color: #030C1A;
+    background-color: var(--FondoPrincipal);
 }
 
 .menu i{
@@ -29,20 +38,22 @@
 .menu{
     position: fixed;
 }
-
+/* secion de categorias de restaurantes */
 .titulo-seccion-restaurante{
     width: 100%;
     background-color: yellowgreen;
 }
 .cards{
-    height: 95%;
+    position: relative;
+    height: 80%;
     width: 100%;
+    background-color: var(--ColorCards);
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: 1fr 3fr;
     grid-template-areas: 
     "titulo-recomendaciones titulo-recomendaciones titulo-recomendaciones"
-    "recomendaciones recomendaciones recomendaciones"
+    "recomendaciones recomendaciones2 recomendaciones3"
     ;
 }
 
@@ -51,6 +62,12 @@
 }
 .recomendaciones{
     grid-area: recomendaciones;
+}
+.recomendaciones:nth-child(2){
+    grid-area: recomendaciones2;
+}
+.recomendaciones:nth-child(3){
+    grid-area: recomendaciones3;
 }
 
 .tipos-de-restaurantes{
@@ -72,24 +89,36 @@
 }
 
 .comida-rapida{
-    background-color: red;
+/* 
+    background-color: red; */
     grid-area: comida-rapida;
 }
 .lujo{
-    background-color: red;
+
+    /* background-color: red; */
     grid-area: lujo;
 }
 .casual{
-    background-color: red;
+    /* background-color: red; */
     grid-area: casual;
 }
 
 .target-tipos-de-restaurantes{
     background-color: blueviolet;
-    height: 100%;
-    
+    height: 70%;
+    width: 150%;
+    /* position: absolute; */
+    align-self: center;
+    justify-self: center;
+    margin-bottom: 30px;
 }
-
-.comida-rapida:nth-child(3){
+.target-tipos-de-restaurantes:nth-child(2){
+    position: absolute;
+    z-index: 10px;
     background-color: aqua;
+    margin-bottom: 60px;
 }
+/* ___________________________________________________________ */
+/* ___________________________________________________________ */
+
+
