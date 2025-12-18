@@ -1,0 +1,95 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container{
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 76px;
+    background-color: #0D1117;
+    height: 100%;
+    width: 100%;
+}
+
+.secciones{
+    height: 100vh;
+    width: 90%;
+    background-color: #030C1A;
+}
+
+.menu i{
+    color: white;
+    font-size: 2rem;
+}
+
+.menu{
+    position: fixed;
+}
+
+.titulo-seccion-restaurante{
+    width: 100%;
+    background-color: yellowgreen;
+}
+.cards{
+    height: 95%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 1fr 3fr;
+    grid-template-areas: 
+    "titulo-recomendaciones titulo-recomendaciones titulo-recomendaciones"
+    "recomendaciones recomendaciones recomendaciones"
+    ;
+}
+
+.titulo-recomendaciones{
+    grid-area: titulo-recomendaciones;
+}
+.recomendaciones{
+    grid-area: recomendaciones;
+}
+
+.tipos-de-restaurantes{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 1fr repeat(3, 2fr);
+    grid-template-areas: 
+    "tituloSeccion tituloSeccion tituloSeccion"
+    "comida-rapida comida-rapida comida-rapida"
+    "lujo lujo lujo"
+    "casual casual casual"
+    ;
+}
+
+.titulo-seccion-restaurante{
+    grid-area: tituloSeccion;
+    align-self: center;
+    text-align: center;
+}
+
+.comida-rapida{
+    background-color: red;
+    grid-area: comida-rapida;
+}
+.lujo{
+    background-color: red;
+    grid-area: lujo;
+}
+.casual{
+    background-color: red;
+    grid-area: casual;
+}
+
+.target-tipos-de-restaurantes{
+    background-color: blueviolet;
+    height: 100%;
+    
+}
+
+.comida-rapida:nth-child(3){
+    background-color: aqua;
+}
