@@ -11,6 +11,12 @@
     --ColorBotonesDeAccionGris:#2A2A2A;
     --ColorCards:#3c3c3c39;
     --ColorLetra:#FFFFFF;
+    --AlturaSeciones:100vh;
+    --AnchoSeciones:90%;
+    --AlturaCardsCategorias:80%;
+    --AnchoCardsCategorias:100%;
+    --AlturaCardsRestaurantes:25%;
+    --AnchoCardsRestaurantes:100%;
 }
 
 .container{
@@ -25,8 +31,8 @@
 }
 
 .secciones{
-    height: 100vh;
-    width: 90%;
+    height: var(--AlturaSeciones);
+    width: var(--AnchoSeciones);
     background-color: var(--FondoPrincipal);
 }
 
@@ -45,8 +51,8 @@
 }
 .cards{
     position: relative;
-    height: 80%;
-    width: 100%;
+    height: var(--AlturaCardsCategorias);
+    width: var(--AnchoCardsCategorias);
     background-color: var(--ColorCards);
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -118,7 +124,19 @@
     background-color: aqua;
     margin-bottom: 60px;
 }
+.restaurantes{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+.restaurantes .cards{
+    /* display: inline-block; */
+    height: var(--AlturaCardsRestaurantes);
+    width: var(--AnchoCardsRestaurantes);
+    background-color: red;
+}
 /* ___________________________________________________________ */
 /* ___________________________________________________________ */
+
 
 
