@@ -17,15 +17,19 @@
     --AnchoCardsCategorias:100%;
     --AlturaCardsRestaurantes:25%;
     --AnchoCardsRestaurantes:100%;
+    --Fuente-General:"Cinzel Decorative", serif;
+    
 }
 
+
 .container{
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x:hidden;
     display: flex;
     flex-direction: column;
     background-color: var(--FondoSecundario);
     align-items: center;
-    gap: 76px;
+    gap: 40px;
     height: 100%;
     width: 100%;
 }
@@ -34,6 +38,7 @@
     height: var(--AlturaSeciones);
     width: var(--AnchoSeciones);
     background-color: var(--FondoPrincipal);
+    position: relative;
 }
 
 .menu i{
@@ -43,11 +48,14 @@
 
 .menu{
     position: fixed;
+    z-index: 11;
 }
 /* secion de categorias de restaurantes */
-.titulo-seccion-restaurante{
+.titulo-seccion-restaurante,.titulo-seccion-mercados,.titulo-seccion-mascotas{
     width: 100%;
-    background-color: yellowgreen;
+    color: var(--ColorLetra);
+    font-family: var(--Fuente-General);
+    /* background-color: yellowgreen; */
 }
 .cards{
     position: relative;
@@ -65,6 +73,9 @@
 
 .titulo-recomendaciones{
     grid-area: titulo-recomendaciones;
+    color: var(--ColorLetra);
+    font-family: var(--Fuente-General);
+    font-weight: lighter;
 }
 .recomendaciones{
     grid-area: recomendaciones;
@@ -76,7 +87,7 @@
     grid-area: recomendaciones3;
 }
 
-.tipos-de-restaurantes{
+.tipos-de-restaurantes,.tipos-de-mercados,.tipos-de-productos-mascotas{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: 1fr repeat(3, 2fr);
@@ -88,28 +99,37 @@
     ;
 }
 
-.titulo-seccion-restaurante{
+.titulo-seccion-restaurante,.titulo-seccion-mercados,.titulo-seccion-mascotas{
     grid-area: tituloSeccion;
     align-self: center;
     text-align: center;
 }
 
-.comida-rapida{
+.comida-rapida,.mercados-compra-venta,.Comida-mascotas{
 /* 
     background-color: red; */
     grid-area: comida-rapida;
+    color: var(--ColorLetra);
+    font-family: var(--Fuente-General);
+    
 }
-.lujo{
+.lujo,.tecnologico,.Cuidado{
 
     /* background-color: red; */
     grid-area: lujo;
+    color: var(--ColorLetra);
+    font-family: var(--Fuente-General);
+    
 }
-.casual{
+.casual,.mecanico,.Accesorios{
     /* background-color: red; */
     grid-area: casual;
+    color: var(--ColorLetra);
+    font-family: var(--Fuente-General);
+    
 }
 
-.target-tipos-de-restaurantes{
+.target-tipos-de-restaurantes,.target-tipos-de-mercados,.target-tipos-de-productos-mascotas{
     background-color: blueviolet;
     height: 70%;
     width: 150%;
@@ -118,18 +138,18 @@
     justify-self: center;
     margin-bottom: 30px;
 }
-.target-tipos-de-restaurantes:nth-child(2){
+.target-tipos-de-restaurantes:nth-child(2),.target-tipos-de-mercados:nth-child(2),.target-tipos-de-productos-mascotas:nth-child(2){
     position: absolute;
-    z-index: 10px;
+    z-index: 10;
     background-color: aqua;
     margin-bottom: 60px;
 }
-.restaurantes{
+.restaurantes,.mercados,.mascotas{
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
 }
-.restaurantes .cards{
+.restaurantes .cards,.mercados .cards,.mascotas .cards{
     /* display: inline-block; */
     height: var(--AlturaCardsRestaurantes);
     width: var(--AnchoCardsRestaurantes);
