@@ -5,33 +5,62 @@
 }
 
 :root{
+    /* Paleta De Colores */
     --FondoPrincipal:#030C1A;
     --FondoSecundario:#0D1117;
     --ColorBotonesDeAccionDorado:#C9A227;
     --ColorBotonesDeAccionGris:#2A2A2A;
     --ColorCards:#3c3c3c39;
     --ColorLetra:#FFFFFF;
+
+    /* Fuente De Letra */
+    --Fuente-General:"Cinzel Decorative", serif;
+
+    /* TamañoSecciones */
     --AlturaSeciones:100vh;
     --AnchoSeciones:90%;
+
+    /* Tamaño Cards Categorias */
     --AlturaCardsCategorias:80%;
     --AnchoCardsCategorias:100%;
+
+
+    /* Tamaño Cards Restaurantes */
     --AlturaCardsRestaurantes:25%;
-    --AnchoCardsRestaurantes:100%;
-    --Fuente-General:"Cinzel Decorative", serif;
-    
+    --AnchoCardsRestaurantes:90%;
+
+    /* Separacion De Secciones */
+    --SeparacionSecciones: 40px;
+
+    /* Tamaños Container */
+    --AltoContainer:100%;
+    --AnchoContainer:100%;
+
+    /* Tamaños Cards Categorias en Tablets */
+    --AlturaCardsCategoriasTablets:90%;
+
+    /* Tamaño Letra */
+    /* Mobile */
+    --TamañoLetraMobile:1rem;
+    /* Tablet */
+    --TamañoLetraTablet:1.6rem;
 }
-
-
+/* ________________________________________ */
+/* ________________________________________ */
+/*                  Mobile                  */
+/* ________________________________________ */
+/* ________________________________________ */
 .container{
+    font-size: var(--TamañoLetraMobile);
     overflow-y: auto;
     overflow-x:hidden;
     display: flex;
     flex-direction: column;
     background-color: var(--FondoSecundario);
     align-items: center;
-    gap: 40px;
-    height: 100%;
-    width: 100%;
+    gap: var(--SeparacionSecciones);
+    height: var(--AltoContainer);
+    width: var(--AnchoContainer);
 }
 
 .secciones{
@@ -106,27 +135,25 @@
 }
 
 .comida-rapida,.mercados-compra-venta,.Comida-mascotas{
-/* 
-    background-color: red; */
+    /*background-color: red; */
     grid-area: comida-rapida;
     color: var(--ColorLetra);
     font-family: var(--Fuente-General);
-    
 }
 .lujo,.tecnologico,.Cuidado{
-
     /* background-color: red; */
     grid-area: lujo;
     color: var(--ColorLetra);
     font-family: var(--Fuente-General);
-    
 }
 .casual,.mecanico,.Accesorios{
     /* background-color: red; */
     grid-area: casual;
     color: var(--ColorLetra);
     font-family: var(--Fuente-General);
-    
+}
+.casual h2,.mecanico h2,.Accesorios h2,.lujo h2,.tecnologico h2,.Cuidado h2,.comida-rapida h2,.mercados-compra-venta h2,.Comida-mascotas h2{
+    margin-left: 5%;
 }
 
 .target-tipos-de-restaurantes,.target-tipos-de-mercados,.target-tipos-de-productos-mascotas{
@@ -153,6 +180,7 @@
     /* display: inline-block; */
     height: var(--AlturaCardsRestaurantes);
     width: var(--AnchoCardsRestaurantes);
+    align-self: center;
     background-color: red;
 }
 /* ___________________________________________________________ */
@@ -160,3 +188,17 @@
 
 
 
+/* ___________________________________________________________ */
+/* ___________________________________________________________ */
+/*                          Tablet                             */
+/* ___________________________________________________________ */
+/* ___________________________________________________________ */
+
+@media(min-width:768px){
+    .target-tipos-de-restaurantes,.target-tipos-de-mercados,.target-tipos-de-productos-mascotas{
+    height: 90%;
+    }
+    .cards{
+        height: var(--AlturaCardsCategoriasTablets);
+    }
+}
