@@ -10,6 +10,7 @@
     --FondoSecundario:#0D1117;
     --ColorBotonesDeAccionDorado:#C9A227;
     --ColorBotonesDeAccionGris:#2A2A2A;
+    --ColorBotonesDeAccionGrisHover:#0f0f0f;
     --ColorCards:#3c3c3c39;
     --ColorLetra:#FFFFFF;
 
@@ -65,6 +66,7 @@
     gap: var(--SeparacionSecciones);
     height: var(--AltoContainer);
     width: var(--AnchoContainer);
+
 }
 
 .secciones{
@@ -169,6 +171,7 @@
     justify-self: center;
     margin-bottom: 30px;
 }
+
 .target-tipos-de-restaurantes:nth-child(2),.target-tipos-de-mercados:nth-child(2),.target-tipos-de-productos-mascotas:nth-child(2){
     position: absolute;
     z-index: 10;
@@ -180,12 +183,56 @@
     flex-direction: column;
     justify-content: space-evenly;
 }
-.restaurantes .cards,.mercados .cards,.mascotas .cards{
+.restaurantes .baners,.mercados .baners,.mascotas .baners{
     /* display: inline-block; */
     height: var(--AlturaCardsRestaurantes);
     width: var(--AnchoCardsRestaurantes);
     align-self: center;
     background-color: red;
+}
+
+.target-mercados{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 4fr 1fr;
+    height: 100%;
+    column-gap: 15px;
+    grid-template-areas: 
+    "banner banner"
+    "PideYa Calificanos"
+    ;
+}
+
+.banner{
+    grid-area: banner;
+    background-color: blue;
+}
+.PideYa{
+    grid-area: PideYa;
+    justify-self: end;
+    align-self: center;
+}
+.Calificanos{
+    grid-area: Calificanos;
+    justify-self: start;
+    align-self: center;
+}
+.baners .target-mercados button{
+    background-color: var(--ColorBotonesDeAccionGris);
+    border: 1px solid var(--ColorBotonesDeAccionDorado);
+    color: var(--ColorLetra);
+    font-family: var(--Fuente-General);
+    font-weight: bolder;
+    font-size: 1.1rem;
+    width: 117px;
+    height: 30px;
+}
+.baners .target-mercados button:nth-child(3){
+    width: 147px;
+
+}
+.baners .target-mercados button:hover{
+    background-color: var(--ColorBotonesDeAccionGrisHover);
 }
 /* ___________________________________________________________ */
 /* ___________________________________________________________ */
