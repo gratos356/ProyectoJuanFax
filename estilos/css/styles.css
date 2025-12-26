@@ -50,6 +50,10 @@
 /*                  Mobile                  */
 /* ________________________________________ */
 /* ________________________________________ */
+
+.Dekstop{
+    display: none;
+}
 .container{
     font-size: var(--TamañoLetraMobile);
     overflow-y: auto;
@@ -199,9 +203,19 @@
         font-size: var(--TamañoLetraTablet);
     }
     .target-tipos-de-restaurantes,.target-tipos-de-mercados,.target-tipos-de-productos-mascotas{
-    height: 90%;
+        height: 90%;
     }
     .cards{
         height: var(--AlturaCardsCategoriasTablets);
+    }
+}
+
+@media(min-width:1280px){
+    .mobile-tablet{
+        display: none;        
+    }
+
+    .Dekstop{
+        display: flex;
     }
 }
