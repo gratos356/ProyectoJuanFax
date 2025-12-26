@@ -43,7 +43,7 @@
     /* Mobile */
     --TamañoLetraMobile:1rem;
     /* Tablet */
-    --TamañoLetraTablet:1.6rem;
+    --TamañoLetraTablet:1.5rem;
 }
 /* ________________________________________ */
 /* ________________________________________ */
@@ -195,6 +195,9 @@
 /* ___________________________________________________________ */
 
 @media(min-width:768px){
+    .container{
+        font-size: var(--TamañoLetraTablet);
+    }
     .target-tipos-de-restaurantes,.target-tipos-de-mercados,.target-tipos-de-productos-mascotas{
     height: 90%;
     }
