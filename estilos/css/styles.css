@@ -2,6 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: var(--Fuente-General);
 }
 
 :root{
@@ -55,7 +56,7 @@
 .Dekstop{
     display: none;
 }
-.container{
+.movil-tablet{
     font-size: var(--TamañoLetraMobile);
     overflow-y: auto;
     overflow-x:hidden;
@@ -89,7 +90,7 @@
 .titulo-seccion-restaurante,.titulo-seccion-mercados,.titulo-seccion-mascotas{
     width: 100%;
     color: var(--ColorLetra);
-    font-family: var(--Fuente-General);
+    /* font-family: var(--Fuente-General); */
     /* background-color: yellowgreen; */
 }
 .cards{
@@ -109,7 +110,7 @@
 .titulo-recomendaciones{
     grid-area: titulo-recomendaciones;
     color: var(--ColorLetra);
-    font-family: var(--Fuente-General);
+    /* font-family: var(--Fuente-General); */
     font-weight: lighter;
 }
 .recomendaciones{
@@ -144,19 +145,19 @@
     /*background-color: red; */
     grid-area: comida-rapida;
     color: var(--ColorLetra);
-    font-family: var(--Fuente-General);
+    /* font-family: var(--Fuente-General); */
 }
 .lujo,.tecnologico,.Cuidado{
     /* background-color: red; */
     grid-area: lujo;
     color: var(--ColorLetra);
-    font-family: var(--Fuente-General);
+    /* font-family: var(--Fuente-General); */
 }
 .casual,.mecanico,.Accesorios{
     /* background-color: red; */
     grid-area: casual;
     color: var(--ColorLetra);
-    font-family: var(--Fuente-General);
+    /* font-family: var(--Fuente-General); */
 }
 .casual h2,.mecanico h2,.Accesorios h2,.lujo h2,.tecnologico h2,.Cuidado h2,.comida-rapida h2,.mercados-compra-venta h2,.Comida-mascotas h2{
     margin-left: 5%;
@@ -221,7 +222,7 @@
     background-color: var(--ColorBotonesDeAccionGris);
     border: 1px solid var(--ColorBotonesDeAccionDorado);
     color: var(--ColorLetra);
-    font-family: var(--Fuente-General);
+    /* font-family: var(--Fuente-General); */
     font-weight: bolder;
     font-size: 1.1rem;
     width: 117px;
@@ -246,7 +247,7 @@
 /* ___________________________________________________________ */
 
 @media(min-width:768px){
-    .container{
+    .movil-tablet{
         font-size: var(--TamañoLetraTablet);
     }
     .target-tipos-de-restaurantes,.target-tipos-de-mercados,.target-tipos-de-productos-mascotas{
@@ -257,12 +258,81 @@
     }
 }
 
+/* ___________________________________________________________ */
+/* ___________________________________________________________ */
+/*                          PC                                 */
+/* ___________________________________________________________ */
+/* ___________________________________________________________ */
+
 @media(min-width:1280px){
-    .mobile-tablet{
+    .movil-tablet{
         display: none;        
     }
 
     .Dekstop{
         display: flex;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background-color: var(--FondoPrincipal);
+        height: 100vh;
+        width: 100vw;
+    }
+    .header{
+        display: flex;
+        background-color: var(--FondoSecundario);
+        height: 16%;
+        width: 100%;
+        justify-content: space-around;
+        align-items: center;
+        gap: 25%;
+    }
+    .barra-de-navegacion{
+        height: 70%;
+        width: 50%;
+        background-color: blue;
+        display: flex;
+        align-items: center;
+    }
+    
+    .barra-de-navegacion a{
+        width: 50%;
+        /* background-color: red; */
+        display: flex;
+        justify-content: space-evenly;
+    }
+    .barra-de-navegacion a button{
+        background-color: chartreuse;
+        height: 20px;
+        width: 100px;
+        border: none;
+    }
+    
+    .contenedor-logo-ubicacion-volver{
+        display: flex;
+        height: 100%;
+        width: 20%;
+        justify-content: space-between;
+        align-items: center;
+        background-color: rebeccapurple;
+    }
+    .Logo{
+        height: 70%;
+        width: 30%;
+        background-color: gold;
+        
+    }
+
+    .ubicacion{
+        height: 30%;
+        width: 30%;
+        background-color: green;
+        
+    }
+
+    .volver{
+        height: 30%;
+        width: 11%;
+        background-color: red;
+        
     }
 }
