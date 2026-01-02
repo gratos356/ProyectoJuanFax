@@ -271,20 +271,38 @@
 
     .Dekstop{
         display: flex;
+        display: grid;
+        grid-template-columns: 2fr;
+        /* grid-template-rows: repeat(12,40vh); */
         overflow-y: auto;
         overflow-x: hidden;
         background-color: var(--FondoPrincipal);
         height: 100vh;
         width: 100vw;
+        /* grid-template-areas: 
+        "header"
+        "hero"
+        "."
+        "."
+        "."
+        "."
+        "."
+        "."
+        "."
+        "."
+        "."
+        "." 
+        ; */
     }
     .header{
         display: flex;
         background-color: var(--FondoSecundario);
-        height: 16%;
-        width: 100%;
+        height: 15vh;
+        width: 100vw;
         justify-content: space-around;
         align-items: center;
         gap: 25%;
+        /* grid-area: header; */
     }
     .barra-de-navegacion{
         height: 70%;
@@ -292,21 +310,26 @@
         background-color: blue;
         display: flex;
         align-items: center;
+        justify-content: space-evenly;
     }
     
     .barra-de-navegacion a{
-        width: 50%;
-        /* background-color: red; */
+        height: 30%;
+        width: 16%;
+        background-color: red;
         display: flex;
-        justify-content: space-evenly;
+        justify-content: space-around;
     }
     .barra-de-navegacion a button{
         background-color: chartreuse;
-        height: 20px;
-        width: 100px;
+        height: 100%;
+        width: 100%;
         border: none;
+        transition: 0.1s;
     }
-    
+    .barra-de-navegacion a button:hover{
+        background-color: rgb(73, 146, 0);
+    }
     .contenedor-logo-ubicacion-volver{
         display: flex;
         height: 100%;
@@ -334,5 +357,45 @@
         width: 11%;
         background-color: red;
         
+    }
+
+    .hero{
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        height: 50vh;
+        width: 100vw;
+        background-color: red;
+        align-self: center;
+        justify-self: center;
+        /* overflow-x: auto; */
+        /* grid-area: hero; */
+    }
+    .banner-hero{
+        height: 60%;
+        width: 18%;
+        background-color: rgba(0, 0, 255, 0.258);
+        transition: 0.1s;
+        animation: heroAnimate infinite 5s;
+    }
+    .banner-hero:hover{
+        background-color: rebeccapurple;
+        margin-bottom: 5%;
+        box-shadow:0 0 12px #FFFFFF ;
+
+    }
+}
+@keyframes heroAnimate{
+    0%{
+        background-color: blue;
+    }
+    25%{
+        background-color: greenyellow;
+    }
+    75%{
+        background-color: peru;
+    }
+    100%{
+        background-color: blue;
     }
 }
