@@ -53,6 +53,11 @@
 /* ________________________________________ */
 /* ________________________________________ */
 
+html{
+    scroll-behavior: smooth;
+}
+
+
 .Dekstop{
     display: none;
 }
@@ -65,8 +70,8 @@
     background-color: var(--FondoSecundario);
     align-items: center;
     gap: var(--SeparacionSecciones);
-    height: var(--AltoContainer);
-    width: var(--AnchoContainer);
+    /* height: var(--AltoContainer); */
+    /* width: var(--AnchoContainer); */
 
 }
 
@@ -77,15 +82,55 @@
     position: relative;
 }
 
-.menu i{
-    color: white;
-    font-size: 2rem;
-}
 
-.menu{
+.header-mobil{
+    margin-top: 15px;
     position: fixed;
     z-index: 11;
 }
+#menu-toggle{
+    display: none;
+}
+.menu-icon{
+    font-size: 28px;
+    color: white;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.menu{
+    display: none;
+    position: absolute;
+    top: 24px;
+    left: 0;
+    height: 50vh;
+    width: 60vw;
+    background: #22222287;
+    /* transform: translateY(-120%); */
+    /* transition: transform 0.3s ease; */
+}
+.menu a{
+    display: block;
+    padding: 1rem;
+    color: var(--ColorBotonesDeAccionDorado);
+    border: 1px var(--ColorBotonesDeAccionDorado) solid;
+    width: 90%;
+    background-color: #131313f7;
+    border-radius: 20px;
+    /* border: 1px var(--ColorBotonesDeAccionDorado) solid; */
+    text-decoration: none;
+}
+
+#menu-toggle:checked~.menu{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    /* transform: translateY(0); */
+}
+
+
 /* secion de categorias de restaurantes */
 .titulo-seccion-restaurante,.titulo-seccion-mercados,.titulo-seccion-mascotas{
     width: 100%;
@@ -171,6 +216,10 @@
     align-self: center;
     justify-self: center;
     margin-bottom: 30px;
+}
+
+.target-tipos-de-restaurantes:hover,.target-tipos-de-mercados:hover,.target-tipos-de-productos-mascotas:hover{
+    box-shadow: white 0 0 10px;
 }
 
 .target-tipos-de-restaurantes:nth-child(2),.target-tipos-de-mercados:nth-child(2),.target-tipos-de-productos-mascotas:nth-child(2){
@@ -334,7 +383,7 @@
         border-radius: 5px;
         border: none;
         transition: 0.1s;
-        font-size: 0.5rem;
+        font-size: 0.7rem;
         color: var(--ColorBotonesDeAccionDorado);
         transition: 0.1s;
     }
