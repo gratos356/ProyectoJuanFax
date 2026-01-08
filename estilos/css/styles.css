@@ -15,6 +15,9 @@
     --ColorCards:#3c3c3c39;
     --ColorLetra:#FFFFFF;
 
+    /* margen entre secciones */
+    --margenEntreSecciones:10%;
+
     /* Fuente De Letra */
     --Fuente-General:"Cinzel Decorative", serif;
 
@@ -319,7 +322,7 @@ html{
     }
 
     .Dekstop{
-        display: flex;
+        /* display: flex; */
         display: grid;
         grid-template-columns: 2fr;
         /* grid-template-rows: repeat(12,40vh); */
@@ -453,7 +456,7 @@ html{
             background-color: var(--FondoSecundario);
             align-self: center;
             justify-self: center;
-    
+            margin-top: var(--margenEntreSecciones);
         }
     
         .boton-hero{
@@ -480,14 +483,44 @@ html{
             transition: 0.1s;
         }
         .banner-hero:hover{
-            background-color: rebeccapurple; 
+            /* background-color: rebeccapurple;  */
             margin-bottom: 5%; 
             box-shadow:0 0 12px #FFFFFF ;
         } 
-
-
+        /* _________________ */
+        /*    SECCIONES      */
+        /* _________________ */
+        /* * {
+            outline: 1px solid red;
+        } */
+        .restaurantes-desktop,.mercados-desktop,.animales-desktop{
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+            margin-top: var(--margenEntreSecciones);
+            /* background-color: var(--FondoSecundario); */
+        }
+        .titulo-restaurantes-desktop{
+            width: 100vw;
+            /* background-color: red; */
+            text-align: center;
+            color: var(--ColorLetra);
+        }
+        .restaurantes-desktop .expanding-card,.mercados-desktop .expanding-card,.animales-desktop .expanding-card{
+            background-color: var(--FondoSecundario);
+            border: 1px var(--ColorBotonesDeAccionDorado) solid;
+            height: 45vh;
+            width: 5vw;
+            margin-top: 10px;
+        }
+        .restaurantes-desktop .expanding-card:nth-child(3),.mercados-desktop .expanding-card:nth-child(3),.animales-desktop .expanding-card:nth-child(3){
+            align-self: flex-end;
+        }
+    }
+    
+::-webkit-scrollbar{
+    display: none;
 }
-
 @keyframes animacion-logo{
     0%{
         transform: rotate(-360deg);
