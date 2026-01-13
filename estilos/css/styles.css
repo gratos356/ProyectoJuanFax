@@ -16,7 +16,7 @@
     --ColorLetra:#FFFFFF;
 
     /* margen entre secciones */
-    --margenEntreSecciones:10%;
+    --margenEntreSecciones:15%;
 
     /* Fuente De Letra */
     --Fuente-General:"Cinzel Decorative", serif;
@@ -352,6 +352,7 @@ html{
     .header{
         display: flex;
         background-color: var(--FondoSecundario);
+        position: fixed;
         height: 15vh;
         width: 100vw;
         justify-content: space-around;
@@ -534,6 +535,12 @@ html{
             align-self: flex-end;
         }
 
+        .footer{
+            height: 45vh;
+            width: 100vw;
+            background-color: var(--FondoSecundario);
+            margin-top: 7%;
+        }
     }
     
 ::-webkit-scrollbar{
