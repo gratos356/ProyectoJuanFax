@@ -496,7 +496,7 @@ html{
         .restaurantes-desktop,.mercados-desktop,.animales-desktop{
             display: flex;
             flex-direction: column;
-            height: 80vh;
+            height: 100vh;
             margin-top: var(--margenEntreSecciones);
             /* background-color: var(--FondoSecundario); */
         }
@@ -509,13 +509,31 @@ html{
         .restaurantes-desktop .expanding-card,.mercados-desktop .expanding-card,.animales-desktop .expanding-card{
             background-color: var(--FondoSecundario);
             border: 1px var(--ColorBotonesDeAccionDorado) solid;
-            height: 45vh;
+            height: 28vh;
             width: 5vw;
             margin-top: 10px;
+            transition: 0.5s;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
         }
+        .targets-expanding{
+            display: none;
+            height: 80%;
+            width: 15%;
+            background-color: white;
+        }
+        .expanding-card:hover{
+            width: 90vw;
+        }
+        .expanding-card:hover .targets-expanding{
+            display: flex;
+        }
+
         .restaurantes-desktop .expanding-card:nth-child(3),.mercados-desktop .expanding-card:nth-child(3),.animales-desktop .expanding-card:nth-child(3){
             align-self: flex-end;
         }
+
     }
     
 ::-webkit-scrollbar{
