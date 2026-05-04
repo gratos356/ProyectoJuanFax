@@ -151,7 +151,35 @@ html{
     border: 1px solid var(--ColorBotonesDeAccionDorado);
 }
 
+/* ____________________________________________________________ */
+/* ____________________________________________________________ */
+/*                         Etiquetas                            */
+/* ____________________________________________________________ */
+/* ____________________________________________________________ */
 
+
+
+
+.etiquetas{
+    display: flex;
+    gap: 10px;
+    height: 4vh;
+    width: 100vw;
+}
+.etiquetasFiltros{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: var(--FondoPrincipal);
+    height: 100%;
+    width: 25%;
+    background-color: var(--ColorBotonesDeAccionDorado);
+    border-radius: 0 50px 50px 0;
+    corner-right-shape: bevel;
+    margin-left: 10px;
+}
 /* ___________________________________________________________ */
 /* ___________________________________________________________ */
 
