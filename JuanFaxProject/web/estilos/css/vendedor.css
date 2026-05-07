@@ -1,0 +1,53 @@
+@import url("/estilos/customProperties/CustomProperties.css");
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+.header{
+    display: flex;
+    height: 10vh;
+    gap: 10vw;
+    background-color: var(--FondoSecundario);
+}
+
+.titulo{
+    color: var(--ColorBotonesDeAccionDorado);
+    font-family: var(--Fuente-General);
+    font-size: 1rem;
+    font-weight: bold;
+    margin-left: 5%;
+    display: flex;
+    align-items: center;
+}
+
+.navBar{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 50%;
+    /* background-color: aqua; */
+}
+
+.BttNavegacion{
+    width: 20%;
+    height: 35%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--ColorLetra);
+    font-weight: bold;
+    font-family: var(--Fuente-General);
+    font-size: var(--TamañoLetraMobile);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.BttNavegacionFocus{
+    /* text-decoration: underline var(--ColorBotonesDeAccionDorado) 2px; */
+    color: var(--ColorBotonesDeAccionDorado);
+    border-bottom: 1px solid var(--ColorBotonesDeAccionDorado);
+    border-radius: 0;
+}

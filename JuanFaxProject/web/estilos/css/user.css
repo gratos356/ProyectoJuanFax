@@ -38,9 +38,12 @@ html{
 /* ____________________________________________________________ */
 .headerMovile{
     width: 100vw;
-    height: 7vh;
+    min-height: 7vh;
     background-color: var(--FondoSecundario);
     border-bottom: 1px solid var(--ColorBotonesDeAccionDorado);
+    padding-top: 15px;
+    position: fixed;
+    z-index: 1;
 }
 .navegacionMovil{
     display: flex;
@@ -87,12 +90,13 @@ html{
 /* ____________________________________________________________ */
 /* ____________________________________________________________ */
 .search{
+    margin-top: 9vh;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     width: 95vw;
-    height: 5vh;
+    min-height: 4vh;
     justify-self: center;
 }
 .input-search{
@@ -125,7 +129,7 @@ html{
     background-color: var(--ColorBotonesDeAccionDorado);
     box-shadow: var(--ColorBotonesDeAccionDorado) 0 0 10px;
 }
-.bx-search-big{
+.bx-search-big,.icons{
     color: var(--ColorBotonesDeAccionDorado);
     font-size: 1.3rem;
 }
@@ -138,7 +142,7 @@ html{
 
 .recomended{
     display: flex;
-    height: 15vh;
+    min-height: 15vh;
     width: 100vw;
     gap: 10px;
     overflow-y: auto;
@@ -163,7 +167,7 @@ html{
 .etiquetas{
     display: flex;
     gap: 10px;
-    height: 4vh;
+    min-height: 3vh;
     width: 100vw;
 }
 .etiquetasFiltros{
@@ -172,13 +176,79 @@ html{
     align-items: center;
     font-size: 0.7rem;
     font-weight: bold;
-    color: var(--FondoPrincipal);
+    color: var(--FondoSecundario);
     height: 100%;
-    width: 25%;
+    width: 27%;
     background-color: var(--ColorBotonesDeAccionDorado);
     border-radius: 0 50px 50px 0;
     corner-right-shape: bevel;
     margin-left: 10px;
+}
+
+
+/* ____________________________________________________________ */
+/* ____________________________________________________________ */
+/*                         Negocios                             */
+/* ____________________________________________________________ */
+/* ____________________________________________________________ */
+
+.negocios{
+    display: flex;
+    flex-direction: column;
+    /* justify-content: space-between; */
+    gap: 20px;
+    align-items: center;
+    min-height: 90vh;
+    width: 100vw;
+    /* background-color: red; */
+}
+
+.cardsNegocios{
+    display: flex;
+    flex-direction: column;
+    min-height: 30%;
+    width: 95%;
+    border: 1px solid var(--ColorBotonesDeAccionDorado);
+}
+.imagen{
+    height: 60%;
+    width: 100%;
+    background-image: url(/JuanFaxProject/web/estilos/imagenes/logo_Juan_Fax-removebg-preview\ \(1\)\ 2\ \(1\).png);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.descripcion{
+    height: 40%;
+    width: 100%;
+    background-color: var(--FondoSecundario);
+}
+
+/* ____________________________________________________________ */
+/* ____________________________________________________________ */
+/*                          Footer                              */
+/* ____________________________________________________________ */
+/* ____________________________________________________________ */
+
+.footer{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    min-height: 7vh;
+    width: 100vw;
+    background-color: var(--FondoSecundario);
+    border: 1px solid var(--ColorBotonesDeAccionDorado);
+    z-index: 3;
+}
+.icons{
+    display: flex;
+    height: 60%;
+    width: 15%;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--ColorBotonesDeAccionDorado);
+}
+.icons p{
+    font-size: 0.3rem;
 }
 /* ___________________________________________________________ */
 /* ___________________________________________________________ */
