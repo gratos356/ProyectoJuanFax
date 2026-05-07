@@ -5,19 +5,22 @@
     box-sizing: border-box;
 }
 
-
+body{
+    font-family: var(--Fuente-General);
+}
 .header{
     display: flex;
     height: 10vh;
     gap: 10vw;
     background-color: var(--FondoSecundario);
+    border-bottom: 1px solid var(--ColorBotonesDeAccionGris8);
 }
 
 .titulo{
     color: var(--ColorBotonesDeAccionDorado);
-    font-family: var(--Fuente-General);
+    /* font-family: var(--Fuente-General); */
+    /* font-weight: bold; */
     font-size: 1rem;
-    font-weight: bold;
     margin-left: 5%;
     display: flex;
     align-items: center;
@@ -28,7 +31,6 @@
     justify-content: space-evenly;
     align-items: center;
     width: 50%;
-    /* background-color: aqua; */
 }
 
 .BttNavegacion{
@@ -38,16 +40,72 @@
     justify-content: center;
     align-items: center;
     color: var(--ColorLetra);
-    font-weight: bold;
-    font-family: var(--Fuente-General);
+    /* font-weight: bold; */
+    /* font-family: var(--Fuente-General); */
     font-size: var(--TamañoLetraMobile);
     border-radius: 5px;
     cursor: pointer;
 }
 
-.BttNavegacionFocus{
+.BttNavegacionFocus, .BttnSideBaarFocus{
     /* text-decoration: underline var(--ColorBotonesDeAccionDorado) 2px; */
     color: var(--ColorBotonesDeAccionDorado);
     border-bottom: 1px solid var(--ColorBotonesDeAccionDorado);
     border-radius: 0;
+}
+
+.sideBaar{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 20vw;
+    height: 100vh;
+    background-color: var(--FondoSecundario);
+    padding: 20px;
+    border-right: 1px solid var(--ColorBotonesDeAccionGris8);
+}
+
+.MiNegocio,.Cuenta{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 30%;
+    width: 45%;
+    /* text-align: center; */
+    color: var(--ColorLetra);
+    cursor: pointer;
+}
+.MiNegocio p, .Cuenta p{
+    width: 70%;
+}
+
+.Cuenta{
+    height: 10%;
+}
+
+.main{
+    display: flex;
+    height: 100vh;
+    background-color: var(--FondoPrincipal);
+}
+
+.estadisticas{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 20px;
+    width: 80%;
+    height: 20%;
+    /* padding: 20px; */
+    margin-top: 5vh;
+    /* background-color: crimson; */
+}
+
+.estads{
+    width: 20%;
+    height: 100%;
+    border: 1px solid var(--ColorBotonesDeAccionGris);
+    box-shadow: 0px 0px 10px var(--ColorBotonesDeAccionGris);
+    border-radius: 15px;
 }
