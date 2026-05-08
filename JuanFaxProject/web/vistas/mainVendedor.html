@@ -4,52 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="/estilos/css/vendedor.css">
+    <link rel="stylesheet" href="/web/estilos/css/vendedor.css">
+    <!-- Basic Icons -->
+    <link href="https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css" rel="stylesheet">
+    <!-- Filled Icons -->
+    <link href="https://cdn.boxicons.com/3.0.8/fonts/filled/boxicons-filled.min.css" rel="stylesheet">
+    <!-- Brand Icons -->
+    <link href="https://cdn.boxicons.com/3.0.8/fonts/brands/boxicons-brands.min.css" rel="stylesheet">
 </head>
 <body>
-    <header class="header" id="header">
-        <div class="titulo" id="titulo">
-            <h1>JUANFAX</h1>
-        </div>
-        <nav class="navBar" id="navBar">
-            <div class="BttNavegacion BttNavegacionFocus">
-                <p>Panel</p>
+    <section class="movile" id="movile">
+
+        <!-- Header -->
+        <header class="header" id="header">
+
+            <!-- Titulo -->
+            <div class="titulo" id="titulo">
+                <h1>JUANFAX</h1>
             </div>
-            <div class="BttNavegacion">
-                <p>Mi Negocio</p>
+
+            <!-- Perfil Y Notificaciones -->
+            <div class="perfil_y_notificaciones" id="perfil_y_notificaciones">
+                <!-- Notificaciones -->
+                <i class="bx bx-bell"></i>
+                <!-- Perfil -->
+                <div class="profile" id="profile"><p>JD</p></div>
             </div>
-            <div class="BttNavegacion">
-                <p>Suscripcion</p>
+        </header>
+    </section>
+
+    <secction class="Desktop" id="Desktop">
+        
+        <header class="header" id="header">
+            <div class="titulo" id="titulo">
+                <h1>JUANFAX</h1>
             </div>
-            <div class="BttNavegacion">
-                <p>Estadisticas</p>
+            <div class="perfil_y_notificaciones" id="perfil_y_notificaciones">
+                <i class="bx bx-bell"></i>
+                <div class="profile" id="profile"><p>JD</p></div>
             </div>
-        </nav>
-    </header>
-    <main class="main" id="main">
-        <aside class="sideBaar" id="sideBaar">
-            <div class="MiNegocio" id="MiNegocio">
-                <h2>Mi Negocio</h2>
-                <p class="BttnSideBaar BttnSideBaarFocus">Plan Ejecutivo</p>
-                <p class="BttnSideBaar">Estadisticas</p>
-                <p class="BttnSideBaar">Perfil Negocio</p>
-                <p class="BttnSideBaar">Suscripcion</p>
-                <p class="BttnSideBaar">Calficaciones</p>
-                <p class="BttnSideBaar">Facturas</p>
-            </div>
-            <div class="Cuenta" id="Cuenta">
-                <h2>Cuenta</h2>
-                <p class="BttnSideBaar">Configuracion</p>
-                <p class="BttnSideBaar">Soporte</p>
-            </div>
-        </aside>
-        <div class="estadisticas" id="estadisticas">
-            <div class="estads"></div>
-            <div class="estads"></div>
-            <div class="estads"></div>
-            <div class="estads"></div>
-        </div>
-    </main>
-    <script src="/scrips/vendedor.js"></script>
+        </header>
+        <main class="main" id="main">
+            <aside class="sideBaar" id="sideBaar">
+                <div class="MiNegocio" id="MiNegocio">
+                    <h2>Mi Negocio</h2>
+                    <div class="botones botonesFocus">
+                        <p class="BttnSideBaar">Plan Ejecutivo</p>
+                    </div>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Estadisticas</p>
+                    </div>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Perfil Negocio</p>
+                    </div>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Suscripcion</p>
+                    </div>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Calficaciones</p>
+                    </div>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Facturas</p>
+                    </div>
+                </div>
+                <div class="Cuenta" id="Cuenta">
+                    <h2>Cuenta</h2>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Configuracion</p>
+                    </div>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Soporte</p>
+                    </div>
+                </div>
+            </aside>
+            <section class="informacionNegocio" id="informacionNegocio">
+                <div class="estadisticas" id="estadisticas">
+                    <div class="estads"></div>
+                    <div class="estads"></div>
+                    <div class="estads"></div>
+                    <div class="estads"></div>
+                </div>
+                <div class="fedbacks_Y_vistas" id="fedbacks_Y_vistas">
+                    <div class="vistasPorDia" id="vistasPorDia"></div>
+                    <div class="fedBacks" id="fedBacks"></div>
+                </div>
+                <div class="calificaciones_Y_alertas">
+                    <div class="calificaciones" id="calificaciones"></div>
+                    <div class="alertas" id="alertas"></div>
+                </div>
+                <div class="metricas" id="metricas">
+                    
+                </div>
+            </section>
+        </main>
+    </secction>
+    <script src="/web/scrips/vendedor.js"></script>
 </body>
 </html>

@@ -3,10 +3,14 @@
     --FondoPrincipal:#030C1A;
     --FondoSecundario:#0D1117;
     --ColorBotonesDeAccionDorado:#C9A227;
+    --ColorFondoBotones:#c9a32728;
+    --ColorFondoBotonesRojo:#c9272728;
     --ColorBotonesDeAccionGris:#2A2A2A;
     --ColorBotonesDeAccionGrisHover:#0f0f0f;
     --ColorCards:#3c3c3c39;
     --ColorLetra:#FFFFFF;
+    --ColorLetraNav:#b9b9b9b1;
+    --ColorLetraTitulos:#aeaeae;
 
     /* margen entre secciones */
     --margenEntreSecciones:15%;
