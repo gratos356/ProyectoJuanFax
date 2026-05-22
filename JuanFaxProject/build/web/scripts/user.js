@@ -1,6 +1,5 @@
 const expandingCards = document.querySelectorAll(".expanding-card")
 
-
 // Variables de control global
 let destinos = [];
 let indiceBase = 0;
@@ -113,24 +112,74 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-expandingCards.forEach((card)=>{
-    card.addEventListener("click", ()=>{
-        const isExpanded = card.classList.toggle("cardExpandida");
 
-        if (isExpanded){
-            for (let i = 0; i < 5; i++) {
-                const ExpandingTarget = document.createElement("div");
-                ExpandingTarget.classList.toggle("targets-expanding");
-                card.appendChild(ExpandingTarget);
-                
-            }
-        }else{
-            for (let i = 0; i < 5; i++) {
-                const removeTarget=card.querySelector(".targets-expanding")
-                if (removeTarget) {
-                    removeTarget.remove();
-                }
-            }
+expandingCards.forEach((card) => {
+    card.addEventListener("click", () => {
+        const isExpanded = card.classList.toggle("cardExpandida");
+        //remover titulos cuando se expanda la card
+        const titulo = card.querySelector(".titulos");
+        titulo.classList.toggle("titulosDisable", isExpanded);
+
+        if (isExpanded) {
+            // 1. Obtenemos el nombre de la categoría asignada a esta tarjeta
+            // Si tus tarjetas tienen un título h2 con el nombre (ej: "Restaurantes"), lo extraemos así:
+            const nombreCategoria = card.querySelector("h2") ? card.querySelector("h2").innerText.trim() : "";
+            
+            // Añadimos un mensaje temporal mientras carga
+            const cargando = document.createElement("div");
+            cargando.classList.add("targets-expanding", "loading-text");
+            cargando.innerText = "Cargando...";
+            cargando.style.color = "#fff";
+            card.appendChild(cargando);
+
+            // 2. Hacemos la petición en vivo a tu LoginServlet pasándole la categoría
+            fetch(`../LoginServlet?accion=negociosPorCategoria&categoria=${encodeURIComponent(nombreCategoria)}`)
+                .then(response => response.json())
+                .then(negocios => {
+                    // Quitamos el mensaje de "Cargando..."
+                    const tempLoading = card.querySelector(".loading-text");
+                    if (tempLoading) tempLoading.remove();
+
+                    if (negocios.length === 0) {
+                        const noData = document.createElement("div");
+                        noData.classList.add("targets-expanding");
+                        noData.innerHTML = `<span style="color: #aaa; font-style: italic;">No hay negocios</span>`;
+                        card.appendChild(noData);
+                        return;
+                    }
+
+                    // 3. Reemplazamos el bucle fijo por la cantidad de negocios reales de la BD
+                    negocios.forEach(neg => {
+                        const ExpandingTarget = document.createElement("div");
+                        ExpandingTarget.classList.add("targets-expanding");
+
+                        // Validamos la ruta de la foto de forma inteligente (local o Google)
+                        let fotoFinal = neg.urlImagen.startsWith("http") ? neg.urlImagen : `../imagenes/${neg.urlImagen}`;
+
+                        // Estructura interna elegante para cada negocio inyectado en la tarjeta
+                        ExpandingTarget.innerHTML = `
+                            <div class="content-expanding-cards">
+                                <img src="${fotoFinal}" class="imagen-expanding-card">
+                                <span class="spam-expanding-cards">${neg.nombreEstablecimiento}</span>
+                            </div>
+                        `;
+
+                        // Lo insertamos dentro de la tarjeta expandida
+                        card.appendChild(ExpandingTarget);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error al traer negocios en Juanfax:", error);
+                    const tempLoading = card.querySelector(".loading-text");
+                    if (tempLoading) tempLoading.remove();
+                });
+
+        } else {
+            // Tu lógica de cierre existente: remueve todos los elementos generados de golpe
+            const removeTargets = card.querySelectorAll(".targets-expanding");
+            removeTargets.forEach(target => {
+                target.remove();
+            });
         }
     });
 });
