@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../estilos/css/administrador.css">
+    <!-- Basic Icons -->
+    <link href="https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css" rel="stylesheet">
+    <!-- Filled Icons -->
+    <link href="https://cdn.boxicons.com/3.0.8/fonts/filled/boxicons-filled.min.css" rel="stylesheet">
+    <!-- Brand Icons -->
+    <link href="https://cdn.boxicons.com/3.0.8/fonts/brands/boxicons-brands.min.css" rel="stylesheet">
+</head>
+<body>
+    <section class="movile" id="movile">
+
+        <!-- Header -->
+        <header class="headerMovil" id="headerMovil">
+            <!-- Titulo -->
+            <div class="titulo" id="titulo">
+                <h1>JUANFAX</h1>
+            </div>
+
+            <!-- Perfil Y Notificaciones -->
+            <div class="perfil_y_notificaciones" id="perfil_y_notificaciones">
+                <!-- Notificaciones -->
+                <i class="bx bx-bell"></i>
+                <!-- Perfil -->
+                <div class="profile" id="profile"><p>JD</p></div>
+            </div>
+        </header>
+        <!-- main -->
+        <main class="main_movile" id="main_movile">
+            <div class="AccionesRapidas" id="AccionesRapidas">
+                <div class="contenedorAccionesRapidas contenedorAccionesRapidasFocus" id="contenedorAccionesRapidas">
+                    <i class="bx bx-user-check"></i>
+                    <p>Revisar solicitudes</p>
+                    <h3>Pendientes</h3>
+                </div>
+                <div class="contenedorAccionesRapidas" id="contenedorAccionesRapidas">
+                    <i class="bx bx-arrow-out-down-square-half"></i>
+                    <p>Importar datos</p>
+                    <h3>Carga masiva</h3>
+                </div>
+                <div class="contenedorAccionesRapidas" id="contenedorAccionesRapidas">
+                    <i class="bx bx-check-shield"></i>
+                    <p>Auditoria</p>
+                    <h3>Ver registros</h3>
+                </div>
+                <div class="contenedorAccionesRapidas" id="contenedorAccionesRapidas">
+                    <i class="bx bx-group"></i>
+                    <p>Usuarios</p>
+                    <h3>Gestionar Usuarios</h3>
+                </div>
+            </div>
+            <div class="alertasMovil">
+                <h2>ALERTAS PRIORITARIAS</h2>
+                <div class="alert"></div>
+                <div class="alert"></div>
+                <div class="alert"></div>
+            </div>
+            <div class="solicitudes" id="solicitudes">
+                <h2>SOLICITUDES RECIENTES</h2>
+                <div class="solicitud">
+                    <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ullam architecto facilis, quaerat molestiae mollitia alias natus doloremque quibusdam! Itaque ullam omnis assumenda, error eum dolorem nihil rem officiis commodi odio.</p>
+                    <div class="botonesSolicitud" id="botonesSolicitud">
+                        <button class="BttSolicitud aprobar"></button>
+                        <button class="BttSolicitud rechasar"></button>
+                    </div>
+                </div>
+            </div>
+            <div class="estadisticas" id="estadisticas">
+                <div class="estats negocios"></div>
+                <div class="estats pendientes"></div>
+                <div class="estats bloqueados"></div>
+            </div>
+        </main>
+        <footer class="footer" id="footer">
+            <i class="bx BttNavMovil bx-layout-minus BttNavMovilFocus"></i>
+            <i class="bx BttNavMovil bx-bar-chart-big"></i>
+            <i class="bx BttNavMovil bx-store"></i>
+            <i class="bx BttNavMovil bx-credit-card-alt"></i>
+            <i class="bx BttNavMovil bx-user"></i>
+        </footer>
+    </section>
+
+    <secction class="Desktop" id="Desktop">
+        
+        <header class="header" id="header">
+            <div class="titulo" id="titulo">
+                <h1>JUANFAX</h1>
+            </div>
+            <div class="perfil_y_notificaciones" id="perfil_y_notificaciones">
+                <i class="bx bx-bell"></i>
+                <div class="profile" id="profile"><p>JD</p></div>
+            </div>
+        </header>
+        <main class="main" id="main">
+            <aside class="sideBaar" id="sideBaar">
+                <div class="MiNegocio" id="MiNegocio">
+                    <h2>Mi Negocio</h2>
+                    <div class="botones botonesFocus">
+                        <p class="BttnSideBaar">Plan Ejecutivo</p>
+                    </div>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Estadisticas</p>
+                    </div>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Perfil Negocio</p>
+                    </div>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Suscripcion</p>
+                    </div>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Calficaciones</p>
+                    </div>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Facturas</p>
+                    </div>
+                </div>
+                <div class="Cuenta" id="Cuenta">
+                    <h2>Cuenta</h2>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Configuracion</p>
+                    </div>
+                    <div class="botones">
+                        <p class="BttnSideBaar">Soporte</p>
+                    </div>
+                </div>
+            </aside>
+            <section class="informacionNegocio" id="informacionNegocio">
+                <div class="estadisticas" id="estadisticas">
+                    <div class="estads"></div>
+                    <div class="estads"></div>
+                    <div class="estads"></div>
+                    <div class="estads"></div>
+                </div>
+                <div class="Solicitudes_y_Alertas" id="Solicitudes_y_Alertas">
+                    <div class="Solicitudes" id="Solicitudes"></div>
+                    <div class="Alertas" id="Alertas"></div>
+                </div>
+                <div class="Importacion_Masiva_De_Datos" id="Importacion_Masiva_De_Datos">
+                    
+                </div>
+                <div class="GestionDeNegocios" id="GestionDeNegocios">
+                    
+                </div>
+            </section>
+        </main>
+    </secction>
+    <script src="../scripts/botones.js"></script>
+</body>
+</html>
