@@ -18,38 +18,73 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet("/LoginServlet")
+@WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet"})
 public class LoginServlet extends HttpServlet {
 
-    // Método GET: Ideal para que el JS consulte datos de manera limpia
+    /**
+     * Procesa las peticiones GET (Consultas AJAX de Juanfax)
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        request.setCharacterEncoding("UTF-8");
         String accion = request.getParameter("accion");
 
-        // SI EL JAVASCRIPT SOLICITA EL CARRUSEL
+        // Imprime en la consola de NetBeans para diagnóstico básico
+        System.out.println("👉 ACCION DETECTADA EN GET: [" + accion + "]");
+
+        // ====================================================================
+        // ACCIÓN A: EXPANDING CARDS - FILTRAR NEGOCIOS POR CATEGORÍA
+        // ====================================================================
+        if ("negociosPorCategoria".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            String categoria = request.getParameter("categoria");
+            NegocioDao negocioDao = new NegocioDao();
+            List<NegocioDTO> lista = negocioDao.obtenerNegociosPorCategoria(categoria);
+
+            StringBuilder json = new StringBuilder();
+            json.append("[");
+            for (int i = 0; i < lista.size(); i++) {
+                NegocioDTO n = lista.get(i);
+                json.append("{");
+                json.append("\"nombreEstablecimiento\":\"").append(escapeJson(n.getNombreEstablecimiento())).append("\",");
+                json.append("\"urlImagen\":\"").append(escapeJson(n.getUrl_imagen())).append("\"");
+                json.append("}");
+                if (i < lista.size() - 1) json.append(",");
+            }
+            json.append("]");
+
+            try (PrintWriter out = response.getWriter()) {
+                out.print(json.toString());
+                out.flush();
+            }
+            return; // Corta el flujo
+        }
+
+        // ====================================================================
+        // ACCIÓN B: CARRUSEL HERO TRADICIONAL
+        // ====================================================================
         if ("carrusel".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 
             try (PrintWriter out = response.getWriter()) {
                 NegocioDao negocioDao = new NegocioDao();
-                // Llamamos a tu método del DAO que saca los 3 destinos con mayor promedio
                 List<NegocioDTO> lista = negocioDao.obtenerDestinosDestacados();
 
-                // 🔍 LÍNEA DE DIAGNÓSTICO 1: Ver cuántos datos trae la lista en Java
                 System.out.println("====== DIAGNÓSTICO JUANFAX ======");
                 System.out.println("Cantidad de negocios traídos de la BD: " + lista.size());
                 
-                // Construimos el JSON manualmente paso a paso
                 StringBuilder json = new StringBuilder();
                 json.append("[");
                 for (int i = 0; i < lista.size(); i++) {
                     NegocioDTO n = lista.get(i);
                     json.append("{");
-                    json.append("\"nombreEstablecimiento\":\"").append(n.getNombreEstablecimiento()).append("\",");
-                    json.append("\"urlImagen\":\"").append(n.getUrl_imagen()).append("\"");
+                    json.append("\"nombreEstablecimiento\":\"").append(escapeJson(n.getNombreEstablecimiento())).append("\",");
+                    json.append("\"urlImagen\":\"").append(escapeJson(n.getUrl_imagen())).append("\"");
                     json.append("}");
                     if (i < lista.size() - 1) {
                         json.append(",");
@@ -63,34 +98,36 @@ public class LoginServlet extends HttpServlet {
                 e.printStackTrace();
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
-            return; // Detiene el flujo para que no intente ejecutar lógica de login
+            return; // Corta el flujo
         }
 
-        // Si entran al GET por otra razón, puedes redirigir al login index
+        // Si entran al GET sin una acción válida de AJAX, lo mandamos al index de seguridad
         response.sendRedirect("index.html"); 
     }
         
+    /**
+     * Procesa las peticiones POST (Formulario de Login)
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            
             throws ServletException, IOException {
 
-        // Capturar los parámetros enviados por el formulario usando los atributos 'name' u obtenidos por Fetch
+        request.setCharacterEncoding("UTF-8");
         String correo = request.getParameter("correo_electronico");
         String contrasena = request.getParameter("txtPass");
         
         System.out.println("Intentando login con: " + correo + " y pass: " + contrasena);
         
         String sql = "SELECT u.id_usuario, u.nombre_completo, u.estado, r.nombre_rol " +
-                "FROM usuarios u " +
-                "INNER JOIN roles r ON u.id_rol = r.id_rol " +
-                "WHERE u.correo_electronico = ? AND u.contrasena = ?";
+                     "FROM usuarios u " +
+                     "INNER JOIN roles r ON u.id_rol = r.id_rol " +
+                     "WHERE u.correo_electronico = ? AND u.contrasena = ?";
 
         try (Connection con = Conection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, correo);
-            ps.setString(2, contrasena); // Nota: En producción aplica Hash (BCrypt) aquí.
+            ps.setString(2, contrasena);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -108,7 +145,7 @@ public class LoginServlet extends HttpServlet {
                     String rol = rs.getString("nombre_rol").toUpperCase();
                     session.setAttribute("rol", rol);
 
-                    // Redirección en el Servidor según tu árbol de vistas
+                    // Redirección por Roles
                     switch (rol) {
                         case "ADMINISTRADOR":
                             response.sendRedirect("vistas/mainAdministrador.html");
@@ -121,7 +158,6 @@ public class LoginServlet extends HttpServlet {
                             break;
                     }
                 } else {
-                    // Credenciales incorrectas
                     response.sendRedirect("index.html?error=InvalidCredentials");
                 }
             }
@@ -129,5 +165,21 @@ public class LoginServlet extends HttpServlet {
             System.err.println("Error en LoginServlet: " + e.getMessage());
             response.sendRedirect("index.html?error=ServerError");
         }
+    }
+
+    /**
+     * Función auxiliar para sanitizar el JSON manual
+     */
+    private String escapeJson(String valor) {
+        if (valor == null) {
+            return "";
+        }
+        return valor.replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\b", "\\b")
+                    .replace("\f", "\\f")
+                    .replace("\n", "\\n")
+                    .replace("\r", "\\r")
+                    .replace("\t", "\\t");
     }
 }
