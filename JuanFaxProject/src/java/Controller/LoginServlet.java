@@ -27,12 +27,12 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         request.setCharacterEncoding("UTF-8");
         String accion = request.getParameter("accion");
 
         // Imprime en la consola de NetBeans para diagnóstico básico
-        System.out.println("👉 ACCION DETECTADA EN GET: [" + accion + "]");
+        System.out.println(" ACCION DETECTADA EN GET: [" + accion + "]");
 
         // ====================================================================
         // ACCIÓN A: EXPANDING CARDS - FILTRAR NEGOCIOS POR CATEGORÍA
@@ -61,13 +61,46 @@ public class LoginServlet extends HttpServlet {
                 out.print(json.toString());
                 out.flush();
             }
-            return; // Corta el flujo
-        }
+            return; // Corta el flujo de inmediato
+        } 
+        // ====================================================================
+        // ACCIÓN B: OBTENER UN ÚNICO NEGOCIO CON SUS COORDENADAS
+        // ====================================================================
+        else if ("detalleNegocioUnico".equals(accion)) {
+            String nombreNegocio = request.getParameter("nombre");
+            System.out.println("-> Ejecutando detalleNegocioUnico para: " + nombreNegocio);
 
+            NegocioDao negocioDAO = new NegocioDao(); 
+            NegocioDTO negocio = negocioDAO.obtenerNegocioPorNombre(nombreNegocio);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            if (negocio != null) {
+                String json = "{"
+                        + "\"nombreEstablecimiento\":\"" + escapeJson(negocio.getNombreEstablecimiento()) + "\","
+                        + "\"descripcion\":\"" + escapeJson(negocio.getDescripcion()) + "\","
+                        + "\"urlImagen\":\"" + escapeJson(negocio.getUrl_imagen()) + "\","
+                        + "\"latitud\":" + negocio.getLatitud() + ","
+                        + "\"longitud\":" + negocio.getLongitud()
+                        + "}";
+
+                try (PrintWriter out = response.getWriter()) {
+                    out.print(json);
+                    out.flush();
+                }
+            } else {
+                try (PrintWriter out = response.getWriter()) {
+                    out.print("{\"error\": \"El negocio no fue encontrado en Juanfax\"}");
+                    out.flush();
+                }
+            }
+            return; // Corta el flujo de inmediato
+        }
         // ====================================================================
-        // ACCIÓN B: CARRUSEL HERO TRADICIONAL
+        // ACCIÓN C: CARRUSEL HERO TRADICIONAL
         // ====================================================================
-        if ("carrusel".equals(accion)) {
+        else if ("carrusel".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 
@@ -77,7 +110,7 @@ public class LoginServlet extends HttpServlet {
 
                 System.out.println("====== DIAGNÓSTICO JUANFAX ======");
                 System.out.println("Cantidad de negocios traídos de la BD: " + lista.size());
-                
+
                 StringBuilder json = new StringBuilder();
                 json.append("[");
                 for (int i = 0; i < lista.size(); i++) {
@@ -98,11 +131,15 @@ public class LoginServlet extends HttpServlet {
                 e.printStackTrace();
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
-            return; // Corta el flujo
+            return; // Corta el flujo de inmediato
         }
-
-        // Si entran al GET sin una acción válida de AJAX, lo mandamos al index de seguridad
-        response.sendRedirect("index.html"); 
+        // ====================================================================
+        // PROTECCIÓN DE SEGURIDAD GENERAL
+        // ====================================================================
+        else {
+            System.out.println("⚠️ Alerta: Se detectó una petición GET sin acción AJAX válida. Redirigiendo...");
+            response.sendRedirect("index.html"); 
+        }
     }
         
     /**

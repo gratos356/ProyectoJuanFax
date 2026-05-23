@@ -9,6 +9,8 @@ public class NegocioDTO {
     private String direccionTexto;
     private String barrio;
     private double calificacionPromedio;
+    private double latitud;
+    private double longitud;
 
     public NegocioDTO() {}
 
@@ -94,6 +96,23 @@ public class NegocioDTO {
         this.calificacionPromedio = calificacionPromedio;
     }
 
+    public double getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(double latitud) {
+        this.latitud = latitud;
+    }
+
+    public double getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(double longitud) {
+        this.longitud = longitud;
+    }
+    
+    
     
     
 }

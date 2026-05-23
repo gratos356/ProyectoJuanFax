@@ -453,7 +453,21 @@ html{
             /* background-color: rebeccapurple;  */
             margin-bottom: 5%; 
             box-shadow:var(--ColorBotonesDeAccionDorado) 0 0 12px;
+            background: linear-gradient(rgba(3, 12, 26, 0), rgba(3, 12, 26, 0));
         } 
+        .contenido-interno-hero{
+            padding: 20px; 
+            text-align: center; 
+            pointer-events: none;
+        }
+        .hero-title{
+            color: var(--ColorBotonesDeAccionDorado); 
+            font-family: var(--Fuente-General); 
+            font-size: 1.1rem; 
+            text-transform: uppercase; 
+            margin: 0; 
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+        }
         /* _________________ */
         /*    SECCIONES      */
         /* _________________ */
