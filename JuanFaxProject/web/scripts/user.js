@@ -4,10 +4,12 @@ const expandingCards = document.querySelectorAll(".expanding-card")
 let destinos = [];
 let indiceBase = 0;
 
-// 1. SOLICITAR LOS DATOS REALES AL SERVLET DE LOGIN
+// ====================================================================
+// 1. SOLICITAR LOS DATOS REALES AL SERVLET DE LOGIN (HERO)
+// ====================================================================
 async function cargarDatosHero() {
     try {
-        // Le pegamos al servlet que sí funciona pasándole el parámetro ?accion=carrusel
+        // Le pegamos al servlet pasándole el parámetro ?accion=carrusel
         const respuesta = await fetch('../LoginServlet?accion=carrusel'); 
         
         if (!respuesta.ok) {
@@ -29,7 +31,9 @@ async function cargarDatosHero() {
     }
 }
 
+// ====================================================================
 // 2. RENDERIZAR Y ROTAR LAS 5 CAJAS SIMULTÁNEAMENTE
+// ====================================================================
 function renderizarCarruselHero() {
     const cajas = document.querySelectorAll("#HeroContent .banner-hero");
     
@@ -39,18 +43,15 @@ function renderizarCarruselHero() {
         const indiceDato = (indiceBase + posicionFisica) % destinos.length;
         const destino = destinos[indiceDato];
         
-        // 🌟 VALIDACIÓN INTELIGENTE DE RUTA
+        // VALIDACIÓN INTELIGENTE DE RUTA DE IMAGEN
         let rutaFinalImagen = "";
-        
         if (destino.urlImagen.startsWith("http://") || destino.urlImagen.startsWith("https://")) {
-            // Si viene de Google o internet, usamos la URL tal cual
             rutaFinalImagen = destino.urlImagen;
         } else {
-            // Si es una imagen local que guardaste en el proyecto
             rutaFinalImagen = `../imagenes/${destino.urlImagen}`;
         }
         
-        // Inyectamos el estilo visual con la ruta corregida
+        // Inyectamos el fondo con la ruta corregida
         caja.style.backgroundImage = `linear-gradient(rgba(3, 12, 26, 0.65), rgba(3, 12, 26, 0.85)), url('${rutaFinalImagen}')`;
         caja.style.backgroundSize = "cover";
         caja.style.backgroundPosition = "center";
@@ -58,37 +59,47 @@ function renderizarCarruselHero() {
 
         // Cambiamos el texto dinámicamente
         caja.innerHTML = `
-            <div class="contenido-interno-hero" style="padding: 20px; text-align: center; pointer-events: none;">
-                <h3 style="color: var(--ColorBotonesDeAccionDorado); font-family: var(--Fuente-General); font-size: 1.1rem; text-transform: uppercase; margin: 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.9);">
+            <div class="contenido-interno-hero">
+                <h3 class="hero-title">
                     ${destino.nombreEstablecimiento}
                 </h3>
             </div>
         `;
+
+        // REDIRECCIÓN DIRECTA AL HACER CLIC EN UNA TARJETA DEL HERO
+        caja.onclick = () => {
+            window.location.href = `usuarioInformacionNegocio.html?nombre=${encodeURIComponent(destino.nombreEstablecimiento)}`;
+        };
     });
 }
 
-// 3. MOVIMIENTO DE LOS BOTONES
+// ====================================================================
+// 3. MOVIMIENTO DE LOS BOTONES DEL HERO
+// ====================================================================
 function moverDerecha() {
     if (destinos.length === 0) return;
     indiceBase = (indiceBase + 1) % destinos.length;
     renderizarCarruselHero();
 }
 
-// Sumamos el tamaño del arreglo para evitar que dé números negativos al ir hacia atrás
 function moverIzquierda() {
     if (destinos.length === 0) return;
     indiceBase = (indiceBase - 1 + destinos.length) % destinos.length;
     renderizarCarruselHero();
 }
 
-// 4. AUTOMATIZACIÓN (Cambio de imágenes automático cada 5 segundos)
+// ====================================================================
+// 4. AUTOMATIZACIÓN DEL HERO (Autoplay)
+// ====================================================================
 let autoplayTimer;
 function iniciarAutoplay() {
     clearInterval(autoplayTimer);
     autoplayTimer = setInterval(moverDerecha, 5000);
 }
 
+// ====================================================================
 // 5. INICIALIZADOR AL CARGAR LA PÁGINA
+// ====================================================================
 document.addEventListener("DOMContentLoaded", () => {
     // Disparamos la lectura a la base de datos
     cargarDatosHero();
@@ -100,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnIzquierda) {
         btnIzquierda.addEventListener("click", () => {
             moverIzquierda();
-            iniciarAutoplay(); // Resetea el tiempo para una mejor experiencia de usuario
+            iniciarAutoplay(); 
         });
     }
 
@@ -112,17 +123,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-
+// ====================================================================
+// 6. LÓGICA DE TARJETAS EXPANDIBLES (EXPANDING CARDS)
+// ====================================================================
 expandingCards.forEach((card) => {
     card.addEventListener("click", () => {
         const isExpanded = card.classList.toggle("cardExpandida");
-        //remover titulos cuando se expanda la card
+        
+        // Remover títulos cuando se expanda la card
         const titulo = card.querySelector(".titulos");
-        titulo.classList.toggle("titulosDisable", isExpanded);
+        if (titulo) titulo.classList.toggle("titulosDisable", isExpanded);
 
         if (isExpanded) {
-            // 1. Obtenemos el nombre de la categoría asignada a esta tarjeta
-            // Si tus tarjetas tienen un título h2 con el nombre (ej: "Restaurantes"), lo extraemos así:
+            // Obtenemos el nombre de la categoría asignada a esta tarjeta
             const nombreCategoria = card.querySelector("h2") ? card.querySelector("h2").innerText.trim() : "";
             
             // Añadimos un mensaje temporal mientras carga
@@ -132,7 +145,7 @@ expandingCards.forEach((card) => {
             cargando.style.color = "#fff";
             card.appendChild(cargando);
 
-            // 2. Hacemos la petición en vivo a tu LoginServlet pasándole la categoría
+            // Hacemos la petición en vivo a tu LoginServlet pasándole la categoría
             fetch(`../LoginServlet?accion=negociosPorCategoria&categoria=${encodeURIComponent(nombreCategoria)}`)
                 .then(response => response.json())
                 .then(negocios => {
@@ -148,15 +161,15 @@ expandingCards.forEach((card) => {
                         return;
                     }
 
-                    // 3. Reemplazamos el bucle fijo por la cantidad de negocios reales de la BD
+                    // Recorremos los negocios devueltos por el Servlet
                     negocios.forEach(neg => {
                         const ExpandingTarget = document.createElement("div");
                         ExpandingTarget.classList.add("targets-expanding");
 
-                        // Validamos la ruta de la foto de forma inteligente (local o Google)
+                        // Validamos si la imagen es local o externa
                         let fotoFinal = neg.urlImagen.startsWith("http") ? neg.urlImagen : `../imagenes/${neg.urlImagen}`;
 
-                        // Estructura interna elegante para cada negocio inyectado en la tarjeta
+                        // Tu estructura HTML original intacta sin estilos incrustados
                         ExpandingTarget.innerHTML = `
                             <div class="content-expanding-cards">
                                 <img src="${fotoFinal}" class="imagen-expanding-card">
@@ -164,7 +177,19 @@ expandingCards.forEach((card) => {
                             </div>
                         `;
 
-                        // Lo insertamos dentro de la tarjeta expandida
+                        // 🌟 ¡AQUÍ ESTÁ EL EVENTO QUE HACÍA FALTA! 🌟
+                        // Escuchamos el clic en la sub-tarjeta que acabamos de crear
+                        ExpandingTarget.addEventListener("click", (e) => {
+                            // Detiene la propagación para que no se cierre la tarjeta grande al hacer clic adentro
+                            e.stopPropagation(); 
+                            
+                            console.log("Redirigiendo al negocio:", neg.nombreEstablecimiento);
+                            
+                            // Redirecciona pasándole el nombre del establecimiento por parámetro URL
+                            window.location.href = `usuarioInformacionNegocio.html?nombre=${encodeURIComponent(neg.nombreEstablecimiento)}`;
+                        });
+
+                        // Insertamos el nodo hijo en la tarjeta grande
                         card.appendChild(ExpandingTarget);
                     });
                 })
@@ -175,7 +200,7 @@ expandingCards.forEach((card) => {
                 });
 
         } else {
-            // Tu lógica de cierre existente: remueve todos los elementos generados de golpe
+            // Remueve todos los elementos generados al contraerse la tarjeta
             const removeTargets = card.querySelectorAll(".targets-expanding");
             removeTargets.forEach(target => {
                 target.remove();

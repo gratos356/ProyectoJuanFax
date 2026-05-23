@@ -1,0 +1,107 @@
+@import url("../customProperties/CustomProperties.css");
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: var(--Fuente-General);
+}
+
+body {
+    background-color: var(--FondoPrincipal);
+    color: var(--ColorLetra);
+    display: grid;
+    height: 100vh;
+    grid-template-rows: 1fr 3fr 1fr;
+    grid-template-areas:
+    "header"
+    "principal"
+    "footer"
+    ;
+}
+.headerContainer{
+    display: grid;
+    grid-area: header;
+    background-color: var(--FondoSecundario);
+    grid-template-columns: 1fr 3fr;
+    grid-template-areas:
+    "logo nav";
+    border-bottom: 1px solid var(--ColorCards);
+}
+.logo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url(../imagenes/Gemini_Generated_Image_fm1x4lfm1x4lfm1x-removebg-preview\ 1.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    grid-area: logo;
+}
+.navContainer{
+    display: flex;
+    justify-content: flex-end;
+    background-color: red;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    grid-area: nav;
+}
+.back{
+    background-color: black;
+    margin-right: 20px;
+    height: 40px;
+    width: 40px;
+}
+
+.principalContainer{
+    display: grid;
+    grid-area: principal;;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 2fr 1fr 1fr 1fr;
+    grid-template-areas:
+    "imagenNegocio showMap"
+    "imagenNegocio showMap"
+    "nombreNegocio showMap"
+    "descripcionNegocio showMap"
+}
+.imagenNegocio{
+    grid-area: imagenNegocio;
+    border:1px solid var(--ColorCards);
+    height: 100%;
+    width: 100%;
+    /* background-size: contain;
+    background-repeat: no-repeat; */
+}
+.contenedorImagen{
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+
+}
+
+.nombreNegocio{
+    grid-area: nombreNegocio;
+    border:1px solid var(--ColorCards);
+}
+.descripcionNegocio{
+    grid-area: descripcionNegocio;
+    border:1px solid var(--ColorCards);
+}
+.showMap{
+    grid-area: showMap;
+    border:1px solid var(--ColorCards);
+    background-color:green;
+    height: 100%;
+    width: 100%;
+}
+
+.footerContainer{
+    display: flex;
+    grid-area: footer;
+    background-color: var(--FondoSecundario);
+    border-top: 1px solid var(--ColorCards);
+}

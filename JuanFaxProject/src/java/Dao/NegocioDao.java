@@ -22,7 +22,7 @@ public class NegocioDao {
                 NegocioDTO n = new NegocioDTO();
                 n.setNombreEstablecimiento(rs.getString("nombre_establecimiento"));
 
-                // Leemos url_imagen tal cual se llama ahora en tu tabla modificada
+                // Leemos url_imagen 
                 String foto = rs.getString("url_imagen");
                 n.setUrl_imagen(foto != null ? foto : "defecto.jpg"); 
 
@@ -62,5 +62,51 @@ public class NegocioDao {
             e.printStackTrace();
         }
         return lista;
+    }
+    
+    public NegocioDTO obtenerNegocioPorNombre(String nombreBuscar) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        NegocioDTO negocio = null;
+
+        // Tu consulta con el INNER JOIN amarrando la ubicación por id_negocio
+        String sql = "SELECT n.id_negocio, n.nombre_establecimiento, n.descripcion, "
+                           + "i.url_imagen, u.latitud, u.longitud, u.direccion_texto "
+                           + "FROM negocios n "
+                           + "LEFT JOIN imagenes i ON n.id_negocio = i.id_negocio "
+                           + "LEFT JOIN puntos_ubicacion u ON n.id_negocio = u.id_negocio "
+                           + "WHERE n.nombre_establecimiento = ?";
+
+        try {
+            // Reemplaza 'Conexion.getConnection()' por tu método real de conectar a MySQL
+            con = Conection.getConnection(); 
+            ps = con.prepareStatement(sql);
+            ps.setString(1, nombreBuscar);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                negocio = new NegocioDTO();
+                negocio.setIdNegocio(rs.getInt("id_negocio"));
+                negocio.setNombreEstablecimiento(rs.getString("nombre_establecimiento"));
+                negocio.setDescripcion(rs.getString("descripcion"));
+                negocio.setUrl_imagen(rs.getString("url_imagen"));
+
+                // 🌟 CAPTURAMOS LAS COORDENADAS REALES DE LA BASE DE DATOS
+                negocio.setLatitud(rs.getDouble("latitud"));
+                negocio.setLongitud(rs.getDouble("longitud"));
+                // Opcional por si necesitas pintar la dirección en texto en la vista
+                negocio.setDireccionTexto(rs.getString("direccion_texto")); 
+            }
+        } catch (Exception e) {
+            System.out.println("Error al obtener detalles geográficos en Juanfax: " + e.getMessage());
+        } finally {
+            // Buenas prácticas de ADSO: Cerrar flujos para evitar saturar la BD
+            try { if (rs != null) rs.close(); } catch (Exception e) {}
+            try { if (ps != null) ps.close(); } catch (Exception e) {}
+            try { if (con != null) con.close(); } catch (Exception e) {}
+        }
+
+        return negocio;
     }
 }
