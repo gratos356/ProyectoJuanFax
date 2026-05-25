@@ -14,10 +14,11 @@ body {
     color: var(--ColorLetra);
     display: grid;
     height: 100vh;
-    grid-template-rows: 1fr 3fr 1fr;
+    grid-template-rows: 10% 80% 40% 10%;
     grid-template-areas:
     "header"
     "principal"
+    "listaComentarios"
     "footer"
     ;
 }
@@ -42,24 +43,25 @@ body {
 .navContainer{
     display: flex;
     justify-content: flex-end;
-    background-color: red;
+    /* background-color: red; */
     align-items: center;
     width: 100%;
     height: 100%;
     grid-area: nav;
 }
 .back{
-    background-color: black;
+    background-color: transparent;
     margin-right: 20px;
     height: 40px;
     width: 40px;
+    color: white;
 }
 
 .principalContainer{
     display: grid;
     grid-area: principal;;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 2fr 1fr 1fr 1fr;
+    grid-template-rows: 50% 25% 1fr 1fr;
     grid-template-areas:
     "imagenNegocio showMap"
     "imagenNegocio showMap"
@@ -94,13 +96,83 @@ body {
 .showMap{
     grid-area: showMap;
     border:1px solid var(--ColorCards);
-    background-color:green;
+    /* background-color:green; */
     height: 100%;
     width: 100%;
 }
+/* .listaComentarios{
+} */
+
+.comentariosContainer {
+    grid-area: listaComentarios;
+    /* max-width: 1200px; */
+    display: flex;
+    /* align-items: center; */
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-color: transparent transparent  ;
+    border-radius: 8px;
+    color: #ffffff;
+}
+
+.comentariosContainer h2 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    border-bottom: 2px solid var(--FondoSecundario);
+    padding-bottom: 10px;
+}
+
+.formComentario .inputComentarios {
+    width: 100%;
+    height: 100px;
+    background-color: var(--FondoSecundario);
+    border: 1px solid var(--ColorCards);
+    border-radius: 6px;
+    color: white;
+    padding: 10px;
+    resize: none;
+    margin-bottom: 10px;
+}
+
+.formComentario button {
+    background-color: #3b82f6; /* Azul llamativo */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.formComentario button:hover {
+    background-color: #2563eb;
+} 
+
+.listaComentarios {
+    margin-top: 30px;
+}
+
+.comentarioCard {
+    background-color: var(--FondoSecundario);
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    border-left: 4px solid var(--ColorCards);
+}
+
+.usuarioNombre {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin-bottom: 5px;
+}
+
+.fecha {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-left: 10px;
+}
 
 .footerContainer{
-    display: flex;
     grid-area: footer;
     background-color: var(--FondoSecundario);
     border-top: 1px solid var(--ColorCards);

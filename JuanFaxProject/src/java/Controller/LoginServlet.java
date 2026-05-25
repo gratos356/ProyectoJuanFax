@@ -5,7 +5,7 @@ import Model.NegocioDTO;
 import java.io.PrintWriter;
 import java.util.List;
 
-import Config.Conection;
+import Config.conection;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,10 +28,10 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // 🌟 REGLA DE ORO: Forzamos UTF-8 al inicio para que no rompa tildes como en "Café Central Girón"
         request.setCharacterEncoding("UTF-8");
         String accion = request.getParameter("accion");
 
-        // Imprime en la consola de NetBeans para diagnóstico básico
         System.out.println(" ACCION DETECTADA EN GET: [" + accion + "]");
 
         // ====================================================================
@@ -61,10 +61,11 @@ public class LoginServlet extends HttpServlet {
                 out.print(json.toString());
                 out.flush();
             }
-            return; // Corta el flujo de inmediato
+            return;
         } 
+        
         // ====================================================================
-        // ACCIÓN B: OBTENER UN ÚNICO NEGOCIO CON SUS COORDENADAS
+        // ACCIÓN B: DETALLE DE NEGOCIO ÚNICO
         // ====================================================================
         else if ("detalleNegocioUnico".equals(accion)) {
             String nombreNegocio = request.getParameter("nombre");
@@ -77,7 +78,9 @@ public class LoginServlet extends HttpServlet {
             response.setCharacterEncoding("UTF-8");
 
             if (negocio != null) {
+                // 🌟 CORREGIDO: Añadimos \"idNegocio\" al JSON para que el JS sepa qué establecimiento es
                 String json = "{"
+                        + "\"idNegocio\":" + negocio.getIdNegocio() + ","
                         + "\"nombreEstablecimiento\":\"" + escapeJson(negocio.getNombreEstablecimiento()) + "\","
                         + "\"descripcion\":\"" + escapeJson(negocio.getDescripcion()) + "\","
                         + "\"urlImagen\":\"" + escapeJson(negocio.getUrl_imagen()) + "\","
@@ -95,10 +98,11 @@ public class LoginServlet extends HttpServlet {
                     out.flush();
                 }
             }
-            return; // Corta el flujo de inmediato
+            return;
         }
+        
         // ====================================================================
-        // ACCIÓN C: CARRUSEL HERO TRADICIONAL
+        // ACCIÓN C: CARRUSEL DESTACADOS
         // ====================================================================
         else if ("carrusel".equals(accion)) {
             response.setContentType("application/json");
@@ -108,9 +112,6 @@ public class LoginServlet extends HttpServlet {
                 NegocioDao negocioDao = new NegocioDao();
                 List<NegocioDTO> lista = negocioDao.obtenerDestinosDestacados();
 
-                System.out.println("====== DIAGNÓSTICO JUANFAX ======");
-                System.out.println("Cantidad de negocios traídos de la BD: " + lista.size());
-
                 StringBuilder json = new StringBuilder();
                 json.append("[");
                 for (int i = 0; i < lista.size(); i++) {
@@ -119,9 +120,7 @@ public class LoginServlet extends HttpServlet {
                     json.append("\"nombreEstablecimiento\":\"").append(escapeJson(n.getNombreEstablecimiento())).append("\",");
                     json.append("\"urlImagen\":\"").append(escapeJson(n.getUrl_imagen())).append("\"");
                     json.append("}");
-                    if (i < lista.size() - 1) {
-                        json.append(",");
-                    }
+                    if (i < lista.size() - 1) json.append(",");
                 }
                 json.append("]");
 
@@ -131,11 +130,53 @@ public class LoginServlet extends HttpServlet {
                 e.printStackTrace();
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
-            return; // Corta el flujo de inmediato
+            return;
         }
+        
         // ====================================================================
-        // PROTECCIÓN DE SEGURIDAD GENERAL
+        // ACCIÓN D: LISTAR COMENTARIOS DESDE LA BD
         // ====================================================================
+        else if ("listarComentarios".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            String idNegocioStr = request.getParameter("idNegocio");
+            
+            if (idNegocioStr != null && !idNegocioStr.isEmpty()) {
+                int idNegocio = Integer.parseInt(idNegocioStr);
+                Dao.ComentarioDao comentarioDao = new Dao.ComentarioDao();
+                List<Model.ComentarioDTO> lista = comentarioDao.obtenerComentariosPorNegocio(idNegocio);
+
+                StringBuilder json = new StringBuilder();
+                json.append("[");
+                for (int i = 0; i < lista.size(); i++) {
+                    Model.ComentarioDTO c = lista.get(i);
+                    
+                    // Formateamos la fecha de forma amigable (dd/MM/yyyy)
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                    String fechaFormateada = c.getFechaPublicacion() != null ? sdf.format(c.getFechaPublicacion()) : "";
+
+                    json.append("{");
+                    json.append("\"nombreUsuario\":\"").append(escapeJson(c.getNombreUsuario())).append("\",");
+                    json.append("\"textoComentario\":\"").append(escapeJson(c.getTextoComentario())).append("\",");
+                    json.append("\"fecha\":\"").append(fechaFormateada).append("\"");
+                    json.append("}");
+                    if (i < lista.size() - 1) json.append(",");
+                }
+                json.append("]");
+
+                try (PrintWriter out = response.getWriter()) {
+                    out.print(json.toString());
+                    out.flush();
+                }
+            } else {
+                try (PrintWriter out = response.getWriter()) {
+                    out.print("[]");
+                    out.flush();
+                }
+            }
+            return; 
+        }
         else {
             System.out.println("⚠️ Alerta: Se detectó una petición GET sin acción AJAX válida. Redirigiendo...");
             response.sendRedirect("index.html"); 
@@ -143,13 +184,115 @@ public class LoginServlet extends HttpServlet {
     }
         
     /**
-     * Procesa las peticiones POST (Formulario de Login)
+     * Procesa las peticiones POST (Formulario de Login y Guardado)
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        String accion = request.getParameter("accion");
+
+        // ====================================================================
+        // ACCIÓN E: GUARDAR COMENTARIOS
+        // ====================================================================
+        if ("guardarComentario".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("idUsuario") == null) {
+                response.getWriter().print("{\"status\":\"error\", \"message\":\"Debes iniciar sesión para comentar.\"}");
+                return;
+            }
+
+            int idUsuario = (int) session.getAttribute("idUsuario");
+            int idNegocio = Integer.parseInt(request.getParameter("idNegocio"));
+            
+            // 🌟 CORREGIDO: Macheamos con "textoComentario" que es el que manda tu JS
+            String texto = request.getParameter("textoComentario"); 
+
+            Model.ComentarioDTO nuevoComentario = new Model.ComentarioDTO();
+            nuevoComentario.setIdNegocio(idNegocio);
+            nuevoComentario.setIdUsuario(idUsuario);
+            nuevoComentario.setTextoComentario(texto);
+
+            Dao.ComentarioDao comentarioDao = new Dao.ComentarioDao();
+            boolean exito = comentarioDao.insertarComentario(nuevoComentario);
+
+            if (exito) {
+                response.getWriter().print("{\"status\":\"success\", \"message\":\"Comentario publicado\"}");
+            } else {
+                response.getWriter().print("{\"status\":\"error\", \"message\":\"No se pudo guardar el comentario\"}");
+            }
+            return; 
+        }
+        // ====================================================================
+        // 🌟 NUEVA ACCIÓN: REGISTRAR UN NUEVO USUARIO (CON ROL Y TÉRMINOS)
+        // ====================================================================
+        if ("registrarUsuario".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            String nombreCompleto = request.getParameter("nombreCompleto");
+            String correoElectronico = request.getParameter("correoElectronico");
+            String contrasena = request.getParameter("contrasena");
+            String idRolStr = request.getParameter("idRol");
+            String aceptaTerminosStr = request.getParameter("aceptaTerminos");
+
+            // Validar que no lleguen parámetros vacíos
+            if (nombreCompleto == null || correoElectronico == null || contrasena == null ||
+                nombreCompleto.isEmpty() || correoElectronico.isEmpty() || contrasena.isEmpty()) {
+                response.getWriter().print("{\"status\":\"error\", \"message\":\"Datos obligatorios incompletos.\"}");
+                return;
+            }
+
+            int idRol = (idRolStr != null) ? Integer.parseInt(idRolStr) : 3; 
+            int aceptaTerminos = (aceptaTerminosStr != null) ? Integer.parseInt(aceptaTerminosStr) : 1;
+
+            // Consultas adaptadas exactamente al diseño de tu base de datos
+            String sqlInsert = "INSERT INTO usuarios (nombre_completo, correo_electronico, contrasena, id_rol, acepta_terminos, fecha_aceptacion_terminos, estado) VALUES (?, ?, ?, ?, ?, NOW(), 'ACTIVO')";
+            String sqlCheck = "SELECT id_usuario FROM usuarios WHERE correo_electronico = ?";
+
+            try (Connection con = conection.getConnection()) {
+                
+                // 1. Evitar la creación de correos duplicados
+                try (PreparedStatement psCheck = con.prepareStatement(sqlCheck)) {
+                    psCheck.setString(1, correoElectronico);
+                    try (ResultSet rsCheck = psCheck.executeQuery()) {
+                        if (rsCheck.next()) {
+                            response.getWriter().print("{\"status\":\"error\", \"message\":\"El correo electrónico ya se encuentra registrado.\"}");
+                            return;
+                        }
+                    }
+                }
+
+                // 2. Insertar el nuevo registro con estado 'ACTIVO' por defecto
+                try (PreparedStatement psInsert = con.prepareStatement(sqlInsert)) {
+                    psInsert.setString(1, nombreCompleto);
+                    psInsert.setString(2, correoElectronico);
+                    psInsert.setString(3, contrasena);
+                    psInsert.setInt(4, idRol);          // Guarda el 2 (Vendedor) o 3 (Cliente)
+                    psInsert.setInt(5, aceptaTerminos); // Guarda 1 (Aceptó)
+
+                    int filasAfectadas = psInsert.executeUpdate();
+
+                    if (filasAfectadas > 0) {
+                        response.getWriter().print("{\"status\":\"success\", \"message\":\"¡Te has registrado con éxito en Juanfax!\"}");
+                    } else {
+                        response.getWriter().print("{\"status\":\"error\", \"message\":\"No se pudo insertar el registro en el sistema.\"}");
+                    }
+                }
+
+            } catch (SQLException e) {
+                System.err.println("Error SQL en Registro Juanfax: " + e.getMessage());
+                response.getWriter().print("{\"status\":\"error\", \"message\":\"Error interno en el servidor al intentar registrar.\"}");
+            }
+            return; // Corta el flujo para que no intente ejecutar el código de Login inferior
+        }
+        // ====================================================================
+        // AUTENTICACIÓN ORIGINAL DE JUANFAX (MANTENIDA INTACTA)
+        // ====================================================================
         String correo = request.getParameter("correo_electronico");
         String contrasena = request.getParameter("txtPass");
         
@@ -160,7 +303,7 @@ public class LoginServlet extends HttpServlet {
                      "INNER JOIN roles r ON u.id_rol = r.id_rol " +
                      "WHERE u.correo_electronico = ? AND u.contrasena = ?";
 
-        try (Connection con = Conection.getConnection();
+        try (Connection con = conection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, correo);
@@ -175,14 +318,12 @@ public class LoginServlet extends HttpServlet {
                         return;
                     }
 
-                    // Crear la sesión del usuario
                     HttpSession session = request.getSession(true);
                     session.setAttribute("idUsuario", rs.getInt("id_usuario"));
                     session.setAttribute("nombre", rs.getString("nombre_completo"));
                     String rol = rs.getString("nombre_rol").toUpperCase();
                     session.setAttribute("rol", rol);
 
-                    // Redirección por Roles
                     switch (rol) {
                         case "ADMINISTRADOR":
                             response.sendRedirect("vistas/mainAdministrador.html");
@@ -204,13 +345,8 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    /**
-     * Función auxiliar para sanitizar el JSON manual
-     */
     private String escapeJson(String valor) {
-        if (valor == null) {
-            return "";
-        }
+        if (valor == null) return "";
         return valor.replace("\\", "\\\\")
                     .replace("\"", "\\\"")
                     .replace("\b", "\\b")
