@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Juanfax - Login / Registro</title>
     <link rel="stylesheet" href="./estilos/css/Login.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,60 +11,116 @@
     <link href='https://cdn.boxicons.com/3.0.3/fonts/basic/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
-    <!-- CONTENEDOR PRINCIPAL -->
     <main class="contenedor-principal">
         <div class="tarjeta-login">
-            <!-- ENCABEZADO DE LA TARJETA -->
-            <div class="tarjeta-login__encabezado">
-                <div class="tarjeta-login__logo">JFX</div>
-                <h1 class="tarjeta-login__titulo">Bienvenido</h1>
-                <p class="tarjeta-login__subtitulo">Ingresa a tu cuenta</p>
-            </div>
+            
+            <div id="bloqueLogin">
+                <div class="tarjeta-login__encabezado">
+                    <div class="tarjeta-login__logo">JFX</div>
+                    <h1 class="tarjeta-login__titulo">Bienvenido</h1>
+                    <p class="tarjeta-login__subtitulo">Ingresa a tu cuenta</p>
+                </div>
 
-            <!-- FORMULARIO -->
-            <form class="formulario-login" id="formulario_login" action="LoginServlet" method="POST">
-                <div class="formulario-login__grupo">
-                    <label class="formulario-login__etiqueta" for="correo">Correo electrónico</label>
-                    <input class="formulario-login__campo" id="formularioCorreo" name="correo_electronico" type="email" id="correo" placeholder="tu@correo.com">
-                </div>
-                <div class="formulario-login__grupo">
-                    <label class="formulario-login__etiqueta" for="contrasena">Contraseña</label>
-                    <input class="formulario-login__campo" id="formularioContraseña" name="txtPass" type="password" id="contrasena" placeholder="••••••••">
-                </div>
-                <div class="formulario-login__opciones">
-                    <div class="formulario-login__recordar">
-                        <input type="checkbox" id="recordar">
-                        <label for="recordar">Recordarme</label>
+                <form class="formulario-login" id="formulario_login" action="LoginServlet" method="POST">
+                    <div class="formulario-login__grupo">
+                        <label class="formulario-login__etiqueta" for="formularioCorreo">Correo electrónico</label>
+                        <input class="formulario-login__campo" id="formularioCorreo" name="correo_electronico" type="email" placeholder="tu@correo.com" required>
                     </div>
-                    <a href="#" class="formulario-login__enlace">¿Olvidaste tu contraseña?</a>
+                    <div class="formulario-login__grupo">
+                        <label class="formulario-login__etiqueta" for="formularioContraseña">Contraseña</label>
+                        <input class="formulario-login__campo" id="formularioContraseña" name="txtPass" type="password" placeholder="••••••••" required>
+                    </div>
+                    <div class="formulario-login__opciones">
+                        <div class="formulario-login__recordar">
+                            <input type="checkbox" id="recordar">
+                            <label for="recordar">Recordarme</label>
+                        </div>
+                        <a href="#" class="formulario-login__enlace">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    <button type="submit" name="accion" class="formulario-login__boton" id="formulario-login__boton" value="Ingresar">
+                        Iniciar Sesión
+                    </button>
+                </form>
+
+                <div class="divisor">
+                    <span class="divisor__texto">O continúa con</span>
                 </div>
-                <button type="submit" name="accion" class="formulario-login__boton" id="formulario-login__boton" value="Ingresar">
-                    Iniciar Sesión
-                </button>
-            </form>
 
-            <!-- DIVISOR -->
-            <div class="divisor">
-                <span class="divisor__texto">O continúa con</span>
+                <div class="login-social">
+                    <button class="login-social__boton">Google</button>
+                    <button class="login-social__boton">GitHub</button>
+                </div>
+
+                <div class="enlace-registro">
+                    ¿No tienes cuenta? <a href="#" id="enlaceIrARegistro" class="enlace-registro__link">Regístrate aquí</a>
+                </div>
             </div>
 
-            <!-- LOGIN SOCIAL -->
-            <div class="login-social">
-                <button class="login-social__boton">Google</button>
-                <button class="login-social__boton">GitHub</button>
+
+            <div id="bloqueRegistro" class="oculto">
+                <div class="tarjeta-login__encabezado">
+                    <div class="tarjeta-login__logo">JFX</div>
+                    <h1 class="tarjeta-login__titulo">Únete a Nosotros</h1>
+                    <p class="tarjeta-login__subtitulo">Crea tu cuenta en Juanfax</p>
+                </div>
+
+<form class="formulario-login" id="formRegistro">
+                    <div class="formulario-login__grupo">
+                        <label class="formulario-login__etiqueta" for="regNombre">Nombre Completo</label>
+                        <input class="formulario-login__campo" id="regNombre" type="text" placeholder="Ej. Juan David" required>
+                    </div>
+                    
+                    <div class="formulario-login__grupo">
+                        <label class="formulario-login__etiqueta" for="regCorreo">Correo electrónico</label>
+                        <input class="formulario-login__campo" id="regCorreo" type="email" placeholder="tu@correo.com" required>
+                    </div>
+                    
+                    <div class="formulario-login__grupo">
+                        <label class="formulario-login__etiqueta" for="regPass">Contraseña</label>
+                        <input class="formulario-login__campo" id="regPass" type="password" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="formulario-login__grupo">
+                        <label class="formulario-login__etiqueta" for="regRol">¿Cómo quieres usar Juanfax?</label>
+                        <select class="formulario-login__campo" id="regRol" required style="cursor: pointer; background-color: transparent;">
+                            <option value="" disabled selected hidden>Selecciona tu rol...</option>
+                            <option value="3" style="color: #000;">Quiero buscar negocios (Cliente)</option>
+                            <option value="2" style="color: #000;">Quiero registrar mi negocio (Vendedor)</option>
+                        </select>
+                    </div>
+
+                    <div class="formulario-login__opciones" style="justify-content: flex-start; gap: 8px; margin-bottom: 15px;">
+                        <input type="checkbox" id="regTerminos" required>
+                        <label for="regTerminos" class="formulario-login__etiqueta" style="margin-bottom: 0; cursor: pointer;">
+                            Acepto los términos y condiciones
+                        </label>
+                    </div>
+
+                    <button type="submit" class="formulario-login__boton">
+                        Registrarse
+                    </button>
+                </form>
+
+                <div class="divisor">
+                    <span class="divisor__texto">O regístrate con</span>
+                </div>
+
+                <div class="login-social">
+                    <button class="login-social__boton">Google</button>
+                    <button class="login-social__boton">GitHub</button>
+                </div>
+
+                <div class="enlace-registro">
+                    ¿Ya tienes cuenta? <a href="#" id="enlaceIrALogin" class="enlace-registro__link">Inicia sesión aquí</a>
+                </div>
             </div>
 
-            <!-- ENLACE REGISTRO -->
-            <div class="enlace-registro">
-                ¿No tienes cuenta? <a href="#" class="enlace-registro__link">Regístrate aquí</a>
-            </div>
         </div>
     </main>
 
-    <!-- PIE DE PÁGINA -->
     <footer class="pie-pagina">
         @ 2026 JUANFAX. Todos los derechos reservados.
     </footer>
-
-</body>
+    <script src="scripts/login.js"></script>
+    </body>
 </html>

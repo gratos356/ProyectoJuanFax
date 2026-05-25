@@ -1,6 +1,6 @@
 package Dao;
 
-import Config.Conection;
+import Config.conection;
 import Model.NegocioDTO;
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class NegocioDao {
                      "LEFT JOIN imagenes i ON n.id_negocio = i.id_negocio " +
                      "LIMIT 5";
 
-        try (Connection con = Conection.getConnection();
+        try (Connection con = conection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -42,7 +42,7 @@ public class NegocioDao {
                      "LEFT JOIN imagenes i ON n.id_negocio = i.id_negocio " +
                      "WHERE c.nombre_cat = ? AND n.estado_revision = 'APROBADO'";
 
-        try (Connection con = Conection.getConnection();
+        try (Connection con = conection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, nombreCategoria);
@@ -80,7 +80,7 @@ public class NegocioDao {
 
         try {
             // Reemplaza 'Conexion.getConnection()' por tu método real de conectar a MySQL
-            con = Conection.getConnection(); 
+            con = conection.getConnection(); 
             ps = con.prepareStatement(sql);
             ps.setString(1, nombreBuscar);
             rs = ps.executeQuery();

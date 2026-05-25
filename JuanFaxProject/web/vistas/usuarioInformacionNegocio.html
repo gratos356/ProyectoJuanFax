@@ -5,12 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="../estilos/css/usuarioInformacionNegocio.css">
+    <!-- Basic Icons -->
+    <link href="https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css" rel="stylesheet">
+    <!-- Filled Icons -->
+    <link href="https://cdn.boxicons.com/3.0.8/fonts/filled/boxicons-filled.min.css" rel="stylesheet">
+    <!-- Brand Icons -->
+    <link href="https://cdn.boxicons.com/3.0.8/fonts/brands/boxicons-brands.min.css" rel="stylesheet">
 </head>
 <body>
     <header class="headerContainer" id="headerContainer">
         <div class="logo"></div>
         <nav class="navContainer" id="navContainer">
-            <div class="back" id="back"></div>
+            <button class="back bx-reply-big" id="back">
+            </button>
         </nav>
     </header>
     <main class="principalContainer" id="principalContainer">
@@ -19,6 +26,21 @@
         <div class="descripcionNegocio" id="descripcionNegocio"></div>
         <div class="showMap" id="showMap"></div>
     </main>
+    <section class="comentariosContainer" id="comentariosContainer">
+        <h2>Comentarios y Reseñas</h2>
+        
+        <form id="formComentario" class="formComentario">
+            <input class="inputComentarios" id="txtComentario" placeholder="Escribe tu reseña sobre este negocio..." required>
+            <button type="submit">Publicar Comentario</button>
+        </form>
+
+        <div class="listaComentarios" id="listaComentarios">
+            <div class="comentarioCard">
+                <p class="usuarioNombre"><strong>Juan David</strong> <span class="fecha">24/05/2026</span></p>
+                <p class="comentarioTexto">¡Los mejores raspados de Girón! Súper recomendado.</p>
+            </div>
+        </div>
+    </section>
     <footer class="footerContainer" id="footerContainer">
 
     </footer>
