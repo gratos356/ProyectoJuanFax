@@ -85,7 +85,9 @@ body{
     height: 100vh;
     background-color: var(--FondoPrincipal);
 }
-
+.informacionNegocio h3,.informacionNegocio p ,.informacionNegocio span,.informacionNegocio strong,.i    {
+    color: var(--ColorLetra);
+}
 /* _____________________ */
 /*        Side Baar      */
 /* _____________________ */
@@ -146,6 +148,9 @@ body{
     /* background-color: red; */
 }
 .estads{
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 20%;
     height: 100%;
     border: 1px solid var(--ColorBotonesDeAccionGris);
@@ -159,12 +164,44 @@ body{
     width: 80%;
     height: 30%;
 }
+.fedBacks{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.vistasPorDia{
+    padding: 30px;
+}
 .vistasPorDia,.fedBacks{
     width: 45%;
     height: 100%;
     border: 1px solid var(--ColorBotonesDeAccionGris);
     box-shadow: 0px 0px 10px var(--ColorBotonesDeAccionGris);
     border-radius: 15px;
+}
+.simulador-grafico {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 140px;
+    padding: 10px 0;
+}
+.barra-css {
+    width: 10%;
+    background-color: peru;
+    height: var(--alto);
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.barra-css span {
+    position: absolute;
+    bottom: -22px;
+    font-size: 10px;
+    color: #8a99a8;
 }
 .calificaciones_Y_alertas{
     display: flex;
@@ -174,6 +211,10 @@ body{
     height: 30%;
 }
 .calificaciones,.alertas{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     width: 40%;
     height: 100%;
     border: 1px solid var(--ColorBotonesDeAccionGris);
@@ -190,4 +231,67 @@ body{
     box-shadow: 0px 0px 10px var(--ColorBotonesDeAccionGris);
     border-radius: 15px;
     margin-top: var(--SeparacionSecciones);
+}
+
+.lista-comentarios-vendedor {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.comentario-mini {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 10px;
+    border-radius: 6px;
+    border-left: 3px solid #e5c158;
+}
+
+.meta-comentario {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.comentario-mini p {
+    font-size: 12px;
+    color: #bcbcbc;
+}
+
+/* Progress Bars para las calificaciones de estrellas */
+.progreso-estrellas {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.barra-progreso {
+    flex: 1;
+    background: rgba(255,255,255,0.1);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.barra-progreso .llenado {
+    background: #e5c158;
+    height: 100%;
+}
+
+/* Alertas */
+.alerta-mensaje {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(146, 20, 12, 0.15);
+    border: 1px solid rgba(146, 20, 12, 0.3);
+    padding: 12px;
+    border-radius: 6px;
+    color: #ff8882;
+    font-size: 13px;
+    margin-top: 15px;
 }

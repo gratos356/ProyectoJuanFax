@@ -33,11 +33,106 @@ public class LoginServlet extends HttpServlet {
         String accion = request.getParameter("accion");
 
         System.out.println(" ACCION DETECTADA EN GET: [" + accion + "]");
+        
+        // 2. INTERCEPTAR LA PETICIÓN ASÍNCRONA PRIMERO
+        if ("metricasVendedor".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
 
+            // 1. Recuperamos la sesión actual de forma segura
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("idUsuario") == null) {
+                response.getWriter().print("{\"error\": \"Sesión no válida o caducada.\"}");
+                return;
+            }
+
+            // 2. Capturamos el id_usuario del vendedor logueado
+            int idVendedor = (int) session.getAttribute("idUsuario");
+
+            // 3. Instanciamos tu DAO (Fíjate en la mayúscula de Dao)
+            Dao.NegocioDao negocioDao = new Dao.NegocioDao();
+            
+            // Consultamos las métricas unificadas desde MySQL
+            java.util.Map<String, Object> datosReales = negocioDao.obtenerMetricasVendedor(idVendedor);
+
+            // 4. Extraemos de forma segura los valores numéricos y la lista
+            int vistas = (int) datosReales.getOrDefault("vistasTotales", 0);
+            int clicks = (int) datosReales.getOrDefault("clicksEnlaces", 0);
+            int resenas = (int) datosReales.getOrDefault("totalResenas", 0);
+            double puntuacion = (double) datosReales.getOrDefault("puntuacion", 0.0);
+            
+            java.util.List<java.util.Map<String, Object>> listaComentarios = 
+                (java.util.List<java.util.Map<String, Object>>) datosReales.get("comentariosRecientes");
+            
+            java.util.Map<String, Integer> dist = 
+                (java.util.Map<String, Integer>) datosReales.get("distribucionEstrellas");
+
+            // 5. CONSTRUCCIÓN DEL JSON DINÁMICO
+            StringBuilder json = new StringBuilder();
+            json.append("{");
+            json.append("\"vistasTotales\": ").append(vistas).append(",");
+            json.append("\"clicksEnlaces\": ").append(clicks).append(",");
+            json.append("\"totalResenas\": ").append(resenas).append(",");
+            json.append("\"puntuacion\": ").append(puntuacion).append(",");
+            
+            // Mantenemos las barras del gráfico temporales con los días de la semana
+            json.append("\"visitasSemana\": [");
+            json.append("  {\"nombreDia\":\"Lun\", \"porcentaje\": 45},");
+            json.append("  {\"nombreDia\":\"Mar\", \"porcentaje\": 60},");
+            json.append("  {\"nombreDia\":\"Mié\", \"porcentaje\": 80},");
+            json.append("  {\"nombreDia\":\"Jue\", \"porcentaje\": 50},");
+            json.append("  {\"nombreDia\":\"Vie\", \"porcentaje\": 95},");
+            json.append("  {\"nombreDia\":\"Sáb\", \"porcentaje\": 70},");
+            json.append("  {\"nombreDia\":\"Dom\", \"porcentaje\": 35}");
+            json.append("],");
+
+            // Mapeamos los comentarios reales traídos por el JOIN de usuarios y calificaciones_sanciones
+            json.append("\"comentariosRecientes\": [");
+            if (listaComentarios != null) {
+                for (int i = 0; i < listaComentarios.size(); i++) {
+                    java.util.Map<String, Object> c = listaComentarios.get(i);
+                    
+                    // Validamos que el texto del comentario no venga nulo para evitar romper el JSON
+                    String texto = c.get("textoComentario") != null ? c.get("textoComentario").toString() : "";
+                    // Escapamos comillas dobles internas por seguridad
+                    texto = texto.replace("\"", "\\\"");
+
+                    json.append("{");
+                    json.append("\"nombreUsuario\":\"").append(c.get("nombreUsuario")).append("\",");
+                    json.append("\"calificacion\":").append(c.get("calificacion")).append(",");
+                    json.append("\"textoComentario\":\"").append(texto).append("\"");
+                    json.append("}");
+                    
+                    if (i < listaComentarios.size() - 1) {
+                        json.append(",");
+                    }
+                }
+            }
+            json.append("],");
+
+            // Mapeamos la distribución porcentual calculada por el DAO
+            int p5 = dist != null ? dist.getOrDefault("cinco", 0) : 0;
+            int p4 = dist != null ? dist.getOrDefault("cuatro", 0) : 0;
+            int p3 = dist != null ? dist.getOrDefault("tres", 0) : 0;
+
+            json.append("\"distribucionEstrellas\": {");
+            json.append("  \"cinco\": ").append(p5).append(",");
+            json.append("  \"cuatro\": ").append(p4).append(",");
+            json.append("  \"tres\": ").append(p3);
+            json.append("}");
+            json.append("}"); // Fin del JSON principal
+
+            // 6. ENVIAMOS LA RESPUESTA LIMPIA AL FRONTEND
+            try (java.io.PrintWriter out = response.getWriter()) {
+                out.print(json.toString());
+                out.flush();
+            }
+            return; // ⭐ CRUCIAL: Detiene la ejecución aquí para que no mande un HTML abajo.
+        }
         // ====================================================================
         // ACCIÓN A: EXPANDING CARDS - FILTRAR NEGOCIOS POR CATEGORÍA
         // ====================================================================
-        if ("negociosPorCategoria".equals(accion)) {
+        else if ("negociosPorCategoria".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 

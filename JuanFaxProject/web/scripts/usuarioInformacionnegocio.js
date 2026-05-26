@@ -12,7 +12,6 @@ function cargarDetallesNegocio() {
 
     if (!nombreNegocio) return;
 
-    
     fetch(`../LoginServlet?accion=detalleNegocioUnico&nombre=${encodeURIComponent(nombreNegocio)}`)
     .then(response => response.json())
     .then(negocio => {
@@ -32,16 +31,20 @@ function cargarDetallesNegocio() {
             contenedorImagen.innerHTML = `<div class="contenedorImagen" style="background-image: url('${fotoFinal}');" alt="${negocio.nombreEstablecimiento}"></div>`;
         }
         
-        // 🌟 INYECTAR EL MAPA AL FINAL (Solo si los datos ya se pintaron con éxito)
+        // 🌟 INDICADOR AUTOMÁTICO DE VISTA: El negocio cargó con éxito, registramos la vista en la BD
+        if (idNegocioActual) {
+            registrarMetricaSilenciosa(idNegocioActual, "registrarVista");
+            cargarComentarios(idNegocioActual);
+        }
+
+        // INYECTAR EL MAPA AL FINAL (Solo si los datos ya se pintaron con éxito)
         if (negocio.latitud && negocio.longitud) {
             inicializarMapaGoogle(parseFloat(negocio.latitud), parseFloat(negocio.longitud), negocio.nombreEstablecimiento);
-        }
-        if (idNegocioActual) {
-            cargarComentarios(idNegocioActual);
         }
     })
     .catch(error => console.error("Error en Juanfax JS:", error));
 }
+
 // 2. FUNCIÓN PARA TRAER LOS COMENTARIOS DE LA BD
 function cargarComentarios(idNegocio) {
     fetch(`../LoginServlet?accion=listarComentarios&idNegocio=${idNegocio}`)
@@ -78,12 +81,19 @@ function configurarFormularioComentario() {
     if (!formulario) return;
 
     formulario.addEventListener("submit", (e) => {
-        e.preventDefault(); // Evita que la página se recargue
+        e.preventDefault(); 
 
         const cajaTexto = document.getElementById("txtComentario");
-        if (!cajaTexto) return;
+        // 🌟 CAPTURAMOS LA ESTRELLA SELECCIONADA
+        const estrellaSeleccionada = document.querySelector('input[name="puntuacion"]:checked');
+        
+        if (!cajaTexto || !estrellaSeleccionada) {
+            alert("Por favor, selecciona una puntuación en estrellas.");
+            return;
+        }
         
         const texto = cajaTexto.value.trim();
+        const valorEstrellas = estrellaSeleccionada.value; // Guardará "5", "4" o "3"
 
         if (!idNegocioActual) {
             alert("Error: No se pudo identificar el negocio.");
@@ -95,13 +105,13 @@ function configurarFormularioComentario() {
             return;
         }
 
-        // Enviar los datos simulando un formulario tradicional x-www-form-urlencoded
+        // Construimos los parámetros para el Servlet
         const datos = new URLSearchParams();
         datos.append("accion", "guardarComentario");
         datos.append("idNegocio", idNegocioActual);
-        datos.append("textoComentario", texto); // El mismo nombre que lee el getParameter del Servlet
+        datos.append("textoComentario", texto); 
+        datos.append("valorPuntuacion", valorEstrellas); // 👈 ENVIAMOS LAS ESTRELLAS AL BACKEND
 
-        // Disparamos la petición POST hacia el LoginServlet
         fetch("../LoginServlet", {
             method: "POST",
             headers: {
@@ -114,37 +124,33 @@ function configurarFormularioComentario() {
             console.log("Respuesta real del servidor:", resultado);
 
             if (resultado.status === "success") {
-                cajaTexto.value = ""; // Limpiamos la caja de texto
-                cargarComentarios(idNegocioActual); // Refrescamos la lista de inmediato
+                cajaTexto.value = ""; 
+                // Limpiamos la selección de estrellas para el próximo comentario
+                estrellaSeleccionada.checked = false; 
+                cargarComentarios(idNegocioActual); // Refrescamos la lista
             } else {
-                // 🌟 AQUÍ SE CORRIGE EL UNDEFINED:
-                // Evaluamos todas las variantes posibles que envía tu Servlet ("message" o "error")
-                const mensajeError = resultado.message || resultado.error || "Error interno en el servidor.";
+                const mensajeError = resultado.message || resultado.error || "Error interno.";
                 alert("No se pudo publicar: " + mensajeError);
             }
         })
         .catch(error => {
             console.error("Error en la petición FETCH de Juanfax:", error);
-            alert("Error crítico de conexión al intentar comunicar con el servidor.");
+            alert("Error crítico de conexión.");
         });
     });
 }
 
 const botonVolver = document.querySelector("#back");
 function volverAtras() {
-    // Si hay historial en el navegador, va hacia atrás respetando los filtros que tenía antes
     if (document.referrer && window.history.length > 1) {
         window.history.back();
     } else {
-        // Si entró directo desde un enlace limpio, lo mandamos al panel principal de forma segura
         window.location.href = "mainUser.html"; 
     }
 }
 botonVolver.addEventListener("click", volverAtras);
 
-
-
-// 2. Función aislada para el mapa (Evita que si Google falla, se caiga el resto de la página)
+// 4. FUNCIÓN AISLADA PARA EL MAPA
 function inicializarMapaGoogle(lat, lng, nombre) {
     const contenedorMapa = document.getElementById("showMap");
     if (!contenedorMapa) return;
@@ -166,6 +172,28 @@ function inicializarMapaGoogle(lat, lng, nombre) {
         map: map,
         title: nombre
     });
+
+    // 🌟 REGISTRO POR CLIC EN EL MAPA: Escuchamos la interacción con el contenedor del mapa
+    contenedorMapa.addEventListener("click", () => {
+        // Usamos una bandera en dataset para evitar que clics repetidos saturen la base de datos
+        if (!contenedorMapa.dataset.clicRegistrado && idNegocioActual) {
+            registrarMetricaSilenciosa(idNegocioActual, "registrarClic");
+            contenedorMapa.dataset.clicRegistrado = "true";
+        }
+    });
+}
+
+// 🌟 FUNCIÓN AUXILIAR: ENVÍA LAS INTERACCIONES EN SEGUNDO PLANO AL METRICASSERVLET
+async function registrarMetricaSilenciosa(idNegocio, accionMetrica) {
+    try {
+        const url = `../MetricasServlet?accion=${accionMetrica}&idNegocio=${idNegocio}`;
+        const response = await fetch(url, { method: "POST" });
+        if (response.ok) {
+            console.log(`✅ Métrica '${accionMetrica}' guardada silenciosamente para el negocio #${idNegocio}`);
+        }
+    } catch (error) {
+        console.error("❌ Error de red reportando métrica:", error);
+    }
 }
 
 // Declaramos la función initMap vacía por si Google la llama por defecto en la URL

@@ -100,7 +100,8 @@ body {
     height: 100%;
     width: 100%;
 }
-/* .listaComentarios{
+/* .principalContainer{
+    display:;
 } */
 
 .comentariosContainer {
@@ -170,6 +171,64 @@ body {
     font-size: 0.8rem;
     color: #64748b;
     margin-left: 10px;
+}
+
+.comentariosContainer .estrellas-rating {
+    display: flex;
+    flex-direction: row-reverse; /* Mantiene el truco para pintar hacia atrás */
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+/* Ocultamiento visual seguro para el required */
+.comentariosContainer .estrellas-rating input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+    pointer-events: none;
+}
+
+/* Estilo base para pintar los íconos con tamaño real */
+.comentariosContainer .estrellas-rating label i {
+    display: inline-block; /* 👈 PERMITE QUE EL ELEMENTO TENGA ANCHO Y ALTO */
+    /* font-family: 'Boxicons' !important; */
+    font-size: 32px; /* Un tamaño excelente para web y mobile */
+    color: #475569;  /* Gris apagado por defecto */
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.1s ease;
+    min-width: 32px;
+    min-height: 32px;
+    text-align: center;
+}
+
+/* 🌟 INYECCIÓN DEL CARÁCTER: Forzamos a que pinte la estrella sólida de Boxicons */
+.comentariosContainer .estrellas-rating label::before {
+    content: "\eeb1"; /* Código unicode de 'bxs-star' en Boxicons */
+}
+
+/* Efecto hover sutil */
+.comentariosContainer .estrellas-rating label:hover {
+    transform: scale(1.15);
+}
+
+/* Cambiar a color dorado en cascada cuando se selecciona o se pasa el mouse */
+.comentariosContainer .estrellas-rating input[type="radio"]:checked ~ label i,
+.comentariosContainer .estrellas-rating label i:hover,
+.comentariosContainer .estrellas-rating label i:hover ~ label i {
+    color: #fbbf24; 
+}
+
+/* Texto de ayuda lateral */
+.comentariosContainer .ayuda-rating {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-left: 12px;
+    order: -1; /* Lo mantiene a la izquierda por el row-reverse */
 }
 
 .footerContainer{
