@@ -7,13 +7,14 @@ package Model;
 import java.sql.Timestamp;
 
 public class ComentarioDTO {
-    private int idComentario;
+private int idComentario;
     private int idNegocio;
     private int idUsuario;
     private String textoComentario;
     private Timestamp fechaPublicacion;
-    
     private String nombreUsuario;
+    // 🌟 NUEVO: Atributo para almacenar las estrellas de la reseña
+    private int calificacion;
     
     
     public ComentarioDTO() {
@@ -66,6 +67,15 @@ public class ComentarioDTO {
     public void setNombreUsuario(String nombreUsuario) {
         this.nombreUsuario = nombreUsuario;
     }
-    
+
+    public int getCalificacion() {
+        return calificacion;
+    }
+
+    public void setCalificacion(int calificacion) {
+        this.calificacion = calificacion;
+    }
+
+   
     
 }

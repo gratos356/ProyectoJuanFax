@@ -12,25 +12,25 @@ import java.util.List;
 
 public class ComentarioDao {
     public boolean insertarComentario(ComentarioDTO comentario) {
-        String sql = "INSERT INTO comentarios (id_negocio, id_usuario, texto_comentario) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO calificaciones_sanciones (id_usuario, id_negocio, comentario_justificacion, valor_puntuacion, tipo_registro, fecha_registro) VALUES (?, ?, ?, ?, 'CALIFICACION', NOW())";
         
-        try (Connection con = conection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            
-            ps.setInt(1, comentario.getIdNegocio());
-            ps.setInt(2, comentario.getIdUsuario());
-            ps.setString(3, comentario.getTextoComentario());
-            
-            int filasAfectadas = ps.executeUpdate();
-            return filasAfectadas > 0; // Retorna true si se guardó con éxito
-            
-        } catch (SQLException e) {
-            System.out.println("❌ Error al insertar comentario en Juanfax: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
+        try (Connection con = Config.conection.getConnection();
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+
+                ps.setInt(1, comentario.getIdUsuario());
+                ps.setInt(2, comentario.getIdNegocio());
+                ps.setString(3, comentario.getTextoComentario());
+                ps.setInt(4, comentario.getCalificacion()); // 🌟 Pasamos las estrellas al PreparedStatement
+
+                int filas = ps.executeUpdate();
+                return filas > 0;
+
+            } catch (SQLException e) {
+                System.err.println("Error al insertar comentario en el DAO: " + e.getMessage());
+                return false;
+            }
     }
-    
+
     public List<ComentarioDTO> obtenerComentariosPorNegocio(int idNegocio) {
         List<ComentarioDTO> lista = new ArrayList<>();
         

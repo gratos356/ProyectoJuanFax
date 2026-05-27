@@ -166,9 +166,11 @@ body{
 }
 .fedBacks{
     display: flex;
+    padding-top: 40px;
     justify-content: center;
     align-items: center;
     flex-direction: column;
+
 }
 .vistasPorDia{
     padding: 30px;
@@ -179,6 +181,8 @@ body{
     border: 1px solid var(--ColorBotonesDeAccionGris);
     box-shadow: 0px 0px 10px var(--ColorBotonesDeAccionGris);
     border-radius: 15px;
+    overflow-x: auto;
+    scrollbar-color: transparent transparent  ;
 }
 .simulador-grafico {
     display: flex;
@@ -212,8 +216,9 @@ body{
 }
 .calificaciones,.alertas{
     display: flex;
-    justify-content: center;
-    align-items: center;
+    /* justify-content: center;
+    align-items: center; */
+    padding: 30px;
     flex-direction: column;
     width: 40%;
     height: 100%;
