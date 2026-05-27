@@ -2,46 +2,77 @@ let idNegocioActual = null;
 
 // 1. Ejecutamos la carga apenas se abra la página
 document.addEventListener("DOMContentLoaded", () => {
+    // 1. Extraer el ID de la URL
+    const params = new URLSearchParams(window.location.search);
+    const idEnUrl = params.get("id"); // O el nombre de tu parámetro
+    
+    // 2. Asignar a la variable global
+    if (idEnUrl) {
+        idNegocioActual = idEnUrl;
+    }
+
+    // 3. Ahora sí, ejecutar las funciones
     cargarDetallesNegocio();
     configurarFormularioComentario();
 });
 
 function cargarDetallesNegocio() {
     const params = new URLSearchParams(window.location.search);
-    const nombreNegocio = params.get("nombre");
+    const idNegocio = params.get("id");
 
-    if (!nombreNegocio) return;
+    console.log("-> ID recibido en la página de detalle:", idNegocio); // <--- ESTO ES VITAL
 
-    
-    fetch(`../LoginServlet?accion=detalleNegocioUnico&nombre=${encodeURIComponent(nombreNegocio)}`)
+    if (!idNegocio) {
+        console.error("No se encontró ID en la URL");
+        return;
+    }
+    if (!idNegocio) return;
+
+    fetch(`../LoginServlet?accion=detalleNegocioUnico&id=${idNegocio}`)
     .then(response => response.json())
     .then(negocio => {
+        console.log("Datos recibidos del servidor:", negocio);
         if (!negocio || negocio.error) return;
+        
+        // --- AQUÍ ESTABA EL ERROR: Necesitas asignar el ID del negocio recibido ---
+        // Asegúrate de que 'negocio.idNegocio' sea el nombre correcto que viene de tu Java
+        idNegocioActual = negocio.idNegocio; 
         
         // PINTAR DATOS ORIGINALES
         const txtNombre = document.getElementById("nombreNegocio");
         const txtDescripcion = document.getElementById("descripcionNegocio");
         const contenedorImagen = document.getElementById("imagenNegocio");
         
-        if (txtNombre) txtNombre.innerHTML = `<h1>${negocio.nombreEstablecimiento}</h1>`;
-        if (txtDescripcion) txtDescripcion.innerHTML = `<p>${negocio.descripcion}</p>`;
-        idNegocioActual = parseInt(negocio.idNegocio);
+        // Validar campos para evitar errores si vienen nulos
+        if (txtNombre) txtNombre.innerText = negocio.nombreEstablecimiento || "Sin nombre";
+        if (txtDescripcion) txtDescripcion.innerText = negocio.descripcion || "Sin descripción";
         
+        let rutaImagen = negocio.url_imagen || negocio.urlImagen;
+        let fotoFinal = '../imagenes/default-negocio.jpg';
+
+        if (rutaImagen) {
+            fotoFinal = rutaImagen.startsWith("http") 
+                ? rutaImagen 
+                : `../verImagen?nombre=${rutaImagen}`;
+        }
+
         if (contenedorImagen) {
-            let fotoFinal = negocio.urlImagen.startsWith("http") ? negocio.urlImagen : `../imagenes/${negocio.urlImagen}`;
             contenedorImagen.innerHTML = `<div class="contenedorImagen" style="background-image: url('${fotoFinal}');" alt="${negocio.nombreEstablecimiento}"></div>`;
         }
         
-        // 🌟 INYECTAR EL MAPA AL FINAL (Solo si los datos ya se pintaron con éxito)
+        // AHORA SÍ: Como idNegocioActual ya tiene valor, esto funcionará:
+        if (idNegocioActual) {
+            registrarMetricaSilenciosa(idNegocioActual, "registrarVista");
+            cargarComentarios(idNegocioActual);
+        }
+
         if (negocio.latitud && negocio.longitud) {
             inicializarMapaGoogle(parseFloat(negocio.latitud), parseFloat(negocio.longitud), negocio.nombreEstablecimiento);
-        }
-        if (idNegocioActual) {
-            cargarComentarios(idNegocioActual);
         }
     })
     .catch(error => console.error("Error en Juanfax JS:", error));
 }
+
 // 2. FUNCIÓN PARA TRAER LOS COMENTARIOS DE LA BD
 function cargarComentarios(idNegocio) {
     fetch(`../LoginServlet?accion=listarComentarios&idNegocio=${idNegocio}`)
@@ -78,30 +109,34 @@ function configurarFormularioComentario() {
     if (!formulario) return;
 
     formulario.addEventListener("submit", (e) => {
-        e.preventDefault(); // Evita que la página se recargue
+        e.preventDefault();
 
         const cajaTexto = document.getElementById("txtComentario");
-        if (!cajaTexto) return;
         
-        const texto = cajaTexto.value.trim();
-
-        if (!idNegocioActual) {
-            alert("Error: No se pudo identificar el negocio.");
+        // Capturamos cuál radio button está seleccionado (:checked)
+        const estrellaSeleccionada = document.querySelector('input[name="puntuacion"]:checked');
+        
+        // Validación: Si no ha seleccionado ninguna estrella, detenemos el envío
+        if (!estrellaSeleccionada) {
+            alert("Por favor, selecciona una calificación en estrellas antes de publicar tu comentario.");
             return;
         }
 
+        const texto = cajaTexto.value.trim();
         if (texto === "") {
             alert("El comentario no puede estar vacío.");
             return;
         }
 
-        // Enviar los datos simulando un formulario tradicional x-www-form-urlencoded
+        // Preparación de los parámetros para el Servlet
         const datos = new URLSearchParams();
         datos.append("accion", "guardarComentario");
         datos.append("idNegocio", idNegocioActual);
-        datos.append("textoComentario", texto); // El mismo nombre que lee el getParameter del Servlet
+        datos.append("textoComentario", texto);
+        
+        // 🌟 CLAVE: Asegúrate de enviarlo con el nombre exacto que lee el Servlet: "valorPuntuacion"
+        datos.append("valorPuntuacion", estrellaSeleccionada.value); 
 
-        // Disparamos la petición POST hacia el LoginServlet
         fetch("../LoginServlet", {
             method: "POST",
             headers: {
@@ -111,40 +146,31 @@ function configurarFormularioComentario() {
         })
         .then(response => response.json())
         .then(resultado => {
-            console.log("Respuesta real del servidor:", resultado);
-
             if (resultado.status === "success") {
-                cajaTexto.value = ""; // Limpiamos la caja de texto
-                cargarComentarios(idNegocioActual); // Refrescamos la lista de inmediato
+                cajaTexto.value = ""; // Limpiar texto
+                estrellaSeleccionada.checked = false; // Desmarcar estrellas para el próximo uso
+                
+                cargarComentarios(idNegocioActual); // Recargar lista visual
+                alert("¡Comentario y puntuación publicados con éxito!");
             } else {
-                // 🌟 AQUÍ SE CORRIGE EL UNDEFINED:
-                // Evaluamos todas las variantes posibles que envía tu Servlet ("message" o "error")
-                const mensajeError = resultado.message || resultado.error || "Error interno en el servidor.";
-                alert("No se pudo publicar: " + mensajeError);
+                alert("Error al guardar: " + resultado.message);
             }
         })
-        .catch(error => {
-            console.error("Error en la petición FETCH de Juanfax:", error);
-            alert("Error crítico de conexión al intentar comunicar con el servidor.");
-        });
+        .catch(error => console.error("Error en la petición:", error));
     });
 }
 
 const botonVolver = document.querySelector("#back");
 function volverAtras() {
-    // Si hay historial en el navegador, va hacia atrás respetando los filtros que tenía antes
     if (document.referrer && window.history.length > 1) {
         window.history.back();
     } else {
-        // Si entró directo desde un enlace limpio, lo mandamos al panel principal de forma segura
         window.location.href = "mainUser.html"; 
     }
 }
 botonVolver.addEventListener("click", volverAtras);
 
-
-
-// 2. Función aislada para el mapa (Evita que si Google falla, se caiga el resto de la página)
+// 4. FUNCIÓN AISLADA PARA EL MAPA
 function inicializarMapaGoogle(lat, lng, nombre) {
     const contenedorMapa = document.getElementById("showMap");
     if (!contenedorMapa) return;
@@ -166,6 +192,28 @@ function inicializarMapaGoogle(lat, lng, nombre) {
         map: map,
         title: nombre
     });
+
+    // 🌟 REGISTRO POR CLIC EN EL MAPA: Escuchamos la interacción con el contenedor del mapa
+    contenedorMapa.addEventListener("click", () => {
+        // Usamos una bandera en dataset para evitar que clics repetidos saturen la base de datos
+        if (!contenedorMapa.dataset.clicRegistrado && idNegocioActual) {
+            registrarMetricaSilenciosa(idNegocioActual, "registrarClic");
+            contenedorMapa.dataset.clicRegistrado = "true";
+        }
+    });
+}
+
+// 🌟 FUNCIÓN AUXILIAR: ENVÍA LAS INTERACCIONES EN SEGUNDO PLANO AL METRICASSERVLET
+async function registrarMetricaSilenciosa(idNegocio, accionMetrica) {
+    try {
+        const url = `../MetricasServlet?accion=${accionMetrica}&idNegocio=${idNegocio}`;
+        const response = await fetch(url, { method: "POST" });
+        if (response.ok) {
+            console.log(`✅ Métrica '${accionMetrica}' guardada silenciosamente para el negocio #${idNegocio}`);
+        }
+    } catch (error) {
+        console.error("❌ Error de red reportando métrica:", error);
+    }
 }
 
 // Declaramos la función initMap vacía por si Google la llama por defecto en la URL

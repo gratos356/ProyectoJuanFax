@@ -33,11 +33,153 @@ public class LoginServlet extends HttpServlet {
         String accion = request.getParameter("accion");
 
         System.out.println(" ACCION DETECTADA EN GET: [" + accion + "]");
+        
+        // 2. INTERCEPTAR LA PETICIÓN ASÍNCRONA PRIMERO
+        if ("metricasVendedor".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
 
+            // 1. Recuperamos la sesión actual de forma segura
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("idUsuario") == null) {
+                response.getWriter().print("{\"error\": \"Sesión no válida o caducada.\"}");
+                return;
+            }
+
+            // 2. Capturamos el id_usuario del vendedor logueado
+            int idVendedor = (int) session.getAttribute("idUsuario");
+            
+            //Capturar el ID del negocio enviado por el JS
+            String idNegocioStr = request.getParameter("idNegocio");
+            int idNegocio = 0;
+            if (idNegocioStr != null && !idNegocioStr.isEmpty()) {
+                idNegocio = Integer.parseInt(idNegocioStr);
+            }
+            
+            // 3. Instanciamos tu DAO (Fíjate en la mayúscula de Dao)
+            Dao.NegocioDao negocioDao = new Dao.NegocioDao();
+            
+            // Consultamos las métricas unificadas desde MySQL
+            java.util.Map<String, Object> datosReales = negocioDao.obtenerMetricasVendedor(idVendedor ,idNegocio);
+
+            // 4. Extraemos de forma segura los valores numéricos y la lista
+            int vistas = (int) datosReales.getOrDefault("vistasTotales", 0);
+            int clicks = (int) datosReales.getOrDefault("clicksEnlaces", 0);
+            int resenas = (int) datosReales.getOrDefault("totalResenas", 0);
+            double puntuacion = (double) datosReales.getOrDefault("puntuacion", 0.0);
+            
+            java.util.List<java.util.Map<String, Object>> listaComentarios = 
+                (java.util.List<java.util.Map<String, Object>>) datosReales.get("comentariosRecientes");
+            
+            java.util.Map<String, Integer> dist = 
+                (java.util.Map<String, Integer>) datosReales.get("distribucionEstrellas");
+
+            // 5. CONSTRUCCIÓN DEL JSON DINÁMICO
+            StringBuilder json = new StringBuilder();
+            json.append("{");
+            json.append("\"vistasTotales\": ").append(vistas).append(",");
+            json.append("\"clicksEnlaces\": ").append(clicks).append(",");
+            json.append("\"totalResenas\": ").append(resenas).append(",");
+            json.append("\"puntuacion\": ").append(puntuacion).append(",");
+            
+            // Mantenemos las barras del gráfico temporales con los días de la semana
+            json.append("\"visitasSemana\": [");
+            json.append("  {\"nombreDia\":\"Lun\", \"porcentaje\": 45},");
+            json.append("  {\"nombreDia\":\"Mar\", \"porcentaje\": 60},");
+            json.append("  {\"nombreDia\":\"Mié\", \"porcentaje\": 80},");
+            json.append("  {\"nombreDia\":\"Jue\", \"porcentaje\": 50},");
+            json.append("  {\"nombreDia\":\"Vie\", \"porcentaje\": 95},");
+            json.append("  {\"nombreDia\":\"Sáb\", \"porcentaje\": 70},");
+            json.append("  {\"nombreDia\":\"Dom\", \"porcentaje\": 35}");
+            json.append("],");
+
+            // Mapeamos los comentarios reales traídos por el JOIN de usuarios y calificaciones_sanciones
+            json.append("\"comentariosRecientes\": [");
+            if (listaComentarios != null) {
+                for (int i = 0; i < listaComentarios.size(); i++) {
+                    java.util.Map<String, Object> c = listaComentarios.get(i);
+                    
+                    // Validamos que el texto del comentario no venga nulo para evitar romper el JSON
+                    String texto = c.get("textoComentario") != null ? c.get("textoComentario").toString() : "";
+                    // Escapamos comillas dobles internas por seguridad
+                    texto = texto.replace("\"", "\\\"");
+
+                    json.append("{");
+                    json.append("\"nombreUsuario\":\"").append(c.get("nombreUsuario")).append("\",");
+                    json.append("\"calificacion\":").append(c.get("calificacion")).append(",");
+                    json.append("\"textoComentario\":\"").append(texto).append("\"");
+                    json.append("}");
+                    
+                    if (i < listaComentarios.size() - 1) {
+                        json.append(",");
+                    }
+                }
+            }
+            json.append("],");
+
+            // Mapeamos la distribución porcentual calculada por el DAO
+            int p5 = dist != null ? dist.getOrDefault("cinco", 0) : 0;
+            int p4 = dist != null ? dist.getOrDefault("cuatro", 0) : 0;
+            int p3 = dist != null ? dist.getOrDefault("tres", 0) : 0;
+
+            json.append("\"distribucionEstrellas\": {");
+            json.append("  \"cinco\": ").append(p5).append(",");
+            json.append("  \"cuatro\": ").append(p4).append(",");
+            json.append("  \"tres\": ").append(p3);
+            json.append("}");
+            json.append("}"); // Fin del JSON principal
+
+            // 6. ENVIAMOS LA RESPUESTA LIMPIA AL FRONTEND
+            try (java.io.PrintWriter out = response.getWriter()) {
+                out.print(json.toString());
+                out.flush();
+            }
+            return; // ⭐ CRUCIAL: Detiene la ejecución aquí para que no mande un HTML abajo.
+        }
+        // ====================================================================
+        // NUEVA ACCIÓN: LISTAR NEGOCIOS ASIGNADOS AL VENDEDOR LOGUEADO
+        // ====================================================================
+        else if ("listarNegociosPorVendedor".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("idUsuario") == null) {
+                response.getWriter().print("[]");
+                return;
+            }
+
+            int idVendedor = (int) session.getAttribute("idUsuario");
+
+            // Aquí puedes instanciar tu NegocioDao para traer la lista filtrada por el ID del usuario
+            Dao.NegocioDao negocioDao = new Dao.NegocioDao();
+            // Nota: Debes tener o crear un método en tu DAO que haga un: 
+            // "SELECT id_negocio, nombre_establecimiento, url_imagen FROM negocios WHERE id_usuario_vendedor = ?"
+            List<Model.NegocioDTO> misNegocios = negocioDao.obtenerNegociosPorVendedor(idVendedor); 
+
+            StringBuilder json = new StringBuilder();
+            json.append("[");
+            for (int i = 0; i < misNegocios.size(); i++) {
+                Model.NegocioDTO n = misNegocios.get(i);
+                json.append("{");
+                json.append("\"idNegocio\":").append(n.getIdNegocio()).append(",");
+                json.append("\"nombreEstablecimiento\":\"").append(escapeJson(n.getNombreEstablecimiento())).append("\",");
+                json.append("\"urlImagen\":\"").append(escapeJson(n.getUrl_imagen())).append("\"");
+                json.append("}");
+                if (i < misNegocios.size() - 1) json.append(",");
+            }
+            json.append("]");
+
+            try (PrintWriter out = response.getWriter()) {
+                out.print(json.toString());
+                out.flush();
+            }
+            return;
+        }
         // ====================================================================
         // ACCIÓN A: EXPANDING CARDS - FILTRAR NEGOCIOS POR CATEGORÍA
         // ====================================================================
-        if ("negociosPorCategoria".equals(accion)) {
+        else if ("negociosPorCategoria".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 
@@ -50,6 +192,7 @@ public class LoginServlet extends HttpServlet {
             for (int i = 0; i < lista.size(); i++) {
                 NegocioDTO n = lista.get(i);
                 json.append("{");
+                json.append("\"idNegocio\":").append(n.getIdNegocio()).append(","); // <--- AÑADE ESTA LÍNEA
                 json.append("\"nombreEstablecimiento\":\"").append(escapeJson(n.getNombreEstablecimiento())).append("\",");
                 json.append("\"urlImagen\":\"").append(escapeJson(n.getUrl_imagen())).append("\"");
                 json.append("}");
@@ -67,36 +210,45 @@ public class LoginServlet extends HttpServlet {
         // ====================================================================
         // ACCIÓN B: DETALLE DE NEGOCIO ÚNICO
         // ====================================================================
-        else if ("detalleNegocioUnico".equals(accion)) {
-            String nombreNegocio = request.getParameter("nombre");
-            System.out.println("-> Ejecutando detalleNegocioUnico para: " + nombreNegocio);
+       else if ("detalleNegocioUnico".equals(accion)) {
+            // 1. CAMBIO: Obtenemos el "id" que envía tu JavaScript
+            String idStr = request.getParameter("id"); 
+            System.out.println("-> Ejecutando detalleNegocioUnico para ID: " + idStr);
 
-            NegocioDao negocioDAO = new NegocioDao(); 
-            NegocioDTO negocio = negocioDAO.obtenerNegocioPorNombre(nombreNegocio);
+            try {
+                int idNegocio = Integer.parseInt(idStr); // Convertimos el string a número
 
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
+                NegocioDao negocioDAO = new NegocioDao(); 
+                // 2. CAMBIO: Llamamos al método por ID (el que agregamos antes al DAO)
+                NegocioDTO negocio = negocioDAO.obtenerNegocioPorId(idNegocio);
 
-            if (negocio != null) {
-                // 🌟 CORREGIDO: Añadimos \"idNegocio\" al JSON para que el JS sepa qué establecimiento es
-                String json = "{"
-                        + "\"idNegocio\":" + negocio.getIdNegocio() + ","
-                        + "\"nombreEstablecimiento\":\"" + escapeJson(negocio.getNombreEstablecimiento()) + "\","
-                        + "\"descripcion\":\"" + escapeJson(negocio.getDescripcion()) + "\","
-                        + "\"urlImagen\":\"" + escapeJson(negocio.getUrl_imagen()) + "\","
-                        + "\"latitud\":" + negocio.getLatitud() + ","
-                        + "\"longitud\":" + negocio.getLongitud()
-                        + "}";
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
 
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(json);
-                    out.flush();
+                if (negocio != null) {
+                    String json = "{"
+                            + "\"idNegocio\":" + negocio.getIdNegocio() + ","
+                            + "\"nombreEstablecimiento\":\"" + escapeJson(negocio.getNombreEstablecimiento()) + "\","
+                            + "\"descripcion\":\"" + escapeJson(negocio.getDescripcion()) + "\","
+                            + "\"urlImagen\":\"" + escapeJson(negocio.getUrl_imagen()) + "\","
+                            + "\"latitud\":" + negocio.getLatitud() + ","
+                            + "\"longitud\":" + negocio.getLongitud()
+                            + "}";
+
+                    try (PrintWriter out = response.getWriter()) {
+                        out.print(json);
+                        out.flush();
+                    }
+                } else {
+                    try (PrintWriter out = response.getWriter()) {
+                        out.print("{\"error\": \"El negocio no fue encontrado en Juanfax\"}");
+                        out.flush();
+                    }
                 }
-            } else {
-                try (PrintWriter out = response.getWriter()) {
-                    out.print("{\"error\": \"El negocio no fue encontrado en Juanfax\"}");
-                    out.flush();
-                }
+            } catch (NumberFormatException e) {
+                // Manejo de error si el ID enviado no es un número válido
+                System.err.println("Error: ID recibido no es un número válido: " + idStr);
+                response.getWriter().print("{\"error\": \"ID inválido\"}");
             }
             return;
         }
@@ -117,6 +269,7 @@ public class LoginServlet extends HttpServlet {
                 for (int i = 0; i < lista.size(); i++) {
                     NegocioDTO n = lista.get(i);
                     json.append("{");
+                    json.append("\"idNegocio\":").append(n.getIdNegocio()).append(","); // <--- AÑADE ESTA LÍNEA
                     json.append("\"nombreEstablecimiento\":\"").append(escapeJson(n.getNombreEstablecimiento())).append("\",");
                     json.append("\"urlImagen\":\"").append(escapeJson(n.getUrl_imagen())).append("\"");
                     json.append("}");
@@ -208,14 +361,24 @@ public class LoginServlet extends HttpServlet {
 
             int idUsuario = (int) session.getAttribute("idUsuario");
             int idNegocio = Integer.parseInt(request.getParameter("idNegocio"));
-            
-            // 🌟 CORREGIDO: Macheamos con "textoComentario" que es el que manda tu JS
             String texto = request.getParameter("textoComentario"); 
+            
+            // 🌟 1. CAPTURAR EL VALOR DE LAS ESTRELLAS DESDE EL JS
+            String valorPuntuacionStr = request.getParameter("valorPuntuacion");
+            int calificacion = 0;
+            
+            if (valorPuntuacionStr != null && !valorPuntuacionStr.isEmpty()) {
+                calificacion = Integer.parseInt(valorPuntuacionStr.trim());
+            }
 
+            // 2. POBLAR EL OBJETO DTO COMPLETAMENTE
             Model.ComentarioDTO nuevoComentario = new Model.ComentarioDTO();
             nuevoComentario.setIdNegocio(idNegocio);
             nuevoComentario.setIdUsuario(idUsuario);
             nuevoComentario.setTextoComentario(texto);
+            
+            // 🌟 3. ASIGNAR LA CALIFICACIÓN AL DTO ANTES DE GUARDAR
+            nuevoComentario.setCalificacion(calificacion); 
 
             Dao.ComentarioDao comentarioDao = new Dao.ComentarioDao();
             boolean exito = comentarioDao.insertarComentario(nuevoComentario);
@@ -230,7 +393,7 @@ public class LoginServlet extends HttpServlet {
         // ====================================================================
         // 🌟 NUEVA ACCIÓN: REGISTRAR UN NUEVO USUARIO (CON ROL Y TÉRMINOS)
         // ====================================================================
-        if ("registrarUsuario".equals(accion)) {
+        else if ("registrarUsuario".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 
@@ -329,7 +492,7 @@ public class LoginServlet extends HttpServlet {
                             response.sendRedirect("vistas/mainAdministrador.html");
                             break;
                         case "VENDEDOR":
-                            response.sendRedirect("vistas/mainVendedor.html");
+                            response.sendRedirect("vistas/misNegocios.html");
                             break;
                         case "TURISTA":
                             response.sendRedirect("vistas/mainUser.html");

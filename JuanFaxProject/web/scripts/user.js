@@ -68,7 +68,13 @@ function renderizarCarruselHero() {
 
         // REDIRECCIÓN DIRECTA AL HACER CLIC EN UNA TARJETA DEL HERO
         caja.onclick = () => {
-            window.location.href = `usuarioInformacionNegocio.html?nombre=${encodeURIComponent(destino.nombreEstablecimiento)}`;
+            // ESTO ES LO QUE NECESITO QUE MIRES EN TU CONSOLA (F12)
+            console.log("DEBUG: Objeto 'destino' completo:", destino);
+            console.log("DEBUG: Valor de 'destino.idNegocio':", destino.idNegocio);
+            
+            // Si al hacer clic aquí, el console.log dice 'undefined' o '0',
+            // entonces el error está en el archivo donde se llenó el array 'destinos'.
+            window.location.href = `usuarioInformacionNegocio.html?id=${destino.idNegocio}`;
         };
     });
 }
@@ -166,27 +172,39 @@ expandingCards.forEach((card) => {
                         const ExpandingTarget = document.createElement("div");
                         ExpandingTarget.classList.add("targets-expanding");
 
-                        // Validamos si la imagen es local o externa
-                        let fotoFinal = neg.urlImagen.startsWith("http") ? neg.urlImagen : `../imagenes/${neg.urlImagen}`;
+                        const rutaImagen = neg.url_imagen || neg.urlImagen; 
 
-                        // Tu estructura HTML original intacta sin estilos incrustados
-                        ExpandingTarget.innerHTML = `
-                            <div class="content-expanding-cards">
-                                <img src="${fotoFinal}" class="imagen-expanding-card">
-                                <span class="spam-expanding-cards">${neg.nombreEstablecimiento}</span>
-                            </div>
-                        `;
+                            // VALIDACIÓN SEGURA: Si rutaImagen es nulo o undefined, asignamos la por defecto
+                            let fotoFinal = '../imagenes/default-negocio.jpg'; 
 
-                        // 🌟 ¡AQUÍ ESTÁ EL EVENTO QUE HACÍA FALTA! 🌟
+                            if (rutaImagen) {
+                                fotoFinal = rutaImagen.startsWith("http") 
+                                    ? rutaImagen 
+                                    : `../verImagen?nombre=${rutaImagen}`;
+                            }
+
+                            ExpandingTarget.innerHTML = `
+                                <div class="content-expanding-cards">
+                                    <img src="${fotoFinal}" class="imagen-expanding-card" alt="${neg.nombreEstablecimiento}">
+                                    <span class="spam-expanding-cards">${neg.nombreEstablecimiento}</span>
+                                </div>
+                            `;
+
                         // Escuchamos el clic en la sub-tarjeta que acabamos de crear
                         ExpandingTarget.addEventListener("click", (e) => {
-                            // Detiene la propagación para que no se cierre la tarjeta grande al hacer clic adentro
                             e.stopPropagation(); 
                             
-                            console.log("Redirigiendo al negocio:", neg.nombreEstablecimiento);
+                            // IMPORTANTE: Asegúrate de que 'neg' tenga la propiedad 'idNegocio'
+                            // Si tu Servlet solo envía 'idNegocio' en la acción 'carrusel' pero no en 'negociosPorCategoria', 
+                            // entonces aquí seguirás recibiendo undefined.
                             
-                            // Redirecciona pasándole el nombre del establecimiento por parámetro URL
-                            window.location.href = `usuarioInformacionNegocio.html?nombre=${encodeURIComponent(neg.nombreEstablecimiento)}`;
+                            console.log("DEBUG: Objeto negocio recibido en categoría:", neg);
+                            
+                            if (neg.idNegocio) {
+                                window.location.href = `usuarioInformacionNegocio.html?id=${neg.idNegocio}`;
+                            } else {
+                                console.error("Error: El negocio no tiene un ID válido.", neg);
+                            }
                         });
 
                         // Insertamos el nodo hijo en la tarjeta grande

@@ -1,0 +1,57 @@
+@import url('../customProperties/CustomProperties.css');
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: var(--Fuente-General);
+    background-color: var(--FondoPrincipal);
+    }
+.contenedor-negocios {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 40px;
+    justify-content: center;
+}
+.card-negocio {
+    background: #1e222b;
+    border: 1px solid #343a40;
+    border-radius: 12px;
+    width: 280px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s, border-color 0.3s;
+}
+.card-negocio:hover {
+    transform: translateY(-5px);
+    border-color: var(--ColorBotonesDeAccionDorado); /* El dorado premium de Juanfax */
+}
+.card-negocio img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+.card-negocio h3 {
+    color: #fff;
+    margin: 10px 0;
+}
+
+/* Estilo especial para la tarjeta de agregar */
+.card-negocio.card-crear-nuevo {
+    border: 2px dashed #3b82f6; /* Borde azul punteado */
+    background-color: #1e293b;  /* Fondo un poco más oscuro */
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.card-negocio.card-crear-nuevo:hover {
+    background-color: #1e293b;
+    border-color: var(--ColorBotonesDeAccionDorado);      
+    transform: translateY(-5px); 
+}
