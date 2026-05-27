@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class Conection {
+public class conection {
     // Ajusta estos valores a tu entorno local
     private static final String URL = "jdbc:mysql://localhost:3306/juanfax?useSSL=false&serverTimezone=UTC";
     private static final String USER = "root"; // Tu usuario de BD

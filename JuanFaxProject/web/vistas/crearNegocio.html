@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juanfax - Registrar Nuevo Negocio</title>
+    <link rel="stylesheet" href="../estilos/css/crearNegocio.css">
+</head>
+<body>
+
+    <main class="contenedor-formulario">
+        <section class="tarjeta-formulario">
+            <header class="encabezado-formulario">
+                <h2>Registrar Establecimiento</h2>
+                <p>Ingresa los datos obligatorios para dar de alta tu nuevo negocio en la plataforma.</p>
+            </header>
+            
+            <form action="../NegocioServlet?accion=registrar" method="POST" enctype="multipart/form-data" class="formulario-registro">
+                
+                <div class="grupo-campo">
+                    <label for="nombre">Nombre del Establecimiento</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej. Café Central Girón" required>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="nit">NIT del Negocio</label>
+                    <input type="text" id="nit" name="nit" placeholder="Ej. 900.123.456-7" required>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="categoria">Categoría del Establecimiento</label>
+                    <select id="categoria" name="categoria" required class="select-formulario">
+                        <option value="" disabled selected>-- Selecciona una categoría --</option>
+                        <option value="1">Históricos</option>
+                        <option value="2">Recreativos</option>
+                        <option value="3">Balnearios</option>
+                    </select>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="descripcion">Descripción Breve</label>
+                    <input type="text" id="descripcion" name="descripcion" placeholder="¿A qué se dedica tu negocio?">
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="foto">Imagen de Portada</label>
+                    <input type="file" id="foto" name="foto" accept="image/*" required>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="latitud">Latitud</label>
+                    <input type="text" id="latitud" name="latitud" placeholder="Ej: 7.0734" required>
+                </div>
+                <div class="grupo-campo">
+                    <label for="longitud">Longitud</label>
+                    <input type="text" id="longitud" name="longitud" placeholder="Ej: -73.0845" required>
+                </div>
+
+                <footer class="acciones-formulario">
+                    <button type="submit" class="btn btn-primario">Guardar Negocio</button>
+                    <a href="misNegocios.html" class="btn btn-secundario">Cancelar</a>
+                </footer>
+            </form>
+        </section>
+    </main>
+
+</body>
+</html>

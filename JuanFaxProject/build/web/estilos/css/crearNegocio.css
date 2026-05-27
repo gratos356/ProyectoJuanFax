@@ -1,0 +1,125 @@
+@import url("../customProperties/CustomProperties.css");
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    font-family: var(--Fuente-General);
+    background-color: var(--FondoPrincipal);
+}
+/* CONTENEDOR CENTRADO */
+.contenedor-formulario {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+    padding: 1.5rem;
+}
+
+/* BLOQUE DE LA TARJETA DEL FORMULARIO */
+.tarjeta-formulario {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 0.5rem;
+    padding: 2.5rem;
+    max-width: 450px;
+    width: 100%;
+}
+
+.encabezado-formulario h2 {
+    color: #f8fafc;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+}
+
+.encabezado-formulario p {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin: 0 0 2rem 0;
+}
+
+/* ESTRUCTURA INTERNA DEL FORMULARIO */
+.formulario-registro {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.grupo-campo label {
+    color: #f8fafc;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.grupo-campo input[type="text"] {
+    background-color: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 0.25rem;
+    color: #f8fafc;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+
+.grupo-campo input[type="text"]:focus {
+    border-color: #3b82f6;
+    outline: none;
+}
+
+.grupo-campo input[type="file"] {
+    color: #94a3b8;
+    padding: 0.5rem 0;
+}
+
+.ayuda-campo {
+    color: #64748b;
+    font-size: 0.75rem;
+}
+
+/* BOTONES DE ACCIÓN */
+.acciones-formulario {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    flex: 1;
+    transition: background-color 0.2s;
+}
+
+.btn-primario {
+    background-color: #3b82f6;
+    color: #ffffff;
+}
+
+.btn-primario:hover {
+    background-color: #2563eb;
+}
+
+.btn-secundario {
+    background-color: #475569;
+    color: #ffffff;
+}
+
+.btn-secundario:hover {
+    background-color: #334155;
+}
