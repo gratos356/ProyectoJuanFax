@@ -39,7 +39,7 @@ public class NegocioDao {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("❌ Error en obtenerNegocioPorId: " + e.getMessage());
+            System.err.println("Error en obtenerNegocioPorId: " + e.getMessage());
             e.printStackTrace();
         }
         return n;
@@ -158,7 +158,7 @@ public class NegocioDao {
             metricas.put("distribucionEstrellas", distribucion);
 
         } catch (SQLException e) {
-            System.out.println("❌ Error en NegocioDao.obtenerMetricasVendedor: " + e.getMessage());
+            System.out.println("Error en NegocioDao.obtenerMetricasVendedor: " + e.getMessage());
             e.printStackTrace();
         } finally {
             // Cerramos todos los recursos de manera limpia e individual
@@ -241,7 +241,7 @@ public class NegocioDao {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("❌ ERROR EN DAO AL FILTRAR: " + e.getMessage());
+            System.out.println("ERROR EN DAO AL FILTRAR: " + e.getMessage());
             e.printStackTrace();
         }
         return lista;
@@ -288,42 +288,44 @@ public class NegocioDao {
     /**
     * Obtiene la lista de negocios asignados a un vendedor específico
     */
-   public List<Model.NegocioDTO> obtenerNegociosPorVendedor(int idVendedor) {
-       List<Model.NegocioDTO> lista = new java.util.ArrayList<>();
+    public List<Model.NegocioDTO> obtenerNegociosPorVendedor(int idVendedor) {
+        List<Model.NegocioDTO> lista = new java.util.ArrayList<>();
 
-       // 🌟 Consulta SQL probada y exacta utilizando la columna id_vendedor
-       String sql = "SELECT n.id_negocio, n.nombre_establecimiento, i.url_imagen " +
-                    "FROM negocios n " +
-                    "LEFT JOIN imagenes i ON n.id_negocio = i.id_negocio " +
-                    "WHERE n.id_vendedor = ?";
+        // 🌟 Agregamos n.estado_revision al final del SELECT
+        String sql = "SELECT n.id_negocio, n.nombre_establecimiento, i.url_imagen, n.estado_revision " +
+                     "FROM negocios n " +
+                     "LEFT JOIN imagenes i ON n.id_negocio = i.id_negocio " +
+                     "WHERE n.id_vendedor = ?";
 
-       try (Connection con = conection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = conection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-           ps.setInt(1, idVendedor);
+            ps.setInt(1, idVendedor);
 
-           try (ResultSet rs = ps.executeQuery()) {
-               while (rs.next()) {
-                   Model.NegocioDTO n = new Model.NegocioDTO();
-                   
-                   // 🌟 CORREGIDO: Usamos índices numéricos según el orden del SELECT para asegurar la lectura
-                   n.setIdNegocio(rs.getInt(1));                  // Toma n.id_negocio
-                   n.setNombreEstablecimiento(rs.getString(2));  // Toma n.nombre_establecimiento
-                   
-                   // Si el negocio no tiene fotos en la tabla imagenes, se le asigna una ruta por defecto
-                   String foto = rs.getString(3);                // Toma i.url_imagen
-                   n.setUrl_imagen(foto != null ? foto : "../imagenes/default-negocio.jpg");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Model.NegocioDTO n = new Model.NegocioDTO();
 
-                   lista.add(n);
-               }
-           }
-       } catch (SQLException e) {
-           System.err.println("❌ Error real en NegocioDao (obtenerNegociosPorVendedor): " + e.getMessage());
-           e.printStackTrace();
-       }
+                    n.setIdNegocio(rs.getInt(1));                  // 1. n.id_negocio
+                    n.setNombreEstablecimiento(rs.getString(2));   // 2. n.nombre_establecimiento
 
-       return lista;
-   }
+                    // Si el negocio no tiene fotos, se le asigna la ruta por defecto
+                    String foto = rs.getString(3);                 // 3. i.url_imagen
+                    n.setUrl_imagen(foto != null ? foto : "../imagenes/default-negocio.jpg");
+
+                    // 🌟 LEEMOS EL ESTADO (Índice 4) y lo guardamos en el DTO
+                    n.setEstado(rs.getString(4));                  // 4. n.estado_revision (Asegúrate de que tu DTO tenga .setEstado o .setEstadoRevision)
+
+                    lista.add(n);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error real en NegocioDao (obtenerNegociosPorVendedor): " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
    public boolean registrarNegocio(NegocioDTO negocio, int idVendedor, int idCategoria,String nit, String descripcion, double latitud, double longitud) {
         Connection con = null;
         PreparedStatement psNegocio = null;
@@ -371,7 +373,7 @@ public class NegocioDao {
                 guardadoExitoso = true;
             }
         } catch (SQLException e) {
-            System.err.println("=== ❌ ERROR SQL: " + e.getMessage() + " ===");
+            System.err.println("=== ERROR SQL: " + e.getMessage() + " ===");
             try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
         } finally {
             try { if (rsKeys != null) rsKeys.close(); } catch (Exception e) {}
@@ -382,4 +384,176 @@ public class NegocioDao {
         }
         return guardadoExitoso;
     }
+    // 1. Método para contar cuántos negocios hay según su estado
+    public int contarNegociosPorEstado(String estado) {
+        String sql = "SELECT COUNT(*) FROM negocios WHERE estado_revision = ?";
+        try (Connection con = conection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, estado);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("ERROR AL CONTAR: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    // 2. Método para listar negocios según su estado (para las solicitudes)
+    public List<NegocioDTO> obtenerNegociosPorEstado(String estado) {
+        List<NegocioDTO> lista = new ArrayList<>();
+        String sql = "SELECT id_negocio, nombre_establecimiento, descripcion " +
+                     "FROM negocios WHERE estado_revision = ?";
+
+        try (Connection con = conection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, estado);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    NegocioDTO n = new NegocioDTO();
+                    n.setIdNegocio(rs.getInt("id_negocio"));
+                    n.setNombreEstablecimiento(rs.getString("nombre_establecimiento"));
+                    n.setDescripcion(rs.getString("descripcion"));
+                    lista.add(n);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("ERROR AL LISTAR POR ESTADO: " + e.getMessage());
+        }
+        return lista;
+    }
+    public boolean actualizarEstadoNegocio(int idNegocio, String nuevoEstado) {
+        String sql = "UPDATE negocios SET estado_revision = ? WHERE id_negocio = ?";
+        
+        try (Connection con = conection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, nuevoEstado);
+            ps.setInt(2, idNegocio);
+            
+            int filasAfectadas = ps.executeUpdate();
+            return filasAfectadas > 0; // Devuelve true si la actualización fue exitosa
+
+        } catch (SQLException e) {
+            System.out.println("Executing UPDATE - ID: " + idNegocio + " - Estado: " + nuevoEstado);
+            System.out.println("ERROR AL ACTUALIZAR ESTADO: " + e.getMessage());
+            return false;
+        }
+    }
+    public boolean eliminarNegocio(int idNegocio) {
+        // 1. Definimos las consultas de eliminación en estricto orden jerárquico
+        String sqlPagos = "DELETE FROM pagos_historial WHERE id_suscripcion IN (SELECT id_suscripcion FROM suscripciones WHERE id_negocio = ?)";
+        String sqlSuscripciones = "DELETE FROM suscripciones WHERE id_negocio = ?";
+        String sqlUbicaciones = "DELETE FROM puntos_ubicacion WHERE id_negocio = ?";
+        String sqlSanciones = "DELETE FROM calificaciones_sanciones WHERE id_negocio = ?";
+        String sqlMetricas = "DELETE FROM metricas_negocio WHERE id_negocio = ?";
+        String sqlNegocio = "DELETE FROM negocios WHERE id_negocio = ?";
+
+        try (Connection con = conection.getConnection()) {
+            // Activamos el modo transacción para asegurar consistencia
+            con.setAutoCommit(false); 
+
+            try (PreparedStatement psPagos = con.prepareStatement(sqlPagos);
+                 PreparedStatement psSuscrip = con.prepareStatement(sqlSuscripciones);
+                 PreparedStatement psUbicac = con.prepareStatement(sqlUbicaciones);
+                 PreparedStatement psSancion = con.prepareStatement(sqlSanciones);
+                 PreparedStatement psMetricas = con.prepareStatement(sqlMetricas);
+                 PreparedStatement psNeg = con.prepareStatement(sqlNegocio)) {
+
+                // Paso A: Borrar el historial de pagos asociados a las suscripciones de este negocio
+                psPagos.setInt(1, idNegocio);
+                psPagos.executeUpdate();
+
+                // Paso B: Borrar las suscripciones del negocio
+                psSuscrip.setInt(1, idNegocio);
+                psSuscrip.executeUpdate();
+
+                // Paso C: Borrar los puntos de ubicación geográfica
+                psUbicac.setInt(1, idNegocio);
+                psUbicac.executeUpdate();
+
+                // Paso D: Borrar calificaciones y registros de sanciones
+                psSancion.setInt(1, idNegocio);
+                psSancion.executeUpdate();
+
+                // Paso E: Borrar las métricas y eventos registrados (vistas, clics)
+                psMetricas.setInt(1, idNegocio);
+                psMetricas.executeUpdate();
+
+                // ⚠️ Paso Final: Ahora que el negocio no tiene ninguna atadura en la DB, lo borramos
+                psNeg.setInt(1, idNegocio);
+                int filasAfectadas = psNeg.executeUpdate();
+
+                // Si el negocio principal se eliminó con éxito, confirmamos toda la transacción
+                con.commit(); 
+                return filasAfectadas > 0;
+
+            } catch (SQLException e) {
+                // Si cualquier consulta llega a fallar, revertimos todo para no romper los datos
+                con.rollback(); 
+                throw e;
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error en NegocioDao.eliminarNegocio: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public List<NegocioDTO> obtenerTodosLosNegociosAdmin() {
+        List<NegocioDTO> lista = new ArrayList<>();
+
+        // Consulta SQL con Joins para traer el nombre de la categoría asignada
+        String sql = "SELECT n.id_negocio, n.nombre_establecimiento, n.estado_revision, " +
+                     "c.nombre_cat AS categoria " +
+                     "FROM negocios n " +
+                     "INNER JOIN categorias c ON n.id_categoria = c.id_categoria";
+
+        try (Connection con = conection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                NegocioDTO n = new NegocioDTO();
+                int idNegocio = rs.getInt("id_negocio");
+
+                n.setIdNegocio(idNegocio);
+                n.setNombreEstablecimiento(rs.getString("nombre_establecimiento"));
+                n.setEstado(rs.getString("estado_revision")); // Toma "Activo", "Trial", "Bloqueado", etc.
+
+                // Pasamos el nombre de la categoría obtenido del JOIN
+                n.setNombreCategoria(rs.getString("categoria")); 
+
+                // --- CÁLCULO DE MÉTRICAS DINÁMICAS INDIVIDUALES ---
+                // 1. Contar vistas reales de este negocio
+                String sqlVistas = "SELECT COUNT(*) FROM metricas_negocio WHERE id_negocio = ? AND tipo_evento = 'VISTA'";
+                try (PreparedStatement psV = con.prepareStatement(sqlVistas)) {
+                    psV.setInt(1, idNegocio);
+                    try (ResultSet rsV = psV.executeQuery()) {
+                        n.setVistas(rsV.next() ? rsV.getInt(1) : 0);
+                    }
+                }
+
+                // 2. Calcular promedio de calificación real
+                String sqlCalific = "SELECT AVG(valor_puntuacion) FROM calificaciones_sanciones WHERE id_negocio = ? AND tipo_registro = 'CALIFICACION'";
+                try (PreparedStatement psC = con.prepareStatement(sqlCalific)) {
+                    psC.setInt(1, idNegocio);
+                    try (ResultSet rsC = psC.executeQuery()) {
+                        n.setCalificacion(rsC.next() ? rsC.getDouble(1) : 0.0);
+                    }
+                }
+
+                // 3. Simulación de suscripción (Si no tienes tabla de suscripciones aún, dejamos una por defecto)
+                n.setSuscripcion("Mensual"); 
+
+                lista.add(n);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error en obtenerTodosLosNegociosAdmin: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return lista;
+    }
+    
 }

@@ -103,7 +103,7 @@ body{
     border-right: 1px solid var(--ColorBotonesDeAccionGris);
 }
 
-.MiNegocio,.Cuenta{
+.Cuenta{
     display: flex;
     flex-direction: column;
     /* justify-content: space-evenly; */
@@ -114,11 +114,11 @@ body{
     cursor: pointer;
     margin-bottom: 40px;
 }
-.MiNegocio p, .Cuenta p{
+.Cuenta p{
     width: 70%;
     font-weight: bold;
 }
-.MiNegocio h2, .Cuenta h2{
+.Cuenta h2{
     color: var(--ColorLetraTitulos);
 }
 .Cuenta{
@@ -132,8 +132,9 @@ body{
     flex-direction: column;
     align-items: center;
     width: 80vw;
-    /* height: 100%; */
+    height: 90vh;
     overflow-x: auto;
+    scrollbar-color: transparent transparent;
     padding-top: var(--SeparacionSecciones);
 }
 .estadisticas{
@@ -146,7 +147,7 @@ body{
     margin-top: 5vh;
 }
 .estads{
-    width: 20%;
+    width: 45%;
     height: 100%;
     border: 1px solid var(--ColorBotonesDeAccionGris);
     box-shadow: 0px 0px 10px var(--ColorBotonesDeAccionGris);
@@ -167,6 +168,8 @@ body{
     border: 1px solid var(--ColorBotonesDeAccionGris);
     box-shadow: 0px 0px 10px var(--ColorBotonesDeAccionGris);
     border-radius: 15px;
+    overflow-x: auto;
+    scrollbar-color: transparent transparent; 
 }
 .Importacion_Masiva_De_Datos{
     width: 95%;
@@ -184,4 +187,321 @@ body{
     border-radius: 15px;
     margin-top: var(--SeparacionSecciones);
     margin-bottom: var(--SeparacionSecciones);
+    overflow-x: auto;
+    scrollbar-color: transparent transparent;
+}
+
+/* ========================================================================
+   ESTILOS COMPLEMENTARIOS PARA MODO OSCURO (JUANFAX PANEL ADMIN)
+   ======================================================================== */
+
+/* --- TEXTOS BASE --- */
+.txt-blanco { color: #ffffff !important; font-weight: 500; }
+.txt-gris { color: #8a99ad !important; }
+.txt-dorado { color: #e0a96d !important; font-weight: 600; }
+
+/* --- CONTADORES SUPERIORES (Sección .estads) --- */
+.estads {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Para que use la caja neomórfica completa */
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.num-estadistica {
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.lbl-estadistica {
+    font-size: 0.85rem;
+    color: #8a99ad;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+/* --- SECCIÓN DE SOLICITUDES (Caja inferior izquierda) --- */
+.solicitudes-titulo {
+    color: #ffffff;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lista-solicitudes-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 280px; /* Evita que rompa la altura de tu contenedor base */
+    overflow-y: auto;  /* Scroll discreto si se acumulan demasiadas */
+    padding-right: 4px;
+}
+
+/* Cada fila de solicitud */
+.item-solicitud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 12px 14px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.item-solicitud:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.solicitud-nombre {
+    font-size: 0.95rem;
+    text-transform: capitalize;
+}
+
+.solicitud-botones {
+    display: flex;
+    gap: 8px;
+}
+
+/* --- BOTONES DEL DASHBOARD (Solicitudes de aprobación directa) --- */
+.btn-dash {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-dash-aprobar {
+    background-color: #10b981;
+    color: #ffffff;
+}
+
+.btn-dash-aprobar:hover {
+    background-color: #059669;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.btn-dash-rechazar {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-dash-rechazar:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+.no-datos-msg {
+    text-align: center;
+    padding: 30px;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+/* --- ESTILOS DE LA TABLA DE GESTIÓN (Tu diseño original) --- */
+.tabla-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.tabla-titulo {
+    color: #e0a96d;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+.btn-filtros {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #8a99ad;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.tabla-negocios {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px; 
+}
+.tabla-negocios th {
+    color: #8a99ad;
+    font-size: 0.8rem;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+}
+.tabla-negocios td {
+    padding: 12px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03); 
+}
+
+/* --- BADGES Y ENLACES --- */
+.badge-estado {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 700; border-radius: 4px; 
+}
+.badge-activo {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981; 
+}
+.badge-trial {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6; 
+}
+.badge-bloqueado {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444; 
+}
+.badge-defecto {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b; 
+}
+.link-accion {
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px; 
+}
+.link-dorado {
+    color: #e0a96d;
+    border: 1px solid rgba(224, 169, 109, 0.2); 
+}
+.link-dorado:hover {
+    background: #e0a96d;
+    color: #000; 
+}
+.link-rojo {
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2); 
+}
+.link-rojo:hover {
+    background: #ef4444;
+    color: #fff; 
+}
+
+/* ========================================================================
+   ESTILOS PARA IMPORTACIÓN MASIVA Y ALERTAS
+   ======================================================================== */
+
+/* --- ZONA DE IMPORTACIÓN (DROP ZONE) --- */
+.import-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: calc(100% - 40px); /* Ajuste dinámico dentro de la caja */
+}
+
+.import-desc {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.drop-zone {
+    flex: 1;
+    border: 2px dashed rgba(224, 169, 109, 0.2); /* Borde discontinuo dorado sutil */
+    background: rgba(255, 255, 255, 0.01);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.drop-zone:hover {
+    border-color: #e0a96d;
+    background: rgba(224, 169, 109, 0.03);
+}
+
+.drop-icon {
+    font-size: 2rem;
+    color: #e0a96d;
+    opacity: 0.7;
+}
+
+.drop-text {
+    font-size: 0.85rem;
+    color: #8a99ad;
+    text-align: center;
+}
+
+/* --- HISTORIAL DE ALERTAS --- */
+.lista-alertas-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.item-alerta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 4px solid #8a99ad; /* Por defecto gris */
+}
+
+/* Colores de gravedad para las alertas */
+.item-alerta.alerta-warning { border-left-color: #f59e0b; } /* Amarillo */
+.item-alerta.alerta-danger  { border-left-color: #ef4444; } /* Rojo */
+.item-alerta.alerta-info    { border-left-color: #3b82f6; } /* Azul */
+
+.alerta-icono {
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+}
+.alerta-warning .alerta-icono { color: #f59e0b; }
+.alerta-danger .alerta-icono  { color: #ef4444; }
+.alerta-info .alerta-icono    { color: #3b82f6; }
+
+.alerta-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.alerta-msg {
+    font-size: 0.88rem;
+    font-weight: 500;
+    display: block;
+}
+
+.alerta-tiempo {
+    font-size: 0.75rem;
+    color: #64748b;
+    display: block;
 }

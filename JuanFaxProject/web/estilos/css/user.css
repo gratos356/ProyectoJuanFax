@@ -247,6 +247,7 @@ html{
     display: flex;
     justify-content: space-evenly;
     align-items: center;
+
 }
 .titulos{
     color: var(--ColorLetra);
@@ -260,7 +261,7 @@ html{
     display: flex;
     /* flex-direction: column; */
     height: 80%;
-    width: 15%;
+    min-width: 166px;
     background-color: var(--FondoPrincipal);
     /* box-shadow: 1px 1px 6px var(--ColorBotonesDeAccionDorado); */
 }
@@ -285,6 +286,10 @@ html{
     font-size: 0.95rem;
 }
 .cardExpandida{
+    display: flex;
+    gap: 28px;
+    overflow-y: hidden;
+    flex-wrap: nowrap; 
     width: 90vw;
 }
 /*

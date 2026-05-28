@@ -11,6 +11,10 @@ public class NegocioDTO {
     private double calificacionPromedio;
     private double latitud;
     private double longitud;
+    private String suscripcion;
+    private int vistas;
+    private double calificacion; // O int, dependiendo de cómo manejes el promedio
+    private String estado;
 
     public NegocioDTO() {}
 
@@ -111,6 +115,40 @@ public class NegocioDTO {
     public void setLongitud(double longitud) {
         this.longitud = longitud;
     }
+
+    public String getSuscripcion() {
+        return suscripcion;
+    }
+
+    public void setSuscripcion(String suscripcion) {
+        this.suscripcion = suscripcion;
+    }
+
+    public int getVistas() {
+        return vistas;
+    }
+
+    public void setVistas(int vistas) {
+        this.vistas = vistas;
+    }
+
+    public double getCalificacion() {
+        return calificacion;
+    }
+
+    public void setCalificacion(double calificacion) {
+        this.calificacion = calificacion;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    
     
     
     
