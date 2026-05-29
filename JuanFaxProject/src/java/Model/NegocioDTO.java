@@ -15,7 +15,10 @@ public class NegocioDTO {
     private int vistas;
     private double calificacion; // O int, dependiendo de cómo manejes el promedio
     private String estado;
-
+    private int idVendedor;      
+    private int idCategoria;     
+    private String nit;
+    
     public NegocioDTO() {}
 
     public NegocioDTO(int idNegocio, String nombreEstablecimiento, String descripcion, String nombreCategoria, 
@@ -148,6 +151,31 @@ public class NegocioDTO {
         this.estado = estado;
     }
 
+    public int getIdVendedor() {
+        return idVendedor;
+    }
+
+    public void setIdVendedor(int idVendedor) {
+        this.idVendedor = idVendedor;
+    }
+
+    public int getIdCategoria() {
+        return idCategoria;
+    }
+
+    public void setIdCategoria(int idCategoria) {
+        this.idCategoria = idCategoria;
+    }
+
+    public String getNit() {
+        return nit;
+    }
+
+    public void setNit(String nit) {
+        this.nit = nit;
+    }
+    
+    
     
     
     

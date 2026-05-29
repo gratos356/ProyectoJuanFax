@@ -5,14 +5,10 @@
         <group>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Dao/NegocioDao.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Model/NegocioDTO.java</file>
-            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Model/AlertaDTO.java</file>
-            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Controller/ImagenServlet.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Controller/NegocioServlet.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Controller/LoginServlet.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Dao/ComentarioDao.java</file>
-            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Config/conection.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Model/ComentarioDTO.java</file>
-            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Controller/MetricasServlet.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Dao/AlertaDao.java</file>
         </group>
     </open-files>

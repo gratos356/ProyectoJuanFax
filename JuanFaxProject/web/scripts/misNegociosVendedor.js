@@ -40,9 +40,14 @@ function cargarMisNegocios() {
                             <span class="badge-estado ${estadoClass}">${estadoTexto}</span>
                         </div>
                         
-                        <button class="btn-eliminar-negocio" style="width: 100%; background: transparent; border: 1px solid #e71d36; color: #e71d36; padding: 6px 0; border-radius: 6px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 5px; font-weight: 500;">
-                            <i class='bx bx-trash'></i> Eliminar
-                        </button>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-editar-negocio" style="flex: 1; background: #3b82f6; border: none; color: white; padding: 6px 0; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                ✏️ Editar
+                            </button>
+                            <button class="btn-eliminar-negocio" style="flex: 1; background: transparent; border: 1px solid #e71d36; color: #e71d36; padding: 6px 0; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                🗑️ Eliminar
+                            </button>
+                        </div>
                     `;
 
                     // Acción al hacer clic en cualquier parte de la tarjeta (Ir a gestionar)
@@ -51,7 +56,13 @@ function cargarMisNegocios() {
                         window.location.href = "mainVendedor.html";
                     });
 
-                    // 🌟 SOLUCIÓN AL CLIC: Buscamos el botón de eliminar recien creado dentro de la card
+                    const btnEditar = card.querySelector(".btn-editar-negocio");
+                    btnEditar.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        localStorage.setItem("idNegocioEditar", negocio.idNegocio); // Guardamos cuál va a editar
+                        window.location.href = "editarNegocio.html"; // Redirige al formulario
+                    });
+                    
                     const btnEliminar = card.querySelector(".btn-eliminar-negocio");
                     btnEliminar.addEventListener("click", (e) => {
                         e.stopPropagation(); // 🛑 DETIENE EL CLIC: Así no se ejecuta el redireccionamiento de la tarjeta

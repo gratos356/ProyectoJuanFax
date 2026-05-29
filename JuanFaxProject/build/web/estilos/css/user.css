@@ -261,8 +261,10 @@ html{
     display: flex;
     /* flex-direction: column; */
     height: 80%;
-    min-width: 166px;
+    min-width: 250px;
+    max-width: 250px;
     background-color: var(--FondoPrincipal);
+ 
     /* box-shadow: 1px 1px 6px var(--ColorBotonesDeAccionDorado); */
 }
 .content-expanding-cards{
@@ -283,13 +285,14 @@ html{
 .spam-expanding-cards{
     color: var(--ColorLetra); 
     font-weight: bold;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
 }
 .cardExpandida{
     display: flex;
     gap: 28px;
     overflow-y: hidden;
     flex-wrap: nowrap; 
+    padding: 0 20px;
     width: 90vw;
 }
 /*

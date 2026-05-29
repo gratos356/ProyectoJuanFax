@@ -91,11 +91,25 @@ function cargarComentarios(idNegocio) {
 
             // Iteramos y construimos las tarjetas dinámicamente con los datos inyectados
             comentarios.forEach(c => {
+                // 🌟 LOGICA VISUAL PARA LAS ESTRELLAS
+                const estrellasMaximas = 5;
+                let estrellasHTML = "";
+                for (let i = 1; i <= estrellasMaximas; i++) {
+                    if (i <= c.calificacion) {
+                        estrellasHTML += '<span style="color: #ffca28; font-size: 1.1rem; margin-right: 2px;">★</span>'; // Estrella llena
+                    } else {
+                        estrellasHTML += '<span style="color: #cbd5e1; font-size: 1.1rem; margin-right: 2px;">☆</span>'; // Estrella vacía
+                    }
+                }
+
                 const card = document.createElement("div");
                 card.className = "comentarioCard"; // Usa tus estilos CSS
                 card.innerHTML = `
-                    <p class="usuarioNombre"><strong>${c.nombreUsuario}</strong> <span class="fecha">${c.fecha}</span></p>
-                    <p class="comentarioTexto">${c.textoComentario}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <p class="usuarioNombre" style="margin: 0;"><strong>${c.nombreUsuario}</strong> <span class="fecha" style="font-size: 0.85rem; color: #94a3b8; margin-left: 8px;">${c.fecha}</span></p>
+                        <div class="estrellasContenedor">${estrellasHTML}</div>
+                    </div>
+                    <p class="comentarioTexto" style="margin: 0; color: #f8fafc;">${c.textoComentario}</p>
                 `;
                 contenedorLista.appendChild(card);
             });

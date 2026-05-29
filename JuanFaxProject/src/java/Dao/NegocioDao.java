@@ -14,11 +14,12 @@ public class NegocioDao {
     
     public NegocioDTO obtenerNegocioPorId(int idNegocio) {
         NegocioDTO n = null;
-        // Consulta JOIN para traer también la imagen si existe
-        String sql = "SELECT n.id_negocio, n.nombre_establecimiento, n.descripcion, " +
-                     "i.url_imagen, p.latitud, p.longitud " +
+
+        // 🌟 CORREGIDO: Cambiamos i.urlImagen e i.idNegocio a snake_case (url_imagen e id_negocio)
+        String sql = "SELECT n.id_negocio, n.nit, n.id_categoria, n.nombre_establecimiento, n.descripcion, " +
+                     "i.url_imagen AS url_final, p.latitud, p.longitud " +
                      "FROM negocios n " +
-                     "LEFT JOIN imagenes i ON n.id_negocio = i.id_negocio " +
+                     "LEFT JOIN imagenes i ON n.id_negocio = i.id_negocio " + 
                      "LEFT JOIN puntos_ubicacion p ON n.id_negocio = p.id_negocio " +
                      "WHERE n.id_negocio = ?";
 
@@ -31,9 +32,16 @@ public class NegocioDao {
                 if (rs.next()) {
                     n = new NegocioDTO();
                     n.setIdNegocio(rs.getInt("id_negocio"));
+                    n.setNit(rs.getString("nit"));
+                    n.setIdCategoria(rs.getInt("id_categoria"));
                     n.setNombreEstablecimiento(rs.getString("nombre_establecimiento"));
+                    
+                    // 🌟 CORREGIDO: Cambiado de setDescription a setDescripcion
                     n.setDescripcion(rs.getString("descripcion"));
-                    n.setUrl_imagen(rs.getString("url_imagen"));
+
+                    // Leemos el alias 'url_final' para evitar choques de nombres
+                    n.setUrl_imagen(rs.getString("url_final"));
+
                     n.setLatitud(rs.getDouble("latitud"));
                     n.setLongitud(rs.getDouble("longitud"));
                 }
@@ -183,10 +191,13 @@ public class NegocioDao {
     // ====================================================================
     public List<NegocioDTO> obtenerDestinosDestacados() {
         List<NegocioDTO> lista = new ArrayList<>();
-        // 🌟 AGREGAMOS n.id_negocio A LA CONSULTA
+
+        // 🌟 FILTRAMOS CON "WHERE n.estado_revision = 'APROBADO'" 
+        // Esto descarta automáticamente los pendientes, rechazados o bloqueados.
         String sql = "SELECT n.id_negocio, n.nombre_establecimiento, i.url_imagen " +
                      "FROM negocios n " +
                      "LEFT JOIN imagenes i ON n.id_negocio = i.id_negocio " +
+                     "WHERE n.estado_revision = 'APROBADO' " +
                      "LIMIT 5";
 
         try (Connection con = conection.getConnection();
@@ -195,9 +206,7 @@ public class NegocioDao {
 
             while (rs.next()) {
                 NegocioDTO n = new NegocioDTO();
-                // 🌟 AGREGAMOS ESTA LÍNEA OBLIGATORIA
                 n.setIdNegocio(rs.getInt("id_negocio")); 
-
                 n.setNombreEstablecimiento(rs.getString("nombre_establecimiento"));
 
                 String foto = rs.getString("url_imagen");
@@ -498,6 +507,27 @@ public class NegocioDao {
         } catch (SQLException e) {
             System.err.println("❌ Error en NegocioDao.eliminarNegocio: " + e.getMessage());
             e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    // B. Actualizar los datos en la DB y devolver el estado a 'PENDIENTE'
+    public boolean actualizarNegocio(Model.NegocioDTO negocio) {
+        String sql = "UPDATE negocios SET nit = ?, nombre_establecimiento = ?, descripcion = ?, id_categoria = ?, estado_revision = 'PENDIENTE' WHERE id_negocio = ?";
+        try (Connection con = conection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, negocio.getNit());
+            ps.setString(2, negocio.getNombreEstablecimiento());
+            ps.setString(3, negocio.getDescripcion());
+            ps.setInt(4, negocio.getIdCategoria());
+            ps.setInt(5, negocio.getIdNegocio());
+
+            int filasAfectadas = ps.executeUpdate();
+            return filasAfectadas > 0;
+        } catch (SQLException e) {
+            System.err.println("Error en actualizarNegocio: " + e.getMessage());
             return false;
         }
     }

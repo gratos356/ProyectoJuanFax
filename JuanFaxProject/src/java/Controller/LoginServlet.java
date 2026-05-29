@@ -271,6 +271,36 @@ public class LoginServlet extends HttpServlet {
             }
             return;
         }
+       else if ("obtenerNegocioPorId".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            try {
+                int id = Integer.parseInt(request.getParameter("id"));
+                Dao.NegocioDao dao = new Dao.NegocioDao();
+                Model.NegocioDTO n = dao.obtenerNegocioPorId(id);
+
+                if (n != null) {
+                    // Reemplazamos los nulos por textos vacíos para que no rompan el JSON
+                    String nit = (n.getNit() != null) ? n.getNit() : "";
+                    String nombre = (n.getNombreEstablecimiento() != null) ? n.getNombreEstablecimiento().replace("\"", "\\\"") : "";
+                    String descripcion = (n.getDescripcion() != null) ? n.getDescripcion().replace("\"", "\\\"") : "";
+
+                    String json = String.format(
+                        "{\"success\": true, \"id\": %d, \"nit\": \"%s\", \"nombre\": \"%s\", \"descripcion\": \"%s\", \"idCategoria\": %d}",
+                        n.getIdNegocio(), nit, nombre, descripcion, n.getIdCategoria()
+                    );
+                    response.getWriter().write(json);
+                } else {
+                    response.getWriter().write("{\"success\": false, \"message\": \"No se encontró el establecimiento en el sistema.\"}");
+                }
+            } catch (Exception e) {
+                // Si algo falla, respondemos en formato JSON y evitamos que Tomcat mande el HTML de error
+                System.err.println("Error crítico en Servlet obtenerNegocioPorId: " + e.getMessage());
+                response.getWriter().write("{\"success\": false, \"message\": \"Error interno: " + e.getMessage() + "\"}");
+            }
+            return;
+        }
         // --------------------------------------------------------------------
         // ACCIÓN 5: OBTENER LOS DESTINOS RECOMENDADOS DEL CARRUSEL principal
         // --------------------------------------------------------------------
@@ -322,14 +352,15 @@ public class LoginServlet extends HttpServlet {
                 json.append("[");
                 for (int i = 0; i < lista.size(); i++) {
                     Model.ComentarioDTO c = lista.get(i);
-                    // Formateo clásico latinoamericano dd/MM/yyyy para las fechas de publicación
+                    
                     java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy");
                     String fechaFormateada = c.getFechaPublicacion() != null ? sdf.format(c.getFechaPublicacion()) : "";
 
                     json.append("{");
                     json.append("\"nombreUsuario\":\"").append(escapeJson(c.getNombreUsuario())).append("\",");
                     json.append("\"textoComentario\":\"").append(escapeJson(c.getTextoComentario())).append("\",");
-                    json.append("\"fecha\":\"").append(fechaFormateada).append("\"");
+                    json.append("\"fecha\":\"").append(fechaFormateada).append("\",");
+                    json.append("\"calificacion\":").append(c.getCalificacion()); // 🌟 Entrega el número de estrellas al JS
                     json.append("}");
                     if (i < lista.size() - 1) json.append(",");
                 }
@@ -806,6 +837,42 @@ public class LoginServlet extends HttpServlet {
                 response.getWriter().write("{\"success\": false, \"message\": \"Error crítico en el servidor: " + e.getMessage() + "\"}");
             }
             return; // Importante para que no siga ejecutando código de abajo
+        }
+        else if ("actualizarNegocio".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            try {
+                // 1. Capturamos los datos básicos que vienen desde el JavaScript (Formulario/Fetch)
+                int id = Integer.parseInt(request.getParameter("id"));
+                String nit = request.getParameter("nit");
+                String nombre = request.getParameter("nombre");
+                String descripcion = request.getParameter("descripcion");
+                int idCategoria = Integer.parseInt(request.getParameter("idCategoria"));
+
+                // 2. Instanciamos y empaquetamos el objeto DTO que espera tu DAO
+                Model.NegocioDTO negocioModificado = new Model.NegocioDTO();
+                negocioModificado.setIdNegocio(id);
+                negocioModificado.setNit(nit);
+                negocioModificado.setNombreEstablecimiento(nombre);
+                negocioModificado.setDescripcion(descripcion);
+                negocioModificado.setIdCategoria(idCategoria);
+
+                // 3. Instanciamos el DAO y ejecutamos tu método pasando el objeto
+                Dao.NegocioDao dao = new Dao.NegocioDao();
+                boolean exito = dao.actualizarNegocio(negocioModificado); // 🌟 Aquí se conecta con tu método
+
+                // 4. Respondemos al frontend según el resultado de la BD
+                if (exito) {
+                    response.getWriter().write("{\"success\": true, \"message\": \"Establecimiento actualizado correctamente.\"}");
+                } else {
+                    response.getWriter().write("{\"success\": false, \"message\": \"No se pudieron salvar los cambios en la base de datos.\"}");
+                }
+            } catch (Exception e) {
+                System.err.println("❌ Error en LoginServlet al actualizar establecimiento: " + e.getMessage());
+                response.getWriter().write("{\"success\": false, \"message\": \"Error interno en el servidor: " + e.getMessage() + "\"}");
+            }
+            return; // 💥 Crucial para frenar el hilo y que no intente hacer el Login tradicional abajo
         }
 
         // ====================================================================
