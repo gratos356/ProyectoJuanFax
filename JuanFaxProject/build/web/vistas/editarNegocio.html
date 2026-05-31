@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>JuanFax - Editar Establecimiento</title>
+    <link rel="stylesheet" href="../estilos/css/editarNegocio.css">
+</head>
+<body>
+
+<div class="form-container">
+    <h2>✏️ Editar Establecimiento</h2>
+    <p style="color: #94a3b8; font-size: 13px;">Nota: Al guardar cambios, el negocio volverá al estado "Pendiente" para validación.</p>
+    
+    <form id="formEditarNegocio">
+        <input type="hidden" id="idNegocio" name="id">
+        
+        <div class="group">
+            <label>NIT del Negocio</label>
+            <input type="text" id="nit" name="nit" required>
+        </div>
+        <div class="group">
+            <label>Nombre Comercial</label>
+            <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div class="group">
+            <label>Categoría</label>
+            <select id="idCategoria" name="idCategoria">
+                <option value="1">HISTORICOS</option>
+                <option value="2">RECRATIVOS</option>
+                <option value="3">BALNEARIOS</option>
+            </select>
+        </div>
+        <div class="group">
+            <label>Descripción del Local</label>
+            <textarea id="descripcion" name="descripcion" rows="4"></textarea>
+        </div>
+        
+        <button type="submit">Guardar Cambios</button>
+        <button type="button" onclick="window.location.href='misNegocios.html'" style="background:transparent; color:#94a3b8; margin-top:10px;">Cancelar</button>
+    </form>
+</div>
+
+<script src="../scripts/editarNegocio.js"></script>
+</body>
+</html>

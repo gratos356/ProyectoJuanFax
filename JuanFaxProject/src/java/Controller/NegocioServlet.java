@@ -37,12 +37,15 @@ public class NegocioServlet extends HttpServlet {
             String nit = request.getParameter("nit");
             int idCategoria = Integer.parseInt(request.getParameter("categoria"));
             String descripcion = request.getParameter("descripcion");
+            
+            // 🌟 NUEVO: Capturar el plan seleccionado ("Mensual" o "Anual")
+            String tipoPlan = request.getParameter("tipoPlan"); 
 
             // 3. Capturar NUEVA ubicación
             double latitud = Double.parseDouble(request.getParameter("latitud"));
             double longitud = Double.parseDouble(request.getParameter("longitud"));
 
-            // 4. Procesar foto (Con la validación que ya teníamos)
+            // 4. Processar foto (Con la validación que ya teníamos)
             Part part = request.getPart("foto");
             String nombreFotoFinal = "default-negocio.jpg";
 
@@ -63,9 +66,9 @@ public class NegocioServlet extends HttpServlet {
             nuevoNegocio.setNombreEstablecimiento(nombreNegocio);
             nuevoNegocio.setUrl_imagen(nombreFotoFinal);
 
-            // 6. Enviar al DAO (Con los nuevos parámetros)
+            // 6. Enviar al DAO (Agregamos 'tipoPlan' al final)
             Dao.NegocioDao negocioDao = new Dao.NegocioDao();
-            boolean exito = negocioDao.registrarNegocio(nuevoNegocio, idVendedor, idCategoria, nit, descripcion, latitud, longitud);
+            boolean exito = negocioDao.registrarNegocio(nuevoNegocio, idVendedor, idCategoria, nit, descripcion, latitud, longitud, tipoPlan);
 
             // 7. Redirección
             if (exito) {

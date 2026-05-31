@@ -62,10 +62,13 @@ body{
 .botones{
     display: flex;
     align-items: center;
-    height: 10%;
+    height: 40%;
     width: 100%;
     padding: 10px;
     transition: 0.5s;
+}
+.botones{
+    border: 1px solid var(--ColorBotonesDeAccionGris);
 }
 .botonesFocus{
     display: flex;
@@ -74,7 +77,7 @@ body{
     color: var(--ColorBotonesDeAccionDorado);
     border-right: 3px solid var(--ColorBotonesDeAccionDorado);
     padding: 11px;
-    height: 10%;
+    /* height: 10%; */
     width: 100%;
 }
 /* _____________________ */
@@ -82,7 +85,7 @@ body{
 /* _____________________ */
 .main{
     display: flex;
-    height: 100vh;
+    min-height: 100%;
     background-color: var(--FondoPrincipal);
 }
 .informacionNegocio h3,.informacionNegocio p ,.informacionNegocio span,.informacionNegocio strong,.i    {
@@ -97,7 +100,7 @@ body{
     align-items: center;
     gap: 20px;
     width: 20vw;
-    height: 100vh;
+    min-height: 100vh;
     background-color: var(--FondoSecundario);
     padding-left: 20px;
     padding-top: 30px;
@@ -107,18 +110,18 @@ body{
 .MiNegocio,.Cuenta{
     display: flex;
     flex-direction: column;
-    /* justify-content: space-evenly; */
-    height: 40%;
     width: 100%;
-    gap: 5px;
+    height: 10%;
+    gap: 2px;
     color: var(--ColorLetraNav);
     cursor: pointer;
-    margin-bottom: 20px;
+
 }
 .MiNegocio p, .Cuenta p{
     width: 70%;
     font-weight: bold;
 }
+
 .MiNegocio h2, .Cuenta h2{
     color: var(--ColorLetraTitulos);
 }
@@ -299,4 +302,202 @@ body{
     color: #ff8882;
     font-size: 13px;
     margin-top: 15px;
+}
+
+/* Contenedor principal del módulo */
+.contenedor-planes {
+    padding: 30px 20px;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    animation: fadeInPlanes 0.4s ease-in-out;
+}
+
+/* Animación de entrada suave para la vista */
+@keyframes fadeInPlanes {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Encabezado del catálogo */
+.planes-header {
+    text-align: center;
+    margin-bottom: 45px;
+}
+
+.planes-header h2 {
+    font-size: 2.2rem;
+    color: #1a202c;
+    margin-bottom: 12px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.planes-header p {
+    font-size: 1.05rem;
+    color: #4a5568;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+/* Contenedor de las dos tarjetas (Grid Dual) */
+.grid-planes-dual {
+    display: flex;
+    gap: 35px;
+    justify-content: center;
+    align-items: stretch; /* Hace que ambas tarjetas tengan la misma altura */
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+    margin-top: 20px;
+}
+
+/* Estructura base de cada tarjeta */
+.tarjeta-plan {
+    background: var(--FondoPrincipal);
+    border: 1px solid var(--ColorBotonesDeAccionGris);
+    border-radius: 16px;
+    padding: 40px 30px;
+    width: 320px;
+    position: relative;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                box-shadow 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                border-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Efecto al pasar el cursor por encima */
+.tarjeta-plan:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #cbd5e0;
+}
+
+/* 🌟 Estilos exclusivos para el Plan Anual (Destacado) */
+.tarjeta-plan.plan-destacado {
+    border: 2px solid var(--ColorBotonesDeAccionDorado); /* Azul destacado */
+    background: var(--FondoPrincipal);      /* Fondo sutilmente diferente */
+}
+
+.tarjeta-plan.plan-destacado:hover {
+    transform: translateY(-8px);
+    border-color: #2b6cb0;
+    box-shadow: 0 20px 25px -5px rgba(43, 108, 176, 0.15), 0 10px 10px -5px rgba(43, 108, 176, 0.1);
+}
+
+/* Etiquetas/Etiquetas flotantes de los planes (Badges) */
+.plan-badge {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    background: #edf2f7;
+    color: #4a5568;
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Badge del plan anual */
+.plan-badge.destacado {
+    background: #2b6cb0;
+    color: #ffffff;
+}
+
+/* Títulos internos de los planes */
+.tarjeta-plan h3 {
+    margin-top: 15px;
+    font-size: 1.45rem;
+    color: #2d3748;
+    font-weight: 600;
+}
+
+/* Contenedor de Precios */
+.plan-precio {
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: #1a202c;
+    margin: 25px 0;
+    letter-spacing: -1px;
+}
+
+.plan-precio span {
+    font-size: 0.95rem;
+    color: #718096;
+    font-weight: 500;
+    letter-spacing: normal;
+}
+
+/* Lista de características del plan */
+.plan-caracteristicas {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 35px 0;
+    flex-grow: 1; /* Empuja el botón hacia el fondo para que queden alineados */
+}
+
+.plan-caracteristicas li {
+    margin-bottom: 14px;
+    font-size: 0.95rem;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    line-height: 1.4;
+}
+
+/* Botones de acción dentro de las tarjetas */
+.btn-seleccionar-plan {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #2b6cb0;
+    background: transparent;
+    color: #2b6cb0;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-seleccionar-plan:hover {
+    background: #2b6cb0;
+    color: #ffffff;
+}
+
+/* Botón del plan destacado (Anual) */
+.btn-pro {
+    background: #2b6cb0;
+    color: #ffffff;
+}
+
+.btn-pro:hover {
+    background: #2c5282;
+    border-color: #2c5282;
+}
+
+/* Footer de la vista / Botón de retorno */
+.planes-footer {
+    text-align: center;
+    margin-top: 35px;
+}
+
+.btn-regresar {
+    background: #718096;
+    color: #ffffff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.btn-regresar:hover {
+    background: #4a5568;
 }

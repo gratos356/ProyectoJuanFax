@@ -51,17 +51,48 @@
                     <label for="latitud">Latitud</label>
                     <input type="text" id="latitud" name="latitud" placeholder="Ej: 7.0734" required>
                 </div>
+                
                 <div class="grupo-campo">
                     <label for="longitud">Longitud</label>
                     <input type="text" id="longitud" name="longitud" placeholder="Ej: -73.0845" required>
                 </div>
 
+                <div class="grupo-campo campo-suscripcion">
+                    <label class="titulo-seccion-plan">Selecciona el plan para tu negocio (Incluye 30 días de Prueba Gratuita)</label>
+                    
+                    <div class="contenedor-planes">
+                        
+                        <label class="tarjeta-plan">
+                            <input type="radio" name="tipoPlan" value="Mensual" checked class="radio-plan">
+                            <div class="plan-info">
+                                <strong class="nombre-plan">Plan Mensual</strong>
+                                <p class="descripcion-plan">
+                                    Pago mes a mes de forma flexible. Ideal para empezar a digitalizar tu local.
+                                </p>
+                                <span class="badge-gratis">🎁 30 días gratis</span>
+                            </div>
+                        </label>
+
+                        <label class="tarjeta-plan">
+                            <input type="radio" name="tipoPlan" value="Anual" class="radio-plan">
+                            <div class="plan-info">
+                                <strong class="nombre-plan">Plan Anual</strong>
+                                <p class="descripcion-plan">
+                                    Ahorra con la suscripción de un año completo. Máxima estabilidad para tu negocio.
+                                </p>
+                                <span class="badge-gratis">🎁 30 días gratis</span>
+                            </div>
+                        </label>
+
+                    </div>
+                </div>
+
                 <footer class="acciones-formulario">
-                    <button type="submit" class="btn btn-primario">Guardar Negocio</button>
+                    <button type="submit" class="btn btn-primario">Guardar Negocio y Activar Plan</button>
                     <a href="misNegocios.html" class="btn btn-secundario">Cancelar</a>
                 </footer>
-            </form>
-        </section>
+
+            </form> </section>
     </main>
 
 </body>
