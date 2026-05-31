@@ -11,38 +11,45 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ComentarioDao {
-    public boolean insertarComentario(ComentarioDTO comentario) {
-        String sql = "INSERT INTO calificaciones_sanciones (id_usuario, id_negocio, comentario_justificacion, valor_puntuacion, tipo_registro, fecha_registro) VALUES (?, ?, ?, ?, 'CALIFICACION', NOW())";
+public boolean insertarComentario(ComentarioDTO comentario) {
+        String sql = "INSERT INTO calificaciones_sanciones "
+                   + "(id_usuario, id_negocio, comentario_justificacion, valor_puntuacion, tipo_registro, fecha_registro) "
+                   + "VALUES (?, ?, ?, ?, 'CALIFICACION', NOW())";
         
-        try (Connection con = Config.conection.getConnection();
-                 PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = conection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-                ps.setInt(1, comentario.getIdUsuario());
-                ps.setInt(2, comentario.getIdNegocio());
-                ps.setString(3, comentario.getTextoComentario());
-                ps.setInt(4, comentario.getCalificacion()); // 🌟 Pasamos las estrellas al PreparedStatement
+            ps.setInt(1, comentario.getIdUsuario());
+            ps.setInt(2, comentario.getIdNegocio());
+            ps.setString(3, comentario.getTextoComentario());
+            ps.setInt(4, comentario.getCalificacion()); 
 
-                int filas = ps.executeUpdate();
-                return filas > 0;
+            int filas = ps.executeUpdate();
+            return filas > 0;
 
-            } catch (SQLException e) {
-                System.err.println("Error al insertar comentario en el DAO: " + e.getMessage());
-                return false;
-            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error al insertar comentario en el DAO: " + e.getMessage());
+            return false;
+        }
     }
 
+    // 2. CONSULTA PARA LISTAR (Traer comentarios y estrellas usando INNER JOIN)
     public List<ComentarioDTO> obtenerComentariosPorNegocio(int idNegocio) {
         List<ComentarioDTO> lista = new ArrayList<>();
         
-        // Cruzamos la tabla comentarios con usuarios para traer el nombre real de quien escribe
-        String sql = "SELECT c.id_comentario, c.id_negocio, c.id_usuario, c.texto_comentario, c.fecha_publicacion, "
+        // 🌟 CONSULTA AJUSTADA A TUS NOMBRES DE TABLA REALES
+        String sql = "SELECT c.id_registro AS id_comentario, "
+                   + "c.id_negocio, c.id_usuario, "
+                   + "c.comentario_justificacion AS texto_comentario, "
+                   + "c.fecha_registro AS fecha_publicacion, "
+                   + "c.valor_puntuacion AS calificacion, "
                    + "u.nombre_completo "
-                   + "FROM comentarios c "
+                   + "FROM calificaciones_sanciones c "
                    + "INNER JOIN usuarios u ON c.id_usuario = u.id_usuario "
-                   + "WHERE c.id_negocio = ? "
-                   + "ORDER BY c.fecha_publicacion DESC"; // Los más recientes primero
+                   + "WHERE c.id_negocio = ? AND c.tipo_registro = 'CALIFICACION' "
+                   + "ORDER BY c.fecha_registro DESC";
 
-        try (Connection con = conection.getConnection();
+        try (Connection con = Config.conection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             
             ps.setInt(1, idNegocio);
@@ -55,15 +62,14 @@ public class ComentarioDao {
                     c.setIdUsuario(rs.getInt("id_usuario"));
                     c.setTextoComentario(rs.getString("texto_comentario"));
                     c.setFechaPublicacion(rs.getTimestamp("fecha_publicacion"));
-                    
-                    // Asignamos el nombre completo del usuario que venía del INNER JOIN
                     c.setNombreUsuario(rs.getString("nombre_completo"));
+                    c.setCalificacion(rs.getInt("calificacion"));
                     
                     lista.add(c);
                 }
             }
         } catch (SQLException e) {
-            System.out.println("❌ Error al obtener comentarios del negocio en Juanfax: " + e.getMessage());
+            System.err.println("❌ Error crítico en ComentarioDao (verificar conexión/tablas): " + e.getMessage());
             e.printStackTrace();
         }
         return lista;
