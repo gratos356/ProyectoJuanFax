@@ -256,44 +256,6 @@ public class NegocioDao {
         return lista;
     }
     
-    public NegocioDTO obtenerNegocioPorNombre(String nombreBuscar) {
-        Connection con = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        NegocioDTO negocio = null;
-
-        String sql = "SELECT n.id_negocio, n.nombre_establecimiento, i.url_imagen " +
-                         "FROM negocios n " +
-                         "LEFT JOIN imagenes i ON n.id_negocio = i.id_negocio " +
-                         "WHERE n.id_vendedor = ?";
-
-        try {
-            con = conection.getConnection(); 
-            ps = con.prepareStatement(sql);
-            ps.setString(1, nombreBuscar);
-            rs = ps.executeQuery();
-
-            if (rs.next()) {
-                negocio = new NegocioDTO();
-                negocio.setIdNegocio(rs.getInt("id_negocio"));
-                negocio.setNombreEstablecimiento(rs.getString("nombre_establecimiento"));
-                negocio.setDescripcion(rs.getString("descripcion"));
-                negocio.setUrl_imagen(rs.getString("url_imagen"));
-
-                negocio.setLatitud(rs.getDouble("latitud"));
-                negocio.setLongitud(rs.getDouble("longitud"));
-                negocio.setDireccionTexto(rs.getString("direccion_texto")); 
-            }
-        } catch (Exception e) {
-            System.out.println("Error al obtener detalles geográficos en Juanfax: " + e.getMessage());
-        } finally {
-            try { if (rs != null) rs.close(); } catch (Exception e) {}
-            try { if (ps != null) ps.close(); } catch (Exception e) {}
-            try { if (con != null) con.close(); } catch (Exception e) {}
-        }
-
-        return negocio;
-    }
     /**
     * Obtiene la lista de negocios asignados a un vendedor específico
     */
@@ -335,21 +297,24 @@ public class NegocioDao {
 
         return lista;
     }
-   public boolean registrarNegocio(NegocioDTO negocio, int idVendedor, int idCategoria,String nit, String descripcion, double latitud, double longitud) {
+   public boolean registrarNegocio(NegocioDTO negocio, int idVendedor, int idCategoria, String nit, String descripcion, double latitud, double longitud, String tipoPlan) {
         Connection con = null;
         PreparedStatement psNegocio = null;
         PreparedStatement psImagen = null;
         PreparedStatement psUbicacion = null;
+        PreparedStatement psSuscripcion = null; 
         ResultSet rsKeys = null;
         boolean guardadoExitoso = false;
 
         String sqlNegocio = "INSERT INTO negocios (id_vendedor, id_categoria, nit, nombre_establecimiento, descripcion) VALUES (?, ?, ?, ?, ?)";
         String sqlImagen = "INSERT INTO imagenes (id_negocio, url_imagen, descripcion, es_portada) VALUES (?, ?, ?, TRUE)";
         String sqlUbicacion = "INSERT INTO puntos_ubicacion (id_negocio, id_destino, latitud, longitud) VALUES (?, 1, ?, ?)";
+        String sqlSuscripcion = "INSERT INTO suscripciones (id_negocio, tipo_plan, estado_plan, fecha_inicio, fecha_fin) " +
+                                "VALUES (?, ?, 'ACTIVO', NOW(), DATE_ADD(NOW(), INTERVAL 1 MONTH))";
 
         try {
             con = conection.getConnection();
-            con.setAutoCommit(false); // Iniciamos transacción
+            con.setAutoCommit(false); // Iniciamos transacción segura
 
             // 1. Insertar Negocio
             psNegocio = con.prepareStatement(sqlNegocio, Statement.RETURN_GENERATED_KEYS);
@@ -378,17 +343,42 @@ public class NegocioDao {
                 psUbicacion.setDouble(3, longitud);
                 psUbicacion.executeUpdate();
 
-                con.commit(); // Todo salió bien
+                // 4. 🛡️ VALIDACIÓN DEFENSIVA: Evita que un null rompa la transacción
+                if (tipoPlan == null || tipoPlan.trim().isEmpty()) {
+                    tipoPlan = "Mensual"; // Si viene vacío del formulario, le ponemos un valor seguro
+                }
+
+                // Insertar Suscripción Inicial
+                psSuscripcion = con.prepareStatement(sqlSuscripcion);
+                psSuscripcion.setInt(1, idNegocioGenerado);
+                psSuscripcion.setString(2, tipoPlan.toUpperCase());
+                psSuscripcion.executeUpdate();
+
+                con.commit(); // ¡Todo salió perfecto! Confirmamos la transacción completa
                 guardadoExitoso = true;
             }
         } catch (SQLException e) {
-            System.err.println("=== ERROR SQL: " + e.getMessage() + " ===");
-            try { if (con != null) con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            System.err.println("=== ❌ ERROR SQL EN LA TRANSACCIÓN DEL REGISTRO ===");
+            System.err.println("Mensaje real: " + e.getMessage());
+            System.err.println("Código de error SQL: " + e.getErrorCode());
+            e.printStackTrace();
+
+            // Si algo falló en cualquiera de los 4 pasos, revertimos todo para no dejar datos basura
+            try { 
+                if (con != null) {
+                    System.err.println("🔄 Ejecutando rollback de la transacción...");
+                    con.rollback(); 
+                }
+            } catch (SQLException ex) { 
+                ex.printStackTrace(); 
+            }
         } finally {
+            // Cierre limpio de recursos en orden inverso
             try { if (rsKeys != null) rsKeys.close(); } catch (Exception e) {}
             try { if (psNegocio != null) psNegocio.close(); } catch (Exception e) {}
             try { if (psImagen != null) psImagen.close(); } catch (Exception e) {}
             try { if (psUbicacion != null) psUbicacion.close(); } catch (Exception e) {}
+            try { if (psSuscripcion != null) psSuscripcion.close(); } catch (Exception e) {} 
             try { if (con != null) con.close(); } catch (Exception e) {}
         }
         return guardadoExitoso;
@@ -534,11 +524,15 @@ public class NegocioDao {
     public List<NegocioDTO> obtenerTodosLosNegociosAdmin() {
         List<NegocioDTO> lista = new ArrayList<>();
 
-        // Consulta SQL con Joins para traer el nombre de la categoría asignada
-        String sql = "SELECT n.id_negocio, n.nombre_establecimiento, n.estado_revision, " +
-                     "c.nombre_cat AS categoria " +
+        // Una sola consulta consolidada usando LEFT JOIN y GROUP BY
+        String sql = "SELECT n.id_negocio, n.nombre_establecimiento, n.estado_revision, c.nombre_cat AS categoria, " +
+                     "COUNT(DISTINCT CASE WHEN m.tipo_evento = 'VISTA' THEN m.id_metrica END) AS total_vistas, " +
+                     "IFNULL(AVG(CASE WHEN cs.tipo_registro = 'CALIFICACION' THEN cs.valor_puntuacion END), 0.0) AS promedio_calificacion " +
                      "FROM negocios n " +
-                     "INNER JOIN categorias c ON n.id_categoria = c.id_categoria";
+                     "INNER JOIN categorias c ON n.id_categoria = c.id_categoria " +
+                     "LEFT JOIN metricas_negocio m ON n.id_negocio = m.id_negocio " +
+                     "LEFT JOIN calificaciones_sanciones cs ON n.id_negocio = cs.id_negocio " +
+                     "GROUP BY n.id_negocio, n.nombre_establecimiento, n.estado_revision, c.nombre_cat";
 
         try (Connection con = conection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
@@ -546,36 +540,13 @@ public class NegocioDao {
 
             while (rs.next()) {
                 NegocioDTO n = new NegocioDTO();
-                int idNegocio = rs.getInt("id_negocio");
-
-                n.setIdNegocio(idNegocio);
+                n.setIdNegocio(rs.getInt("id_negocio"));
                 n.setNombreEstablecimiento(rs.getString("nombre_establecimiento"));
-                n.setEstado(rs.getString("estado_revision")); // Toma "Activo", "Trial", "Bloqueado", etc.
-
-                // Pasamos el nombre de la categoría obtenido del JOIN
+                n.setEstado(rs.getString("estado_revision"));
                 n.setNombreCategoria(rs.getString("categoria")); 
-
-                // --- CÁLCULO DE MÉTRICAS DINÁMICAS INDIVIDUALES ---
-                // 1. Contar vistas reales de este negocio
-                String sqlVistas = "SELECT COUNT(*) FROM metricas_negocio WHERE id_negocio = ? AND tipo_evento = 'VISTA'";
-                try (PreparedStatement psV = con.prepareStatement(sqlVistas)) {
-                    psV.setInt(1, idNegocio);
-                    try (ResultSet rsV = psV.executeQuery()) {
-                        n.setVistas(rsV.next() ? rsV.getInt(1) : 0);
-                    }
-                }
-
-                // 2. Calcular promedio de calificación real
-                String sqlCalific = "SELECT AVG(valor_puntuacion) FROM calificaciones_sanciones WHERE id_negocio = ? AND tipo_registro = 'CALIFICACION'";
-                try (PreparedStatement psC = con.prepareStatement(sqlCalific)) {
-                    psC.setInt(1, idNegocio);
-                    try (ResultSet rsC = psC.executeQuery()) {
-                        n.setCalificacion(rsC.next() ? rsC.getDouble(1) : 0.0);
-                    }
-                }
-
-                // 3. Simulación de suscripción (Si no tienes tabla de suscripciones aún, dejamos una por defecto)
-                n.setSuscripcion("Mensual"); 
+                n.setVistas(rs.getInt("total_vistas"));
+                n.setCalificacion(rs.getDouble("promedio_calificacion"));
+                n.setSuscripcion("Mensual"); // Valor por defecto temporal
 
                 lista.add(n);
             }

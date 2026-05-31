@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <section class="vista-suscripcion" id="vistaSuscripcion">
+        <h2>Gestión de Suscripción</h2>
+        <div class="card-plan-actual">
+            <h3>Tu Plan: <span id="nombrePlan">Ejecutivo</span></h3>
+            <p>Estado: <strong id="estadoPlan" style="color: green;">Activo</strong></p>
+            <p>Vence el: <span id="fechaVencimiento">2026-06-10</span></p>
+        </div>
+
+        <div class="opciones-suscripcion">
+            <button class="btn-primary" onclick="gestionarPlan('renovar')">Renovar Plan</button>
+            <button class="btn-secondary" onclick="gestionarPlan('cambiar')">Cambiar Plan</button>
+        </div>
+    </section>
+    <script src="../scripts/suscripcion.js"></script>
+</body>
+</html>

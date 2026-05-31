@@ -123,3 +123,73 @@ body{
 .btn-secundario:hover {
     background-color: #334155;
 }
+
+
+.campo-suscripcion {
+    margin-bottom: 20px;
+}
+
+.titulo-seccion-plan {
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: block;
+    color: #333333;
+}
+
+.contenedor-planes {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+}
+
+.tarjeta-plan {
+    flex: 1;
+    border: 2px solid #dddddd;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: block;
+    position: relative;
+    background-color: #ffffff;
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Efecto Hover al pasar el mouse por encima */
+.tarjeta-plan:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 🌟 Interactividad: Resalta automáticamente la tarjeta que tenga el radio seleccionado */
+.tarjeta-plan:has(.radio-plan:checked) {
+    border-color: #2563eb; /* Azul corporativo */
+    background-color: #f8fafc; /* Fondo sutilmente azulado/gris */
+}
+
+.radio-plan {
+    margin-bottom: 10px;
+    accent-color: #2563eb; /* Color azul para el círculo del radio button */
+}
+
+.nombre-plan {
+    display: block;
+    font-size: 16px;
+    color: #1e293b;
+}
+
+.descripcion-plan {
+    font-size: 13px;
+    color: #64748b;
+    margin: 6px 0 12px 0;
+    line-height: 1.4;
+}
+
+.badge-gratis {
+    background-color: #dcfce7;
+    color: #15803d;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}

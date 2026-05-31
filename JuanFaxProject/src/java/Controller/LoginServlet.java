@@ -7,6 +7,8 @@ import java.util.List;
 
 import Config.conection;
 import Dao.AlertaDao;
+import Dao.SuscripcionDao;
+import Model.SuscripcionDTO;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -300,6 +302,81 @@ public class LoginServlet extends HttpServlet {
                 response.getWriter().write("{\"success\": false, \"message\": \"Error interno: " + e.getMessage() + "\"}");
             }
             return;
+        }
+       if ("obtenerDatosSuscripcion".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter out = response.getWriter();
+
+            // Capturamos el idNegocio enviado desde el fetch
+            int idNegocio = Integer.parseInt(request.getParameter("idNegocio"));
+
+            SuscripcionDao dao = new SuscripcionDao();
+            String jsonRespuesta = dao.obtenerDatosSuscripcionJSON(idNegocio);
+
+            out.print(jsonRespuesta);
+            out.flush();
+            return;
+        }
+
+        if ("renovarSuscripcion".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter out = response.getWriter();
+
+            int idNegocio = Integer.parseInt(request.getParameter("idNegocio"));
+
+            SuscripcionDao dao = new SuscripcionDao();
+            boolean ejecutado = dao.renovarSuscripcion(idNegocio);
+
+            if (ejecutado) {
+                out.print("{\"success\": true, \"mensaje\": \"¡Plan activado con éxito!\"}");
+            } else {
+                out.print("{\"success\": false, \"mensaje\": \"No se pudo actualizar la suscripción.\"}");
+            }
+            out.flush();
+            return;
+        }
+        else if ("listarUsuarios".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            // CONTROL DE ACCESO INTERNO: Verificamos que sea ADMINISTRADOR
+            HttpSession session = request.getSession(false);
+            if (session == null || !"ADMINISTRADOR".equals(session.getAttribute("role") != null ? session.getAttribute("role") : session.getAttribute("rol"))) {
+                response.getWriter().print("[]"); 
+                return;
+            }
+
+            // Instancias tu DAO de usuarios (Ajusta los nombres según tus clases reales de usuario)
+            Dao.UsuarioDao usuarioDao = new Dao.UsuarioDao();
+            List<Model.UsuarioDTO> listaUsuarios = usuarioDao.obtenerTodosLosUsuarios(); 
+
+            // Transformamos la lista a formato JSON de manera manual
+            StringBuilder json = new StringBuilder();
+            json.append("[");
+            for (int i = 0; i < listaUsuarios.size(); i++) {
+                Model.UsuarioDTO u = listaUsuarios.get(i);
+
+                json.append("{");
+                json.append("\"idUsuario\":").append(u.getIdUsuario()).append(",");
+                json.append("\"nombre\":\"").append(escapeJson(u.getNombreCompleto())).append("\",");
+                json.append("\"correo\":\"").append(escapeJson(u.getCorreoElectronico())).append("\",");
+                json.append("\"rol\":\"").append(escapeJson(u.getNombreRol())).append("\","); // Si manejas el String del rol
+                json.append("\"estado\":\"").append(escapeJson(u.getEstado())).append("\"");
+                json.append("}");
+
+                if (i < listaUsuarios.size() - 1) {
+                    json.append(",");
+                }
+            }
+            json.append("]");
+
+            try (PrintWriter out = response.getWriter()) {
+                out.print(json.toString());
+                out.flush();
+            }
+            return; 
         }
         // --------------------------------------------------------------------
         // ACCIÓN 5: OBTENER LOS DESTINOS RECOMENDADOS DEL CARRUSEL principal
@@ -689,6 +766,27 @@ public class LoginServlet extends HttpServlet {
             }
             return; 
         }
+        else if ("cambiarEstadoUsuario".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            try {
+                int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+                String nuevoEstado = request.getParameter("nuevoEstado");
+
+                Dao.UsuarioDao usuarioDao = new Dao.UsuarioDao();
+                boolean actualizado = usuarioDao.cambiarEstadoUsuario(idUsuario, nuevoEstado);
+
+                if (actualizado) {
+                    response.getWriter().print("{\"success\": true, \"mensaje\": \"Estado actualizado correctamente\"}");
+                } else {
+                    response.getWriter().print("{\"success\": false, \"mensaje\": \"No se pudo actualizar el estado en la base de datos\"}");
+                }
+            } catch (Exception e) {
+                response.getWriter().print("{\"success\": false, \"mensaje\": \"Error en el servidor: " + e.getMessage() + "\"}");
+            }
+            return;
+        }
         else if ("importarNegociosMasivo".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -873,6 +971,49 @@ public class LoginServlet extends HttpServlet {
                 response.getWriter().write("{\"success\": false, \"message\": \"Error interno en el servidor: " + e.getMessage() + "\"}");
             }
             return; // 💥 Crucial para frenar el hilo y que no intente hacer el Login tradicional abajo
+        }
+        
+
+        else if ("renovarSuscripcion".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            java.io.PrintWriter out = response.getWriter();
+
+            try {
+                String idNegocioParam = request.getParameter("idNegocio");
+                if (idNegocioParam == null || idNegocioParam.trim().isEmpty()) {
+                    out.print("{\"success\": false, \"mensaje\": \"El ID del negocio no fue proporcionado.\"}");
+                    return;
+                }
+
+                int idNegocio = Integer.parseInt(idNegocioParam);
+                String tipoPlan = request.getParameter("tipoPlan"); // Captura dinámicamente el plan (MENSUAL o ANUAL)
+
+                Dao.SuscripcionDao dao = new Dao.SuscripcionDao();
+                boolean actualizado;
+
+                // Si mandas un plan específico desde el JS, usamos el nuevo método robusto con ENUMs
+                if (tipoPlan != null && !tipoPlan.trim().isEmpty()) {
+                    actualizado = dao.actualizarPlan(idNegocio, tipoPlan);
+                } else {
+                    // Fallback por si mantienes algún botón de renovación simple de un mes
+                    actualizado = dao.renovarSuscripcion(idNegocio);
+                }
+
+                if (actualizado) {
+                    out.print("{\"success\": true, \"mensaje\": \"¡Suscripción de Juanfax procesada con éxito!\"}");
+                } else {
+                    out.print("{\"success\": false, \"mensaje\": \"No se pudo actualizar la suscripción. Inténtalo de nuevo.\"}");
+                }
+
+            } catch (NumberFormatException e) {
+                out.print("{\"success\": false, \"mensaje\": \"Error: El ID del negocio debe ser un número válido.\"}");
+            } catch (Exception e) {
+                out.print("{\"success\": false, \"mensaje\": \"Error en el servidor: " + e.getMessage() + "\"}");
+            } finally {
+                out.flush();
+            }
+            return; // 💥 ¡SOLUCIÓN CLAVE! Evita que el flujo siga derecho hacia la consulta del Login
         }
 
         // ====================================================================

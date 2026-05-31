@@ -1,16 +1,114 @@
+// ====================================================================
+// 🕹️ CONTROLADOR CENTRAL DE INTERFAZ (SPA) - JUANFAX ADMIN
+// ====================================================================
+
+// Variable global para recordar la plantilla de contenedores original de Negocios
+let plantillaOriginalNegocios = "";
+
 document.addEventListener('DOMContentLoaded', () => {
+    const contenedorPrincipal = document.getElementById("informacionNegocio");
+    const btnNegocios = document.getElementById("btnNavNegocios");
+    const btnUsuarios = document.getElementById("btnNavUsuarios");
+
+    // 1️⃣ Memorizar la estructura esquelética inicial del HTML
+    if (contenedorPrincipal) {
+        plantillaOriginalNegocios = contenedorPrincipal.innerHTML;
+    }
+
+    // 2️⃣ Carga inicial por defecto (Dashboard y Negocios)
     cargarDatosDashboard();
     cargarGestionDeNegocios();
+
+    // 3️⃣ Manejo de navegación limpia mediante Event Listeners fijos
+    if (btnNegocios) {
+        btnNegocios.addEventListener("click", () => navegarAdmin('negocios'));
+    }
+    if (btnUsuarios) {
+        btnUsuarios.addEventListener("click", () => navegarAdmin('usuarios'));
+    }
+
+    // 4️⃣ ⚡ DELEGACIÓN CENTRAL DE EVENTOS (Captura clicks e interacciones dinámicas)
+    if (contenedorPrincipal) {
+        // --- Escuchador de Clicks ---
+        contenedorPrincipal.addEventListener('click', (evento) => {
+            const target = evento.target;
+
+            // Solicitudes del Dashboard (Aprobar / Rechazar)
+            if (target.matches('[data-action="solicitud-gestionar"]')) {
+                const id = target.getAttribute('data-id');
+                const estado = target.getAttribute('data-estado');
+                gestionarNegocio(id, estado);
+            }
+
+            // Enlace Ver Motivo de Bloqueo en Tabla Negocios
+            if (target.matches('[data-action="negocio-ver-motivo"]')) {
+                evento.preventDefault();
+                const id = target.getAttribute('data-id');
+                verMotivoBloqueo(id);
+            }
+
+            // Enlace Gestionar en Tabla Negocios
+            if (target.matches('[data-action="negocio-gestionar"]')) {
+                evento.preventDefault();
+                const id = target.getAttribute('data-id');
+                const nombre = target.getAttribute('data-nombre');
+                abrirMenuGestion(id, nombre);
+            }
+        });
+
+        // --- Escuchador de Cambios (Inputs y Selects) ---
+        contenedorPrincipal.addEventListener('change', (evento) => {
+            const target = evento.target;
+
+            // Importación Masiva (Carga de archivo)
+            if (target.id === 'csvFile') {
+                procesarArchivoMasivo();
+            }
+
+            // Cambio de estado de un Usuario en la tabla
+            if (target.classList.contains('select-cambio-estado')) {
+                const idUsuario = target.getAttribute('data-id');
+                const nuevoEstado = target.value;
+                cambiarEstadoUsuario(idUsuario, nuevoEstado);
+            }
+        });
+    }
 });
 
+/**
+ * Conmutador dinámico de secciones del Administrador
+ */
+function navegarAdmin(seccion) {
+    console.log(`🚀 Conmutando panel hacia: ${seccion.toUpperCase()}`);
+    
+    document.getElementById("btnNavNegocios").classList.remove("botonesFocus");
+    document.getElementById("btnNavUsuarios").classList.remove("botonesFocus");
+    
+    const contenedorPrincipal = document.getElementById("informacionNegocio");
+    if (!contenedorPrincipal) return;
+
+    if (seccion === 'negocios') {
+        document.getElementById("btnNavNegocios").classList.add("botonesFocus");
+        // Restauramos los contenedores originales y volvemos a inyectar la data fresca
+        contenedorPrincipal.innerHTML = plantillaOriginalNegocios;
+        cargarDatosDashboard();
+        cargarGestionDeNegocios();
+    } 
+    else if (seccion === 'usuarios') {
+        document.getElementById("btnNavUsuarios").classList.add("botonesFocus");
+        cargarGestionUsuarios();
+    }
+}
+
+// ====================================================================
 // --- SECCIÓN 1: DASHBOARD (ESTADÍSTICAS Y SOLICITUDES) ---
+// ====================================================================
 function cargarDatosDashboard() {
     fetch('../LoginServlet?accion=cargarDashboard')
         .then(response => response.json())
         .then(data => {
             console.log("Datos del Dashboard recibidos:", data);
             
-            // Cargas de estadísticas existentes
             const divsStats = document.querySelectorAll('.estads');
             if (divsStats.length >= 2) {
                 divsStats[0].innerHTML = `
@@ -23,30 +121,30 @@ function cargarDatosDashboard() {
                 `;
             }
 
-            // Cargas de solicitudes pendientes existentes
             const containerSolicitudes = document.getElementById('Solicitudes');
-            containerSolicitudes.innerHTML = '<h2 class="solicitudes-titulo"><i class="bx bx-bell"></i> SOLICITUDES</h2>'; 
-            if (data.solicitudes.length > 0) {
-                let listaHTML = '<div class="lista-solicitudes-wrapper">';
-                data.solicitudes.forEach(negocio => {
-                    listaHTML += `
-                        <div class="item-solicitud">
-                            <span class="solicitud-nombre txt-blanco">${negocio.nombre}</span>
-                            <div class="solicitud-botones">
-                                <button class="btn-dash btn-dash-aprobar" onclick="gestionarNegocio(${negocio.id}, 'APROBAR')">Aprobar</button>
-                                <button class="btn-dash btn-dash-rechazar" onclick="gestionarNegocio(${negocio.id}, 'RECHAZAR')">Rechazar</button>
+            if (containerSolicitudes) {
+                containerSolicitudes.innerHTML = '<h2 class="solicitudes-titulo"><i class="bx bx-bell"></i> SOLICITUDES</h2>'; 
+                if (data.solicitudes.length > 0) {
+                    let listaHTML = '<div class="lista-solicitudes-wrapper">';
+                    data.solicitudes.forEach(negocio => {
+                        listaHTML += `
+                            <div class="item-solicitud">
+                                <span class="solicitud-nombre txt-blanco">${negocio.nombre}</span>
+                                <div class="solicitud-botones">
+                                    <button class="btn-dash btn-dash-aprobar" data-action="solicitud-gestionar" data-id="${negocio.id}" data-estado="APROBAR">Aprobar</button>
+                                    <button class="btn-dash btn-dash-rechazar" data-action="solicitud-gestionar" data-id="${negocio.id}" data-estado="RECHAZAR">Rechazar</button>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                });
-                listaHTML += '</div>';
-                containerSolicitudes.insertAdjacentHTML('beforeend', listaHTML);
-            } else {
-                containerSolicitudes.innerHTML += '<p class="txt-gris no-datos-msg">No hay solicitudes pendientes 🙌</p>';
+                        `;
+                    });
+                    listaHTML += '</div>';
+                    containerSolicitudes.insertAdjacentHTML('beforeend', listaHTML);
+                } else {
+                    containerSolicitudes.innerHTML += '<p class="txt-gris no-datos-msg">No hay solicitudes pendientes 🙌</p>';
+                }
             }
 
-            // Carga de la sección de Importación Masiva
-            const containerImportacion = document.getElementById('Importacion_Masiva_De_Datos') || divsStats[1].nextElementSibling; 
+            const containerImportacion = document.getElementById('Importacion_Masiva_De_Datos') || (divsStats.length > 1 ? divsStats[1].nextElementSibling : null); 
             if (containerImportacion) {
                 containerImportacion.innerHTML = `
                     <h2 class="solicitudes-titulo"><i class='bx bx-cloud-upload'></i> IMPORTACIÓN MASIVA</h2>
@@ -55,15 +153,12 @@ function cargarDatosDashboard() {
                         <label class="drop-zone" for="csvFile">
                             <i class='bx bxs-file-doc drop-icon'></i>
                             <span class="drop-text">Arrastra tu archivo o <span class="txt-dorado">examina</span></span>
-                            <input type="file" id="csvFile" accept=".csv, .xlsx" hidden onchange="procesarArchivoMasivo()">
+                            <input type="file" id="csvFile" accept=".csv, .xlsx" hidden>
                         </label>
                     </div>
                 `;
             }
 
-            // ========================================================================
-            // 🚀 COMPLETADO: RENDERIZADO 100% DINÁMICO DE ALERTAS DEL SISTEMA
-            // ========================================================================
             const containerAlertas = document.getElementById('Alertas');
             if (containerAlertas) {
                 let htmlAlertas = `
@@ -71,11 +166,8 @@ function cargarDatosDashboard() {
                     <div class="lista-alertas-wrapper">
                 `;
 
-                // Validamos que existan alertas en la respuesta del Servlet
                 if (data.alertas && data.alertas.length > 0) {
                     data.alertas.forEach(alerta => {
-                        
-                        // Mapeamos dinámicamente las clases CSS y los íconos Boxicons según el tipo de alerta
                         let itemClass = 'alerta-info';
                         let iconoClass = 'bx bx-info-circle';
 
@@ -83,14 +175,13 @@ function cargarDatosDashboard() {
                             itemClass = 'alerta-warning';
                             iconoClass = 'bx bx-time';
                         } else if (alerta.tipo === 'error') {
-                            itemClass = 'alerta-danger'; // Mapea a tus estilos CSS de peligro/error
+                            itemClass = 'alerta-danger'; 
                             iconoClass = 'bx bx-user-x';
                         } else if (alerta.tipo === 'success') {
                             itemClass = 'alerta-success';
                             iconoClass = 'bx bx-check-circle';
                         }
 
-                        // Inyectamos la estructura respetando tus estilos visuales originales
                         htmlAlertas += `
                             <div class="item-alerta ${itemClass}">
                                 <div class="alerta-icono"><i class='${iconoClass}'></i></div>
@@ -102,11 +193,10 @@ function cargarDatosDashboard() {
                         `;
                     });
                 } else {
-                    // Mensaje seguro por si la base de datos no tiene alertas registradas aún
                     htmlAlertas += '<p class="txt-gris no-datos-msg" style="text-align: center; padding: 15px;">No hay alertas recientes 🙌</p>';
                 }
 
-                htmlAlertas += '</div>'; // Cerramos la envoltura de la lista
+                htmlAlertas += '</div>';
                 containerAlertas.innerHTML = htmlAlertas;
             }
         })
@@ -115,32 +205,30 @@ function cargarDatosDashboard() {
 
 function procesarArchivoMasivo() {
     const input = document.getElementById('csvFile');
-    if (input.files.length === 0) return;
+    if (!input || input.files.length === 0) return;
 
     const archivo = input.files[0];
-    
-    // Validación básica de extensión por seguridad
     const extension = archivo.name.split('.').pop().toLowerCase();
+    
     if (extension !== 'csv' && extension !== 'xlsx') {
         alert('Por favor, selecciona un archivo válido (.csv o .xlsx)');
-        input.value = ''; // Reseteamos el input
+        input.value = ''; 
         return;
     }
 
-    // Mostramos un mensaje de carga sutil en la interfaz
     const dropZoneText = document.querySelector('.drop-text');
-    const copiaTextoOriginal = dropZoneText.innerHTML;
-    dropZoneText.innerHTML = `<i class='bx bx-loader-alt bx-spin'></i> Subiendo e importando...`;
+    const copiaTextoOriginal = dropZoneText ? dropZoneText.innerHTML : "";
+    if (dropZoneText) {
+        dropZoneText.innerHTML = `<i class='bx bx-loader-alt bx-spin'></i> Subiendo e importando...`;
+    }
 
-    // Empaquetamos el archivo usando FormData (Multipart)
     const formData = new FormData();
     formData.append('accion', 'importarNegociosMasivo');
     formData.append('archivoNegocios', archivo);
 
-    // Enviamos la petición POST al Servlet
     fetch('../LoginServlet', {
         method: 'POST',
-        body: formData // No añadimos Content-Type header, el navegador lo pone automáticamente como multipart/form-data
+        body: formData 
     })
     .then(response => {
         if (!response.ok) throw new Error('Error en el servidor al procesar el lote.');
@@ -149,7 +237,6 @@ function procesarArchivoMasivo() {
     .then(data => {
         if (data.status === 'success') {
             alert(`¡Éxito! Se han importado ${data.insertados} nuevos negocios correctamente.`);
-            // Recargamos el dashboard y la tabla para ver los nuevos datos inmediatamente
             cargarDatosDashboard();
             cargarGestionDeNegocios();
         } else {
@@ -161,21 +248,21 @@ function procesarArchivoMasivo() {
         alert('Ocurrió un fallo de red o el archivo tiene un formato inválido.');
     })
     .finally(() => {
-        // Restauramos el diseño original del input
-        input.value = '';
-        dropZoneText.innerHTML = copiaTextoOriginal;
+        if (input) input.value = '';
+        if (dropZoneText) dropZoneText.innerHTML = copiaTextoOriginal;
     });
 }
 
+// ====================================================================
 // --- SECCIÓN 2: GESTIÓN DE NEGOCIOS REGISTRADOS ---
+// ====================================================================
 function cargarGestionDeNegocios() {
     const containerGestion = document.getElementById('GestionDeNegocios');
+    if (!containerGestion) return;
 
     fetch('../LoginServlet?accion=listarTodosLosNegociosAdmin')
         .then(response => {
-            if (!response.ok) {
-                throw new Error("Error en la respuesta del servidor");
-            }
+            if (!response.ok) throw new Error("Error en la respuesta del servidor");
             return response.json();
         })
         .then(data => {
@@ -212,9 +299,11 @@ function cargarGestionDeNegocios() {
 
                     let accionHtml = '';
                     if (estadoLower === 'bloqueado' || estadoLower === 'rechazado') {
-                        accionHtml = `<a href="#" class="link-accion link-rojo" onclick="verMotivoBloqueo(${negocio.idNegocio})">Ver motivo</a>`;
+                        accionHtml = `<a href="#" class="link-accion link-rojo" data-action="negocio-ver-motivo" data-id="${negocio.idNegocio}">Ver motivo</a>`;
                     } else {
-                        accionHtml = `<a href="#" class="link-accion link-dorado" onclick="abrirMenuGestion(${negocio.idNegocio}, '${negocio.nombre.replace(/'/g, "\\'")}')">Gestionar</a>`;
+                        // Escapamos comillas dobles de forma segura para colocarlo en la propiedad HTML data-nombre
+                        const nombreLimpio = negocio.nombre.replace(/"/g, '&quot;');
+                        accionHtml = `<a href="#" class="link-accion link-dorado" data-action="negocio-gestionar" data-id="${negocio.idNegocio}" data-nombre="${nombreLimpio}">Gestionar</a>`;
                     }
 
                     let califNum = typeof negocio.calificacion === 'number' ? negocio.calificacion : parseFloat(negocio.calificacion) || 0.0;
@@ -242,7 +331,76 @@ function cargarGestionDeNegocios() {
         .catch(error => console.error('Error cargando gestión de negocios:', error));
 }
 
-// --- SECCIÓN 3: ACCIONES Y PROCESAMIENTO ---
+// ====================================================================
+// --- SECCIÓN 3: GESTIÓN DE USUARIOS REGISTRADOS (NUEVO) ---
+// ====================================================================
+function cargarGestionUsuarios() {
+    const contenedorPrincipal = document.getElementById("informacionNegocio");
+    if (!contenedorPrincipal) return;
+
+    contenedorPrincipal.innerHTML = `<div style="padding:20px; color:#8a99ad;"><i class='bx bx-loader-alt bx-spin'></i> Trayendo listado de usuarios...</div>`;
+
+    fetch('../LoginServlet?accion=listarUsuarios')
+    .then(res => {
+        if (!res.ok) throw new Error("Error en la petición de usuarios.");
+        return res.json();
+    })
+    .then(usuarios => {
+        let tablaHTML = `
+            <div class="modulo-gestion" style="padding: 10px 0;">
+                <div class="tabla-header-container" style="margin-bottom: 20px;">
+                    <h2 class="tabla-titulo"><i class='bx bx-group'></i> GESTIÓN DE USUARIOS DEL SISTEMA</h2>
+                </div>
+                <table class="tabla-negocios">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>NOMBRE COMPLETO</th>
+                            <th>CORREO ELECTRÓNICO</th>
+                            <th>ROL</th>
+                            <th>ESTADO ACTUAL</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        if (usuarios.length === 0) {
+            tablaHTML += `<tr><td colspan="6" style="text-align:center; color: #8a99ad;">No hay usuarios registrados en Juanfax.</td></tr>`;
+        } else {
+            usuarios.forEach(u => {
+                const badgeClass = u.estado === 'ACTIVO' ? 'badge-activo' : 'badge-bloqueado';
+                
+                tablaHTML += `
+                    <tr>
+                        <td class="txt-dorado"><strong>#${u.idUsuario}</strong></td>
+                        <td class="txt-blanco">${u.nombre}</td>
+                        <td class="txt-gris">${u.correo}</td>
+                        <td><span class="badge-estado badge-defecto" style="text-transform: uppercase;">${u.rol}</span></td>
+                        <td><span class="badge-estado ${badgeClass}">${u.estado}</span></td>
+                        <td>
+                            <select class="select-cambio-estado" data-id="${u.idUsuario}" style="background:#1a202c; color:#fff; border:1px solid #8a99ad; padding:4px; border-radius:4px; cursor:pointer;">
+                                <option value="ACTIVO" ${u.estado === 'ACTIVO' ? 'selected' : ''}>🔓 Activo</option>
+                                <option value="BLOQUEADO" ${u.estado === 'BLOQUEADO' ? 'selected' : ''}>🔒 Bloqueado</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        tablaHTML += `</tbody></table></div>`;
+        contenedorPrincipal.innerHTML = tablaHTML;
+    })
+    .catch(err => {
+        console.error("❌ Fallo al cargar usuarios:", err);
+        contenedorPrincipal.innerHTML = `<p style="color:red; padding:20px;">Error al conectar con el servidor.</p>`;
+    });
+}
+
+// ====================================================================
+// --- SECCIÓN 4: ACCIONES Y PROCESAMIENTO ---
+// ====================================================================
 function abrirMenuGestion(id, nombre) {
     const opcion = prompt(`Gestionar negocio: "${nombre}"\n\nEscribe el número de la acción:\n1. Aprobar / Activar\n2. Bloquear Negocio\n3. Cancelar`);
     if (opcion === "1") {
@@ -284,4 +442,30 @@ function gestionarNegocio(id, estado) {
         console.error('Error al actualizar el estado:', error);
         alert('Ocurrió un error inesperado. Intenta de nuevo.');
     });
+}
+
+function cambiarEstadoUsuario(idUsuario, nuevoEstado) {
+    if (confirm(`¿Confirmas el cambio de estado a [${nuevoEstado}] para el usuario #${idUsuario}?`)) {
+        fetch(`../LoginServlet?accion=cambiarEstadoUsuario&idUsuario=${idUsuario}&nuevoEstado=${nuevoEstado}`, {
+            method: 'POST'
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Error del servidor.");
+            return res.json();
+        })
+        .then(respuesta => {
+            if (respuesta.success) {
+                alert("✨ ¡Estado de cuenta actualizado!");
+                cargarGestionUsuarios(); 
+            } else {
+                alert("⚠️ " + respuesta.mensaje);
+            }
+        })
+        .catch(err => {
+            console.error("Error al actualizar usuario:", err);
+            alert("No se pudieron guardar los cambios.");
+        });
+    } else {
+        cargarGestionUsuarios(); 
+    }
 }
