@@ -5,12 +5,16 @@
         <group>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Dao/NegocioDao.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Model/UsuarioDTO.java</file>
+            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Controller/ImagenServlet.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Controller/NegocioServlet.java</file>
-            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Dao/SuscripcionDao.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Dao/UsuarioDao.java</file>
+            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Dao/SuscripcionDao.java</file>
+            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Dao/ComentarioDao.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Controller/LoginServlet.java</file>
-            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Config/conection.java</file>
+            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Model/PagoDTO.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Model/SuscripcionDTO.java</file>
+            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Controller/MetricasServlet.java</file>
+            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Dao/AlertaDao.java</file>
         </group>
     </open-files>
 </project-private>

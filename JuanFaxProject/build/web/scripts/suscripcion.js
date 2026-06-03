@@ -9,8 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
     
+    
     // Si existe, cargamos los datos del negocio seleccionado (ej. el 64)
     cargarDatosSuscripcion(parseInt(ID_NEGOCIO_ACTUAL));
+
 });
 
 // 1. Función para cargar los datos de suscripción al abrir la sección

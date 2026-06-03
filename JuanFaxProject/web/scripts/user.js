@@ -226,3 +226,104 @@ expandingCards.forEach((card) => {
         }
     });
 });
+
+// ============================================================================
+// LOGICA DE INTEGRACIÓN DE MI PERFIL (TURISTA) - ACTUALIZADO
+// ============================================================================
+
+// 1. Apuntamos al nuevo id="profile" que agregaste en el HTML
+const profileAvatar = document.getElementById("profile");
+if (profileAvatar) {
+    profileAvatar.style.cursor = "pointer"; // Hace que aparezca la mano al pasar el mouse
+    profileAvatar.addEventListener("click", abrirModalPerfil);
+}
+
+// Configurar cierres del modal e interacciones internas
+document.getElementById("btnCerrarModal").addEventListener("click", () => {
+    document.getElementById("modalPerfil").style.display = "none";
+});
+document.getElementById("btnLogOut").addEventListener("click", () => {
+    window.location.href = "../LoginServlet?accion=cerrarSesion";
+});
+document.getElementById("formMiPerfil").addEventListener("submit", ejecutarActualizacionPerfil);
+document.getElementById("btnBorradoLogico").addEventListener("click", ejecutarBorradoLogicoCuenta);
+
+async function abrirModalPerfil() {
+    try {
+        const res = await fetch("../LoginServlet?accion=verPerfil");
+        const user = await res.json();
+        
+        if (user.error) {
+            alert(user.error);
+            window.location.href = "../index.html";
+            return;
+        }
+
+        // Cargamos los datos dentro del modal
+        document.getElementById("perfilNombre").value = user.nombre;
+        document.getElementById("perfilCorreo").value = user.correo;
+        document.getElementById("perfilRol").innerText = user.rol;
+        document.getElementById("perfilEstado").innerText = user.estado;
+
+        // Desplegamos el modal
+        document.getElementById("modalPerfil").style.display = "flex";
+    } catch (err) {
+        console.error("Error al abrir perfil:", err);
+        alert("No se pudo obtener la información de tu cuenta.");
+    }
+}
+
+async function ejecutarActualizacionPerfil(e) {
+    e.preventDefault();
+    const nombre = document.getElementById("perfilNombre").value.trim();
+    const correo = document.getElementById("perfilCorreo").value.trim();
+
+    const params = new URLSearchParams();
+    params.append("accion", "actualizarPerfil");
+    params.append("nombre", nombre);
+    params.append("correo", correo);
+
+    try {
+        const res = await fetch("../LoginServlet", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params
+        });
+        const data = await res.json();
+        
+        alert(data.mensaje);
+        if (data.success) {
+            document.getElementById("modalPerfil").style.display = "none";
+            
+            // 🌟 NUEVO: Actualiza las iniciales en el header del turista inmediatamente sin recargar
+            if (document.querySelector("#profile p")) {
+                const iniciales = nombre.split(" ").map(n => n[0]).join("").substring(0,2).toUpperCase();
+                document.querySelector("#profile p").innerText = iniciales;
+            }
+        }
+    } catch (err) {
+        alert("Error de comunicación con el servidor.");
+    }
+}
+
+function ejecutarBorradoLogicoCuenta() {
+    const seguro = confirm("¿Estás seguro de que deseas dar de baja tu cuenta? Tu acceso será restringido inmediatamente.");
+    if (!seguro) return;
+
+    const params = new URLSearchParams();
+    params.append("accion", "eliminarMiCuenta");
+
+    fetch("../LoginServlet", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.mensaje);
+        if (data.success) {
+            window.location.href = "../index.html";
+        }
+    })
+    .catch(() => alert("No se pudo procesar la baja de tu cuenta."));
+}

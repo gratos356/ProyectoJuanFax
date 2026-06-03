@@ -84,6 +84,7 @@ function cargarVistaSuscripcion() {
         }
 
         // 3. Renderizar la tarjeta de suscripción utilizando los campos inyectados de MySQL
+        // 🌟 CORRECCIÓN 1: Agregamos la estructura de la tabla abajo del panel
         contenedorPrincipal.innerHTML = `
             <div class="panel-suscripcion">
                 <div class="header-suscripcion">
@@ -99,7 +100,31 @@ function cargarVistaSuscripcion() {
                     <button class="btn-renovar" onclick="procesarPago(${idNegocio})">Renovar Plan</button>
                 </div>
             </div>
+
+            <div class="historial-pagos-contenedor" style="margin-top: 25px;">
+                <h3>Historial de Transacciones</h3>
+                <table id="tablaHistorialPagos" class="tabla-dinamica">
+                    <thead>
+                        <tr>
+                            <th>Fecha de Pago</th>
+                            <th>ID Transacción</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" class="cargando">Buscando transacciones...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         `;
+
+        // 🌟 CORRECCIÓN 2: Como la tabla ya se dibujó en el DOM, mandamos a llamarla
+        if (typeof cargarHistorialPagos === "function") {
+            cargarHistorialPagos(idNegocio);
+        } else {
+            console.error("🚨 Error: La función cargarHistorialPagos() no está accesible en este ámbito.");
+        }
     })
     .catch(error => {
         console.error("❌ Error crítico consumiendo obtenerDatosSuscripcion:", error);
@@ -167,33 +192,57 @@ function procesarPago(idNegocio) {
 /**
  * Procesa la confirmación y envía el tipo de plan ('MENSUAL' o 'ANUAL') al Backend
  */
-function confirmarPlan(idNegocio, tipoPlan, precio) {
-    console.log(`🛒 Solicitud de renovación: Tipo -> ${tipoPlan} | Valor -> $${precio} | Negocio ID -> ${idNegocio}`);
+function confirmarPlan(idNegocio, tipoPlanSeleccionado, montoPlan) {
+    // 1. Simular una confirmación o pasarela de pago
+    const confirmar = confirm(`¿Deseas proceder con el pago del Plan ${tipoPlanSeleccionado} por valor de $${montoPlan.toLocaleString('es-CO')} COP?`);
     
-    const formatoPrecio = precio.toLocaleString('es-CO');
-    const confirmar = confirm(`¿Confirmas la renovación del Plan ${tipoPlan} por un valor de $${formatoPrecio} COP?`);
-    
-    if (confirmar) {
-        fetch(`../LoginServlet?accion=renovarSuscripcion&idNegocio=${idNegocio}&tipoPlan=${tipoPlan}`, {
-            method: 'POST'
-        })
-        .then(res => {
-            if (!res.ok) throw new Error("Error en la respuesta del servidor al procesar la renovación.");
-            return res.json();
-        })
-        .then(respuesta => {
-            if (respuesta.success) {
-                alert("✨ ¡Suscripción renovada con éxito!");
-                cargarVistaSuscripcion(); // Refresca el panel de control con las nuevas fechas
+    if (!confirmar) return; // Si el usuario cancela, frena la ejecución
+
+    // 2. Generamos un código de transacción único para la auditoría de caja de Juanfax
+    const idTransaccionSimulado = "TRX-" + Math.floor(Math.random() * 10000000);
+
+    console.log(`🚀 Enviando pago transaccional... Plan: ${tipoPlanSeleccionado}, Monto: ${montoPlan}, Token: ${idTransaccionSimulado}`);
+
+    // 3. Armamos los parámetros estructurados en formato URL-Encoded
+    const params = new URLSearchParams();
+    params.append("accion", "renovarSuscripcion");
+    params.append("idNegocio", idNegocio);
+    params.append("tipoPlan", tipoPlanSeleccionado); 
+    params.append("monto", montoPlan);
+    params.append("idTransaccion", idTransaccionSimulado);
+
+    // 4. Realizamos la petición HTTP POST hacia el Servidor
+    fetch("../LoginServlet", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: params.toString()
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Error en la respuesta del servidor");
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert("✅ " + data.mensaje);
+            
+            // 🔄 5. Retornar al panel principal y recargar componentes actualizados de inmediato
+            if (typeof cargarVistaSuscripcion === "function") {
+                cargarVistaSuscripcion(); 
             } else {
-                alert("⚠️ No se pudo procesar: " + respuesta.mensaje);
+                location.reload(); // Fallback por si la vista requiere recarga completa
             }
-        })
-        .catch(error => {
-            console.error("❌ Error en la petición de renovación:", error);
-            alert("Hubo un problema de conexión con el servidor.");
-        });
-    }
+        } else {
+            alert("❌ Hubo un inconveniente: " + data.mensaje);
+        }
+    })
+    .catch(error => {
+        console.error("🚨 Error en la petición asíncrona de pago:", error);
+        alert("No se pudo conectar con el servidor de cobros. Intenta de nuevo.");
+    });
 }
 
 
@@ -205,4 +254,143 @@ function configurarListenersMenu() {
     }
     
 
+}
+
+// ============================================================================
+// LOGICA DE INTEGRACIÓN DE MI PERFIL (VENDEDOR)
+// ============================================================================
+
+// Escucha del avatar de perfil existente en mainVendedor.html
+const profileAvatar = document.getElementById("profile");
+if (profileAvatar) {
+    profileAvatar.style.cursor = "pointer"; // Hacemos que se note que es cliqueable
+    profileAvatar.addEventListener("click", abrirModalPerfilVendedor);
+}
+
+// Configurar los botones internos del modal clonado para vendedor
+// Usamos selectores condicionales para evitar colisiones
+const cerrarMdl = document.getElementById("btnCerrarModal");
+if (cerrarMdl) cerrarMdl.addEventListener("click", () => document.getElementById("modalPerfil").style.display = "none");
+
+const logoutBtn = document.getElementById("btnLogOut");
+if (logoutBtn) logoutBtn.addEventListener("click", () => window.location.href = "../LoginServlet?accion=cerrarSesion");
+
+const formPerf = document.getElementById("formMiPerfil");
+if (formPerf) formPerf.addEventListener("submit", ejecutarActualizacionPerfilVendedor);
+
+const bajaBtn = document.getElementById("btnBorradoLogico");
+if (bajaBtn) bajaBtn.addEventListener("click", ejecutarBorradoLogicoCuentaVendedor);
+
+async function abrirModalPerfilVendedor() {
+    try {
+        const res = await fetch("../LoginServlet?accion=verPerfil");
+        const user = await res.json();
+        
+        if (user.error) {
+            alert(user.error);
+            window.location.href = "../index.html";
+            return;
+        }
+
+        document.getElementById("perfilNombre").value = user.nombre;
+        document.getElementById("perfilCorreo").value = user.correo;
+        document.getElementById("perfilRol").innerText = user.rol;
+        document.getElementById("perfilEstado").innerText = user.estado;
+
+        document.getElementById("modalPerfil").style.display = "flex";
+    } catch (err) {
+        console.error("Error:", err);
+        alert("Ocurrió un inconveniente al cargar tu perfil.");
+    }
+}
+
+async function ejecutarActualizacionPerfilVendedor(e) {
+    e.preventDefault();
+    const nombre = document.getElementById("perfilNombre").value.trim();
+    const correo = document.getElementById("perfilCorreo").value.trim();
+
+    const params = new URLSearchParams();
+    params.append("accion", "actualizarPerfil");
+    params.append("nombre", nombre);
+    params.append("correo", correo);
+
+    try {
+        const res = await fetch("../LoginServlet", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params
+        });
+        const data = await res.json();
+        
+        alert(data.mensaje);
+        if (data.success) {
+            document.getElementById("modalPerfil").style.display = "none";
+            // Cambiar de forma dinámica el texto del avatar de iniciales si cambia de nombre
+            if(document.querySelector("#profile p")) {
+                const iniciales = nombre.split(" ").map(n => n[0]).join("").substring(0,2).toUpperCase();
+                document.querySelector("#profile p").innerText = iniciales;
+            }
+        }
+    } catch (err) {
+        alert("Error al procesar la actualización.");
+    }
+}
+
+function ejecutarBorradoLogicoCuentaVendedor() {
+    const seguro = confirm("⚠️ ¿Confirmas la desactivación completa de tu cuenta de vendedor? Tus negocios y catálogos quedarán ocultos temporalmente.");
+    if (!seguro) return;
+
+    const params = new URLSearchParams();
+    params.append("accion", "eliminarMiCuenta");
+
+    fetch("../LoginServlet", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.mensaje);
+        if (data.success) {
+            window.location.href = "../index.html";
+        }
+    })
+    .catch(() => alert("No se pudo tramitar la baja del perfil."));
+}
+
+// 🌟 FUNCIÓN MUDADA A VENDEDOR.JS PARA EVITAR ERRORES DE ÁMBITO
+function cargarHistorialPagos(idNegocio) {
+    fetch(`../LoginServlet?accion=historialPagos&idNegocio=${idNegocio}`)
+    .then(response => response.json())
+    .then(data => {
+        const tablaBody = document.querySelector("#tablaHistorialPagos tbody");
+        if (!tablaBody) return; // Validación de seguridad por si cambias de pestaña rápido
+        
+        tablaBody.innerHTML = ""; 
+
+        if (data.length === 0) {
+            tablaBody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No hay transacciones registradas.</td></tr>";
+            return;
+        }
+
+        // Recorremos los pagos enviados por el Servlet e inyectamos las filas
+        data.forEach(pago => {
+            const fila = `
+                <tr>
+                    <td>${pago.fecha}</td>
+                    <td><code>${pago.transaccion}</code></td>
+                    <td>$${pago.monto.toLocaleString()} COP</td>
+                    <td><span class="badge">${pago.estado}</span></td>
+                </tr>
+            `;
+            tablaBody.insertAdjacentHTML("beforeend", fila);
+        });
+    })
+    .catch(error => {
+        console.error("❌ Error cargando el historial de pagos:", error);
+        const tablaBody = document.querySelector("#tablaHistorialPagos tbody");
+        if (tablaBody) {
+            tablaBody.innerHTML = "<tr><td colspan='4' class='error'>No se pudo cargar el historial.</td></tr>";
+        }
+    });
 }

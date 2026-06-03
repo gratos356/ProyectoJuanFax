@@ -49,88 +49,35 @@ html{
     gap: 25%;
     z-index: 1;
 }
-.search{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 40%;
-    height: 28%;
-}
-.input-search{
-    height: 100%;
-    width: 70%;
-    background-color: var(--ColorBotonesDeAccionGris);
-    border: 1px var(--ColorBotonesDeAccionDorado) solid;
-    border-radius: 5px;
-    padding-left: 10px;
-    color: var(--ColorLetra);
-}
-.input-search::placeholder{
-    filter: drop-shadow(1px 0px 0px var(--ColorLetra));
-}
-.input-search:focus{
-    outline: none;
-}
-.boton-search{
-    height: 100%;
-    width: 6.5%;
-    background-color: var(--ColorBotonesDeAccionGris);
-    border: 1px var(--ColorBotonesDeAccionDorado) solid;
-    border-radius: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: 0.1s;
-}
-.boton-search:hover{
-    background-color: var(--ColorBotonesDeAccionDorado);
-    box-shadow: var(--ColorBotonesDeAccionDorado) 0 0 10px;
-}
-.bx-search-big{
-    color: var(--ColorBotonesDeAccionDorado);
-    font-size: 1.3rem;
-}
+
 
 
 .contenedor-logo-ubicacion-configuracion{
     display: flex;
     height: 100%;
-    width: 20%;
-    justify-content: space-between;
+    width: 100%;
+    justify-content: space-around;
+    gap: 80%;
     align-items: center;
+    /* background-color: peru; */
 }
 .Logo{
     height: 70%;
-    width: 30%;
+    width: 10%;
     background-image: url(../imagenes/logo_Juan_Fax-removebg-preview\ \(1\)\ 2\ \(1\).png);
+    /* background-color: red; */
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
 }
 
-.ubicacion{
-    display: flex;
-    height: 28%;
-    width: 25%;
-    background-color: var(--ColorBotonesDeAccionGris);
-    border: 1px var(--ColorBotonesDeAccionDorado) solid;
-    border-radius: 5px;
-    transition: 0.1s;
-    justify-content: center;
-    align-items: center;
-}
-.bx-map{
-    color: var(--ColorBotonesDeAccionDorado);
-    font-size: 1.3rem;
-}
 .configuracion{
     display: flex;
-    height: 28%;
-    width: 13%;
+    height: 50%;
+    width: 3.7%;
     background-color: var(--ColorBotonesDeAccionGris);
     border: 1px var(--ColorBotonesDeAccionDorado) solid;
-    border-radius: 5px;
+    border-radius: 30px;
     transition: 0.1s;
     justify-content: center;
     align-items: center;
@@ -313,3 +260,163 @@ html{
 }
 
 
+/* --- ESTILOS DEL MODAL PERFIL INTEGRADO --- */
+.modal-perfil-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Por encima de todo */
+}
+
+.modal-perfil-card {
+    background-color: var(--FondoSecundario);
+    width: 90%;
+    max-width: 450px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    overflow: hidden;
+    color: #333333;
+    animation: fadeInModal 0.3s ease;
+}
+
+@keyframes fadeInModal {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-perfil-header {
+    background-color: #1a202c; /* Tono oscuro elegante */
+    color: #ffffff;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-perfil-header h2 {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.btn-cerrar-modal {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-perfil-body {
+    padding: 20px;
+}
+
+.perfil-grupo {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.perfil-grupo label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #4a5568;
+}
+
+.perfil-grupo input {
+    padding: 10px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.perfil-badges {
+    display: flex;
+    justify-content: space-between;
+    background-color: #f7fafc;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.perfil-badges div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 48%;
+}
+
+.perfil-badges small {
+    color: #718096;
+    font-size: 0.75rem;
+}
+
+.perfil-badges span {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #2d3748;
+}
+
+.perfil-acciones-principales {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-guardar-cambios {
+    flex: 2;
+    background-color: #2b6cb0;
+    color: white;
+    border: none;
+    padding: 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-logout {
+    flex: 1;
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+    padding: 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-perfil-footer {
+    background-color: #fff5f5;
+    border-top: 1px solid #fed7d7;
+    padding: 15px 20px;
+    text-align: center;
+}
+
+.modal-perfil-footer p {
+    font-size: 0.8rem;
+    color: #742a2a;
+    margin-bottom: 8px;
+}
+
+.btn-baja-cuenta {
+    background: transparent;
+    border: 1px solid #e53e3e;
+    color: #e53e3e;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-baja-cuenta:hover {
+    background-color: #e53e3e;
+    color: white;
+}

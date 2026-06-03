@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="../estilos/css/vendedor.css">
 </head>
 <body>
     <section class="vista-suscripcion" id="vistaSuscripcion">
@@ -17,6 +18,21 @@
         <div class="opciones-suscripcion">
             <button class="btn-primary" onclick="gestionarPlan('renovar')">Renovar Plan</button>
             <button class="btn-secondary" onclick="gestionarPlan('cambiar')">Cambiar Plan</button>
+        </div>
+        <div class="historial-pagos-seccion" style="margin-top: 20px;">
+            <h3>Historial de Transacciones</h3>
+            <table id="tablaHistorialPagos" border="1" style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>ID Transacción</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
         </div>
     </section>
     <script src="../scripts/suscripcion.js"></script>
