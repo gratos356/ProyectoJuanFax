@@ -501,3 +501,350 @@ body{
 .btn-regresar:hover {
     background: #4a5568;
 }
+/* --- ESTILOS DEL MODAL PERFIL INTEGRADO --- */
+.modal-perfil-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Por encima de todo */
+}
+
+.modal-perfil-card {
+    background-color: #ffffff;
+    width: 90%;
+    max-width: 450px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    overflow: hidden;
+    color: #333333;
+    animation: fadeInModal 0.3s ease;
+}
+
+@keyframes fadeInModal {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-perfil-header {
+    background-color: #1a202c; /* Tono oscuro elegante */
+    color: var(--FondoSecundario);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-perfil-header h2 {
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.btn-cerrar-modal {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-perfil-body {
+    padding: 20px;
+}
+
+.perfil-grupo {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.perfil-grupo label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #4a5568;
+}
+
+.perfil-grupo input {
+    padding: 10px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.perfil-badges {
+    display: flex;
+    justify-content: space-between;
+    background-color: #f7fafc;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.perfil-badges div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 48%;
+}
+
+.perfil-badges small {
+    color: #718096;
+    font-size: 0.75rem;
+}
+
+.perfil-badges span {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #2d3748;
+}
+
+.perfil-acciones-principales {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-guardar-cambios {
+    flex: 2;
+    background-color: #2b6cb0;
+    color: white;
+    border: none;
+    padding: 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-logout {
+    flex: 1;
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+    padding: 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-perfil-footer {
+    background-color: #fff5f5;
+    border-top: 1px solid #fed7d7;
+    padding: 15px 20px;
+    text-align: center;
+}
+
+.modal-perfil-footer p {
+    font-size: 0.8rem;
+    color: #742a2a;
+    margin-bottom: 8px;
+}
+
+.btn-baja-cuenta {
+    background: transparent;
+    border: 1px solid #e53e3e;
+    color: #e53e3e;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-baja-cuenta:hover {
+    background-color: #e53e3e;
+    color: white;
+}
+
+/* ==========================================================================
+   SECCIÓN: GESTIÓN DE SUSCRIPCIÓN Y HISTORIAL DE PAGOS
+   ========================================================================== */
+
+/* 1. Tarjeta de Suscripción Principal */
+.panel-suscripcion {
+    background: var(--FondoSecundario);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    border: 1px solid #eef2f5;
+    margin-bottom: 25px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.panel-suscripcion:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+
+.header-suscripcion h3 {
+    font-size: 1.35rem;
+    color: var(--ColorLetra);
+    margin-bottom: 20px;
+    font-weight: 600;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 12px;
+}
+
+/* Detalles internos del plan alineados con Flexbox */
+.detalles-plan p {
+    font-size: 0.95rem;
+    margin: 14px 0;
+    color: var(--ColorLetra);
+    display: flex;
+    justify-content: space-between; /* Envía el dato a la derecha */
+    align-items: center;
+    border-bottom: 1px dashed #f1f5f9;
+    padding-bottom: 10px;
+}
+
+.detalles-plan strong {
+    color: var(--ColorLetra);
+    font-weight: 600;
+}
+
+/* Badges de estado de la Suscripción */
+.badge-activo {
+    background-color: var(--FondoPrincipal);
+    color: #15803d;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-inactivo {
+    background-color: #ff0000;
+    color: #b91c1c;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-trial {
+    background-color: #fef9c3;
+    color: #a16207;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Botón Renovar */
+.acciones-suscripcion {
+    margin-top: 22px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-renovar {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
+    border: none;
+    padding: 12px 26px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    transition: all 0.25s ease;
+}
+
+.btn-renovar:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+
+/* ==========================================================================
+   JUANFAX: ESTILOS SÓLIDOS PARA EL HISTORIAL DE TRANSACCIONES
+   ========================================================================== */
+
+/* Contenedor externo de la tabla */
+.historial-pagos-contenedor {
+    background: var(--FondoSecundario);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    border: 1px solid #eef2f5;
+}
+
+.historial-pagos-contenedor h3 {
+    font-size: 1.25rem;
+    color: var(--ColorLetra);
+    margin-bottom: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+/* Estructura base de la Tabla Dinámica */
+.tabla-dinamica {
+    width: 100%;
+    border-collapse: separate; /* Permite bordes redondeados en las esquinas */
+    border-spacing: 0;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+/* Cabecera (Thead) */
+.tabla-dinamica thead tr {
+    background-color: var(--FondoPrincipal); /* Gris sutil de fondo */
+}
+
+.tabla-dinamica th {
+    padding: 14px 16px;
+    color: var(--ColorLetra);
+    font-weight: 600;
+    border-bottom: 2px solid #e2e8f0;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+/* Esquinas redondeadas perfectas para la cabecera */
+.tabla-dinamica th:first-child { border-top-left-radius: 8px; }
+.tabla-dinamica th:last-child { border-top-right-radius: 8px; }
+
+/* Celdas del cuerpo (Tbody) */
+.tabla-dinamica td {
+    padding: 16px;
+    color: var(--ColorLetra);
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+/* Efecto hover suave al pasar el mouse por las filas */
+.tabla-dinamica tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.tabla-dinamica tbody tr:hover {
+    background-color: var(--FondoPrincipal);
+}
+
+/* Formato para el ID de Transacción (Etiqueta <code>) */
+.tabla-dinamica code {
+    background-color: var(--FondoPrincipal);
+    color: var(--ColorLetra);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 0.85rem;
+    border: 1px solid #e2e8f0;
+}
+
+/* Texto destacado para el Monto */
+.tabla-dinamica td strong {
+    color: var(--ColorLetra);
+    font-weight: 600;
+}
+

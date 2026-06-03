@@ -197,9 +197,7 @@ public class LoginServlet extends HttpServlet {
             }
             return;
         }
-        // --------------------------------------------------------------------
-        // ACCIÓN 3: FILTRAR NEGOCIOS POR CATEGORÍA (VISTA TURISTA)
-        // --------------------------------------------------------------------
+
         else if ("negociosPorCategoria".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -229,9 +227,7 @@ public class LoginServlet extends HttpServlet {
             }
             return;
         } 
-        // --------------------------------------------------------------------
-        // ACCIÓN 4: EXTRAER EL DETALLE DE UN NEGOCIO ESPECÍFICO
-        // --------------------------------------------------------------------
+
        else if ("detalleNegocioUnico".equals(accion)) {
             String idStr = request.getParameter("id"); 
             System.out.println("-> Ejecutando detalleNegocioUnico para ID: " + idStr);
@@ -303,40 +299,6 @@ public class LoginServlet extends HttpServlet {
             }
             return;
         }
-       if ("obtenerDatosSuscripcion".equals(accion)) {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            PrintWriter out = response.getWriter();
-
-            // Capturamos el idNegocio enviado desde el fetch
-            int idNegocio = Integer.parseInt(request.getParameter("idNegocio"));
-
-            SuscripcionDao dao = new SuscripcionDao();
-            String jsonRespuesta = dao.obtenerDatosSuscripcionJSON(idNegocio);
-
-            out.print(jsonRespuesta);
-            out.flush();
-            return;
-        }
-
-        if ("renovarSuscripcion".equals(accion)) {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            PrintWriter out = response.getWriter();
-
-            int idNegocio = Integer.parseInt(request.getParameter("idNegocio"));
-
-            SuscripcionDao dao = new SuscripcionDao();
-            boolean ejecutado = dao.renovarSuscripcion(idNegocio);
-
-            if (ejecutado) {
-                out.print("{\"success\": true, \"mensaje\": \"¡Plan activado con éxito!\"}");
-            } else {
-                out.print("{\"success\": false, \"mensaje\": \"No se pudo actualizar la suscripción.\"}");
-            }
-            out.flush();
-            return;
-        }
         else if ("listarUsuarios".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -378,9 +340,6 @@ public class LoginServlet extends HttpServlet {
             }
             return; 
         }
-        // --------------------------------------------------------------------
-        // ACCIÓN 5: OBTENER LOS DESTINOS RECOMENDADOS DEL CARRUSEL principal
-        // --------------------------------------------------------------------
         else if ("carrusel".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -411,9 +370,106 @@ public class LoginServlet extends HttpServlet {
             }
             return;
         }
-        // --------------------------------------------------------------------
-        // ACCIÓN 6: EXTRAER LA LISTA DE OPINIONES DE LOS USUARIOS
-        // --------------------------------------------------------------------
+
+        else if ("verPerfil".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("idUsuario") == null) {
+                response.getWriter().print("{\"error\": \"Sesión no válida o caducada.\"}");
+                return;
+            }
+
+            // Obtenemos el ID de quien está logueado directamente de la sesión segura
+            int idUsuario = (int) session.getAttribute("idUsuario");
+            Dao.UsuarioDao usuarioDao = new Dao.UsuarioDao();
+            Model.UsuarioDTO u = usuarioDao.obtenerUsuarioPorId(idUsuario);
+
+            if (u != null) {
+                StringBuilder json = new StringBuilder();
+                json.append("{");
+                json.append("\"idUsuario\":").append(u.getIdUsuario()).append(",");
+                json.append("\"nombre\":\"").append(escapeJson(u.getNombreCompleto())).append("\",");
+                json.append("\"correo\":\"").append(escapeJson(u.getCorreoElectronico())).append("\",");
+                json.append("\"rol\":\"").append(escapeJson(u.getNombreRol())).append("\",");
+                json.append("\"estado\":\"").append(escapeJson(u.getEstado())).append("\"");
+                json.append("}");
+                response.getWriter().print(json.toString());
+            } else {
+                response.getWriter().print("{\"error\": \"No se encontraron los datos del usuario.\"}");
+            }
+            return;
+        }
+
+        else if ("cerrarSesion".equals(accion)) {
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate(); // Destruye por completo la sesión en Tomcat
+            }
+            // Redirige al login de Juanfax de forma tradicional
+            response.sendRedirect("index.html");
+            return;
+        }
+
+        else if ("obtenerDatosSuscripcion".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            try {
+                int idNegocio = Integer.parseInt(request.getParameter("idNegocio"));
+                Dao.SuscripcionDao suscripcionDao = new Dao.SuscripcionDao();
+
+                // El DAO ya calcula los días restantes y nos arma el JSON estructurado
+                String jsonSuscripcion = suscripcionDao.obtenerDatosSuscripcionJSON(idNegocio);
+
+                try (PrintWriter out = response.getWriter()) {
+                    out.print(jsonSuscripcion);
+                    out.flush();
+                }
+            } catch (Exception e) {
+                System.err.println("🚨 Error en LoginServlet [obtenerDatosSuscripcion]: " + e.getMessage());
+                response.getWriter().print("{\"success\": false, \"mensaje\": \"Error de servidor al leer suscripción\"}");
+            }
+            return;
+        }
+
+
+        else if ("historialPagos".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            try {
+                int idNegocio = Integer.parseInt(request.getParameter("idNegocio"));
+                Dao.SuscripcionDao suscripcionDao = new Dao.SuscripcionDao();
+                java.util.List<Model.PagoDTO> historial = suscripcionDao.obtenerHistorialPagos(idNegocio);
+
+                // Construimos el array JSON a mano respetando el estándar de rendimiento de Juanfax
+                StringBuilder json = new StringBuilder();
+                json.append("[");
+                for (int i = 0; i < historial.size(); i++) {
+                    Model.PagoDTO p = historial.get(i);
+                    json.append("{");
+                    json.append("\"fecha\":\"").append(p.getFechaPago() != null ? p.getFechaPago().toString() : "").append("\",");
+                    json.append("\"transaccion\":\"").append(escapeJson(p.getIdTransaccion())).append("\",");
+                    json.append("\"monto\":").append(p.getMonto()).append(",");
+                    json.append("\"estado\":\"").append(escapeJson(p.getEstado())).append("\"");
+                    json.append("}");
+                    if (i < historial.size() - 1) json.append(",");
+                }
+                json.append("]");
+
+                try (PrintWriter out = response.getWriter()) {
+                    out.print(json.toString());
+                    out.flush();
+                }
+            } catch (Exception e) {
+                System.err.println("🚨 Error en LoginServlet [historialPagos]: " + e.getMessage());
+                response.getWriter().print("[]"); // Retorna un array vacío seguro ante caídas
+            }
+            return;
+        }
+
         else if ("listarComentarios".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -455,9 +511,7 @@ public class LoginServlet extends HttpServlet {
             }
             return; 
         }
-        // --------------------------------------------------------------------
-        // ACCIÓN 7: CARGAR ESTADÍSTICAS DEL CONTADOR GENERAL DEL ADMINISTRADOR
-        // --------------------------------------------------------------------
+
         else if ("cargarDashboard".equals(accion)) {
             NegocioDao dao = new NegocioDao();
             
@@ -486,9 +540,7 @@ public class LoginServlet extends HttpServlet {
             }
             json.append("],"); // Cambiamos de llave a coma para continuar el objeto
 
-            // ================================================================
-            // 🚀 NUEVO: CONSULTA DE ALERTAS REALES DESDE LA BASE DE DATOS
-            // ================================================================
+
             json.append("\"alertas\": [");
             String sqlAlertas = "SELECT tipo, mensaje, "
                     + "CASE "
@@ -529,11 +581,10 @@ public class LoginServlet extends HttpServlet {
             response.getWriter().write(json.toString());
             return;
         }
-        // --------------------------------------------------------------------
-        // 🛠️ ACCIÓN 8 (CORREGIDA): RECUPERAR TODOS LOS NEGOCIOS PARA EL PANEL ADMIN
-        // --------------------------------------------------------------------
-        // CRUCIAL: Se movió del doPost al doGet porque el Front-end hace un fetch tradicional (GET).
-        // Al estar en POST antes, causaba un error de parseo porque el script recibía el HTML de index.html por descarte.
+        
+        
+     
+       
         else if ("listarTodosLosNegociosAdmin".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -603,9 +654,7 @@ public class LoginServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String accion = request.getParameter("accion");
 
-        // --------------------------------------------------------------------
-        // ACCIÓN POST A: REGISTRAR UN NUEVO COMENTARIO CON CALIFICACIÓN
-        // --------------------------------------------------------------------
+
         if ("guardarComentario".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -649,9 +698,66 @@ public class LoginServlet extends HttpServlet {
             }
             return; 
         }
-        // --------------------------------------------------------------------
-        // ACCIÓN POST B: PROCESAMIENTO DEL REGISTRO DE NUEVAS CUENTAS (SIGN-UP)
-        // --------------------------------------------------------------------
+
+        else if ("renovarSuscripcion".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            java.io.PrintWriter out = response.getWriter();
+
+            try {
+                String idNegocioParam = request.getParameter("idNegocio");
+                if (idNegocioParam == null || idNegocioParam.trim().isEmpty()) {
+                    out.print("{\"success\": false, \"mensaje\": \"El ID del negocio no fue proporcionado.\"}");
+                    return;
+                }
+
+                int idNegocio = Integer.parseInt(idNegocioParam);
+                
+                // 1. Captura dinámica del plan (MENSUAL o ANUAL)
+                String tipoPlan = request.getParameter("tipoPlan"); 
+                if (tipoPlan == null || tipoPlan.trim().isEmpty()) {
+                    tipoPlan = "MENSUAL"; // Fallback por defecto si no viene del JS
+                } else {
+                    tipoPlan = tipoPlan.toUpperCase().trim();
+                }
+
+                // 2. Captura del monto económico de la transacción
+                String montoStr = request.getParameter("monto");
+                double monto = 35000.0; // Tarifa mensual base por defecto de Juanfax
+                if (montoStr != null && !montoStr.trim().isEmpty()) {
+                    monto = Double.parseDouble(montoStr);
+                } else if ("ANUAL".equals(tipoPlan)) {
+                    monto = 350000.0; // Respaldo de precio anual si el front aún no lo calcula
+                }
+
+                // 3. Captura o generación del código único de pasarela/auditoría de caja
+                String idTransaccion = request.getParameter("idTransaccion");
+                if (idTransaccion == null || idTransaccion.trim().isEmpty()) {
+                    // Genera un token único de rastreo basado en tiempo de ejecución
+                    idTransaccion = "TRX-" + (System.currentTimeMillis() / 1000); 
+                }
+
+                // 4. Invocación al método atómico unificado de tu SuscripcionDao
+                Dao.SuscripcionDao dao = new Dao.SuscripcionDao();
+                boolean exito = dao.registrarPagoYActualizarPlan(idNegocio, tipoPlan, monto, idTransaccion);
+
+                if (exito) {
+                    out.print("{\"success\": true, \"mensaje\": \"¡Transacción exitosa! Plan actualizado e historial de caja registrado.\"}");
+                } else {
+                    out.print("{\"success\": false, \"mensaje\": \"No se encontró una suscripción activa para vincular el pago.\"}");
+                }
+
+            } catch (NumberFormatException e) {
+                out.print("{\"success\": false, \"mensaje\": \"Error: Parámetros numéricos inválidos en el cobro.\"}");
+            } catch (Exception e) {
+                System.err.println("🚨 Error crítico en LoginServlet [renovarSuscripcion POST]: " + e.getMessage());
+                out.print("{\"success\": false, \"mensaje\": \"Error interno en el servidor al procesar el pago.\"}");
+            } finally {
+                out.flush();
+            }
+            return;  
+        }
+
         else if ("registrarUsuario".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -715,9 +821,7 @@ public class LoginServlet extends HttpServlet {
             }
             return; 
         }
-        // --------------------------------------------------------------------
-        // ACCIÓN POST C: MODERACIÓN Y CAMBIO DE ESTADO DE SOLICITUDES POR EL ADMIN
-        // --------------------------------------------------------------------
+
         else if ("actualizarEstado".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -748,7 +852,7 @@ public class LoginServlet extends HttpServlet {
                 boolean exito = dao.actualizarEstadoNegocio(idNegocio, nuevoEstado);
 
                 if (exito) {
-                    System.out.println("✅ Estado del negocio ID " + idNegocio + " cambiado a " + nuevoEstado);
+                    System.out.println(" Estado del negocio ID " + idNegocio + " cambiado a " + nuevoEstado);
                     //  NUEVO: REGISTRAR ALERTA AUTOMÁTICA EN LA BASE DE DATOS
                     AlertaDao alertaDao = new AlertaDao();
                     String tipoAlerta = "success".equals(nuevoEstado.toLowerCase()) || "aprobado".equals(nuevoEstado.toLowerCase()) ? "success" : "error";
@@ -974,52 +1078,67 @@ public class LoginServlet extends HttpServlet {
         }
         
 
-        else if ("renovarSuscripcion".equals(accion)) {
+        
+
+        else if ("actualizarPerfil".equals(accion)) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            java.io.PrintWriter out = response.getWriter();
 
-            try {
-                String idNegocioParam = request.getParameter("idNegocio");
-                if (idNegocioParam == null || idNegocioParam.trim().isEmpty()) {
-                    out.print("{\"success\": false, \"mensaje\": \"El ID del negocio no fue proporcionado.\"}");
-                    return;
-                }
-
-                int idNegocio = Integer.parseInt(idNegocioParam);
-                String tipoPlan = request.getParameter("tipoPlan"); // Captura dinámicamente el plan (MENSUAL o ANUAL)
-
-                Dao.SuscripcionDao dao = new Dao.SuscripcionDao();
-                boolean actualizado;
-
-                // Si mandas un plan específico desde el JS, usamos el nuevo método robusto con ENUMs
-                if (tipoPlan != null && !tipoPlan.trim().isEmpty()) {
-                    actualizado = dao.actualizarPlan(idNegocio, tipoPlan);
-                } else {
-                    // Fallback por si mantienes algún botón de renovación simple de un mes
-                    actualizado = dao.renovarSuscripcion(idNegocio);
-                }
-
-                if (actualizado) {
-                    out.print("{\"success\": true, \"mensaje\": \"¡Suscripción de Juanfax procesada con éxito!\"}");
-                } else {
-                    out.print("{\"success\": false, \"mensaje\": \"No se pudo actualizar la suscripción. Inténtalo de nuevo.\"}");
-                }
-
-            } catch (NumberFormatException e) {
-                out.print("{\"success\": false, \"mensaje\": \"Error: El ID del negocio debe ser un número válido.\"}");
-            } catch (Exception e) {
-                out.print("{\"success\": false, \"mensaje\": \"Error en el servidor: " + e.getMessage() + "\"}");
-            } finally {
-                out.flush();
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("idUsuario") == null) {
+                response.getWriter().print("{\"success\": false, \"mensaje\": \"Sesión inválida.\"}");
+                return;
             }
-            return; // 💥 ¡SOLUCIÓN CLAVE! Evita que el flujo siga derecho hacia la consulta del Login
+
+            int idUsuario = (int) session.getAttribute("idUsuario");
+            String nuevoNombre = request.getParameter("nombre");
+            String nuevoCorreo = request.getParameter("correo");
+
+            if (nuevoNombre == null || nuevoCorreo == null || nuevoNombre.isEmpty() || nuevoCorreo.isEmpty()) {
+                response.getWriter().print("{\"success\": false, \"mensaje\": \"Campos obligatorios vacíos.\"}");
+                return;
+            }
+
+            Dao.UsuarioDao usuarioDao = new Dao.UsuarioDao();
+            boolean exito = usuarioDao.actualizarPerfilUsuario(idUsuario, nuevoNombre, nuevoCorreo);
+
+            if (exito) {
+                // 🌟 IMPORTANTE: Actualizamos el atributo de sesión para que refleje el nuevo nombre en el menú de la UI inmediatamente
+                session.setAttribute("nombre", nuevoNombre);
+                response.getWriter().print("{\"success\": true, \"mensaje\": \"¡Tu perfil ha sido actualizado con éxito!\"}");
+            } else {
+                response.getWriter().print("{\"success\": false, \"mensaje\": \"No se pudieron salvar los cambios en la base de datos.\"}");
+            }
+            return;
         }
 
-        // ====================================================================
-        // FLUJO DE CONTROL PREDETERMINADO: LOGICA DEL LOGIN TRADICIONAL (FORM SUBMIT)
-        // ====================================================================
-        // Este bloque se ejecuta por descarte cuando la petición POST viene directa desde el formulario del index.html
+        else if ("eliminarMiCuenta".equals(accion)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("idUsuario") == null) {
+                response.getWriter().print("{\"success\": false, \"mensaje\": \"Operación inválida.\"}");
+                return;
+            }
+
+            int idUsuario = (int) session.getAttribute("idUsuario");
+            Dao.UsuarioDao usuarioDao = new Dao.UsuarioDao();
+
+            // Aplicamos el borrado lógico cambiando el estado a 'INACTIVO' (o 'BLOQUEADO')
+            boolean exito = usuarioDao.cambiarEstadoUsuario(idUsuario, "INACTIVO");
+
+            if (exito) {
+                session.invalidate(); // Matamos la sesión ya que su cuenta ya no está ACTIVA
+                response.getWriter().print("{\"success\": true, \"mensaje\": \"Tu cuenta ha sido dada de baja del sistema correctamente.\"}");
+            } else {
+                response.getWriter().print("{\"success\": false, \"mensaje\": \"No se pudo procesar la baja de la cuenta.\"}");
+            }
+            return;
+        }
+
+
+
         String correo = request.getParameter("correo_electronico");
         String contrasena = request.getParameter("txtPass");
         

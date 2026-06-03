@@ -70,7 +70,7 @@ body {
 }
 .imagenNegocio{
     grid-area: imagenNegocio;
-    border:1px solid var(--ColorCards);
+    /* border:1px solid var(--ColorCards); */
     height: 100%;
     width: 100%;
     /* background-size: contain;
@@ -87,15 +87,15 @@ body {
 
 .nombreNegocio{
     grid-area: nombreNegocio;
-    border:1px solid var(--ColorCards);
+    /* border:1px solid var(--ColorCards); */
 }
 .descripcionNegocio{
     grid-area: descripcionNegocio;
-    border:1px solid var(--ColorCards);
+    /* border:1px solid var(--ColorCards); */
 }
 .showMap{
     grid-area: showMap;
-    border:1px solid var(--ColorCards);
+    /* border:1px solid var(--ColorCards); */
     /* background-color:green; */
     height: 100%;
     width: 100%;
@@ -119,7 +119,7 @@ body {
 .comentariosContainer h2 {
     margin-bottom: 20px;
     font-size: 1.5rem;
-    border-bottom: 2px solid var(--FondoSecundario);
+    /* border-bottom: 2px solid var(--FondoSecundario); */
     padding-bottom: 10px;
 }
 

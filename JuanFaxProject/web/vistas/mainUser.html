@@ -15,23 +15,14 @@
         <header class="header">
             <div class="contenedor-logo-ubicacion-configuracion">
                 <div class="Logo">
-                    <!-- <img src=a"estilos/imagenes/logo_Juan_Fax-removebg-preview (1) 2 (1).png" alt=""> -->
-                </div>
-                <div class="ubicacion">
-                    <i class="bx bx-map"></i>
+                    
                 </div>
                 <div class="configuracion ">
-                    <i class="bx-cog"></i>
+                    <div class="profile" id="profile"><p>JD</p></div>
                 </div>
 
             </div>         
-            <form class="search" id="search">
-                <input type="text" placeholder="¿Qué estás buscando?" class="input-search">
-                <!-- <button class="boton-search"><i class="bx bx-search"></i></button> -->
-                <button class="boton-search">
-                    <i class="bx bx-search-big"></i>
-                </button>
-            </form>
+            
         </header>
         <section class="hero" id="hero">
             <button class="boton-hero left" id="Boton_Izquierda">‹</button>
@@ -88,6 +79,49 @@
         <footer class="footer">
             
         </footer>
+        <div id="modalPerfil" class="modal-perfil-overlay" style="display: none;">
+            <div class="modal-perfil-card">
+                <div class="modal-perfil-header">
+                    <h2>⚙️ Mi Cuenta</h2>
+                    <button type="button" id="btnCerrarModal" class="btn-cerrar-modal">&times;</button>
+                </div>
+                
+                <div class="modal-perfil-body">
+                    <form id="formMiPerfil">
+                        <div class="perfil-grupo">
+                            <label>Nombre Completo</label>
+                            <input type="text" id="perfilNombre" required>
+                        </div>
+                        
+                        <div class="perfil-grupo">
+                            <label>Correo Electrónico</label>
+                            <input type="email" id="perfilCorreo" required>
+                        </div>
+                        
+                        <div class="perfil-badges">
+                            <div>
+                                <small>Rol Actual</small>
+                                <span id="perfilRol">-</span>
+                            </div>
+                            <div>
+                                <small>Estado</small>
+                                <span id="perfilEstado">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="perfil-acciones-principales">
+                            <button type="submit" class="btn-guardar-cambios">💾 Guardar Cambios</button>
+                            <button type="button" id="btnLogOut" class="btn-logout">❌ Cerrar Sesión</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="modal-perfil-footer">
+                    <p>¿Ya no deseas usar Juanfax?</p>
+                    <button type="button" id="btnBorradoLogico" class="btn-baja-cuenta">⚠️ Dar de baja mi cuenta</button>
+                </div>
+            </div>
+        </div>
     </section>
     <script src="../scripts/user.js"></script>
 </body>
