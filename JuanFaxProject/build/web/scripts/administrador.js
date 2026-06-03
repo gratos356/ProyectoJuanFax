@@ -469,3 +469,24 @@ function cambiarEstadoUsuario(idUsuario, nuevoEstado) {
         cargarGestionUsuarios(); 
     }
 }
+
+
+// ============================================================================
+// CONTROL DE CIERRE DE SESIÓN PARA EL ADMINISTRADOR
+// ============================================================================
+document.addEventListener("DOMContentLoaded", () => {
+    const profileAdmin = document.getElementById("profile");
+    
+    if (profileAdmin) {
+        // Le cambiamos el cursor para que el usuario sepa que es cliqueable
+        profileAdmin.style.cursor = "pointer";
+        
+        profileAdmin.addEventListener("click", () => {
+            const seguro = confirm("🔒 ¿Estás seguro de que deseas cerrar la sesión de Administrador?");
+            if (seguro) {
+                // Redirige directo a la acción de salida del LoginServlet
+                window.location.href = "../LoginServlet?accion=cerrarSesion";
+            }
+        });
+    }
+});
