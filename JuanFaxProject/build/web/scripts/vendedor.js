@@ -22,6 +22,7 @@ function obtenerNegocioInicial() {
     if (idDesdeStorage) {
         window.idNegocioActual = parseInt(idDesdeStorage);
         console.log("📌 Inicializado con éxito desde LocalStorage: ID -> " + window.idNegocioActual);
+        
     }
 
     // 2️⃣ Hacer el fetch para cargar la lista del selector (si aplica), pero protegiendo tu elección
@@ -247,13 +248,105 @@ function confirmarPlan(idNegocio, tipoPlanSeleccionado, montoPlan) {
 
 
 function configurarListenersMenu() {
-    const btnSuscripcion = document.getElementById("btnSuscripcion");
-    
-    if (btnSuscripcion) {
-        btnSuscripcion.addEventListener("click", cargarVistaSuscripcion);
-    }
-    
+    const informacionNegocio = document.getElementById("informacionNegocio"); 
+    const vistaReporteVentas = document.getElementById("vistaReporteVentas"); 
 
+    // 🌟 TRUCO MAESTRO: Guardamos en una variable global de ventana el HTML original de las métricas
+    // Solo lo guardamos la primera vez (cuando aún existe en el HTML) antes de que la suscripción lo borre.
+    if (informacionNegocio && !window.htmlMetricasOriginal) {
+        window.htmlMetricasOriginal = informacionNegocio.innerHTML;
+        console.log("💾 Estructura HTML de Métricas respaldada con éxito en caché.");
+    }
+
+    /**
+     * 🌟 FUNCIÓN CENTRAL DE ENRUTAMIENTO (SPA)
+     */
+    function conmutarSecciones(seccionActiva) {
+        if (seccionActiva === "metricas") {
+            if (informacionNegocio) informacionNegocio.style.display = ""; 
+            if (vistaReporteVentas) vistaReporteVentas.classList.add("vistaReporteVentasOculta");
+        } 
+        else if (seccionActiva === "reportes") {
+            if (informacionNegocio) informacionNegocio.style.display = "none";
+            if (vistaReporteVentas) vistaReporteVentas.classList.remove("vistaReporteVentasOculta");
+        } 
+        else if (seccionActiva === "suscripcion") {
+            if (informacionNegocio) informacionNegocio.style.display = ""; 
+            if (vistaReporteVentas) vistaReporteVentas.classList.add("vistaReporteVentasOculta");
+        }
+    }
+
+    // 2. LISTENERS DE LA BARRA LATERAL (SIDEBAR)
+
+    // 🏠 Botón: Métricas
+    const btnVerMetricas = document.getElementById("btnVerMetricas");
+    if (btnVerMetricas) {
+        btnVerMetricas.addEventListener("click", () => {
+            console.log("🏠 Volviendo al Dashboard principal y restaurando maquetación de métricas...");
+            
+            // 1. Cambiamos los estados visuales de las secciones
+            conmutarSecciones("metricas");
+            
+            // 2. 🌟 RESTAURACIÓN: Reinyectamos las cajas, estadísticas y el simulador gráfico original
+            if (informacionNegocio && window.htmlMetricasOriginal) {
+                informacionNegocio.innerHTML = window.htmlMetricasOriginal;
+            }
+            
+            // 3. Si tienes un Fetch en 'vendedorMetricas.js' para traer datos reales de la BD, ejecútalo aquí:
+            if (typeof cargarMetricasVendedor === "function") {
+                cargarMetricasVendedor(window.idNegocioActual);
+            } else if (typeof inicializarMetricas === "function") {
+                inicializarMetricas();
+            }
+        });
+    }
+
+    // 📊 Botón: Historial Ventas
+    const btnRepoteVentas = document.getElementById("btnVerReporteVentas");
+    if (btnRepoteVentas) {
+        btnRepoteVentas.addEventListener("click", () => {
+            if (window.idNegocioActual) {
+                console.log("📊 Abriendo el historial de ventas...");
+                conmutarSecciones("reportes");
+                cargarResumenVentasVendedor(window.idNegocioActual); 
+            } else {
+                alert("⚠️ No se ha detectado ningún establecimiento seleccionado.");
+            }
+        });
+    }
+
+    // 💳 Botón: Suscripción
+    const btnSuscripcion = document.getElementById("btnSuscripcion");
+    if (btnSuscripcion) {
+        btnSuscripcion.addEventListener("click", () => {
+            console.log("💳 Abriendo gestión de suscripción...");
+            conmutarSecciones("suscripcion");
+            if (typeof cargarVistaSuscripcion === "function") {
+                cargarVistaSuscripcion();
+            }
+        });
+    }
+
+    // 📦 Botón: Productos
+    const btnProductos = document.getElementById("btnProductos");
+    if (btnProductos) {
+        btnProductos.addEventListener("click", () => {
+            if (!window.idNegocioActual) {
+                alert("No se ha detectado ningún establecimiento seleccionado para gestionar.");
+                return;
+            }
+            window.location.href = `gestionProductos.html?idNegocio=${window.idNegocioActual}`;
+        });
+    }
+
+    // Clic en el Título Principal JUANFAX
+    const tituloHeader = document.getElementById("titulo");
+    if (tituloHeader) {
+        tituloHeader.style.cursor = "pointer";
+        tituloHeader.addEventListener("click", () => {
+            window.location.href = "misNegocios.html";
+        });
+    }
 }
 
 // ============================================================================
@@ -392,5 +485,63 @@ function cargarHistorialPagos(idNegocio) {
         if (tablaBody) {
             tablaBody.innerHTML = "<tr><td colspan='4' class='error'>No se pudo cargar el historial.</td></tr>";
         }
+    });
+}
+
+
+function cargarResumenVentasVendedor(idNegocio) {
+    const contenedorTabla = document.getElementById("tablaResumenVentas");
+    const contenedorGranTotal = document.getElementById("granTotalVentas");
+    
+    if (!contenedorTabla || !idNegocio) return;
+
+    fetch(`../PedidoServlet?accion=resumenVentasNegocio&idNegocio=${idNegocio}`)
+    .then(response => {
+        if (!response.ok) throw new Error("Fallo en la comunicación con el servidor");
+        return response.json();
+    })
+    .then(ventas => {
+        if (ventas.length === 0) {
+            contenedorTabla.innerHTML = `
+                <tr>
+                    <td colspan="4" class="fila-vacia-mensaje">
+                        📦 Este establecimiento no registra ventas procesadas todavía.
+                    </td>
+                </tr>`;
+            if (contenedorGranTotal) contenedorGranTotal.innerText = "$0 COP";
+            return;
+        }
+
+        let granTotalAcumulado = 0;
+
+        contenedorTabla.innerHTML = ventas.map(v => {
+            granTotalAcumulado += v.totalIngresosProducto;
+            
+            return `
+                <tr>
+                    <td class="col-id">#${v.idProducto}</td>
+                    <td class="col-producto">${v.nombreProducto}</td>
+                    <td style="text-align: center;">
+                        <span class="badge-unidades">${v.totalUnidadesVendidas}</span>
+                    </td>
+                    <td class="col-ingresos">
+                        $${v.totalIngresosProducto.toLocaleString('es-CO', { minimumFractionDigits: 0 })} COP
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        if (contenedorGranTotal) {
+            contenedorGranTotal.innerText = `$${granTotalAcumulado.toLocaleString('es-CO', { minimumFractionDigits: 0 })} COP`;
+        }
+    })
+    .catch(error => {
+        console.error("❌ Error cargando reporte de ventas:", error);
+        contenedorTabla.innerHTML = `
+            <tr>
+                <td colspan="4" class="fila-error-mensaje">
+                    No se pudo sincronizar el reporte de ventas con el servidor.
+                </td>
+            </tr>`;
     });
 }

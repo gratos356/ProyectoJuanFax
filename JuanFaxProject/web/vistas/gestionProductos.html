@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuanFax - Gestión de Productos</title>
+    <link rel="stylesheet" href="../estilos/css/vendedor.css">
+    <link rel="stylesheet" href="../estilos/css/gestionProductos.css">
+</head>
+<body>
+
+    <header class="header-modulo">
+        <div class="titulo" id="titulo">
+            <h1>JUANFAX</h1>
+        </div>
+        <h2>Panel de Gestión - Inventario de Productos</h2>
+        <p>Establecimiento ID: <span id="labelIdNegocio">-</span></p>
+    </header>
+
+    <main class="contenedor-modulo">
+        
+        <aside class="seccion-formulario">
+            <h2>Nuevo Producto</h2>
+            <form id="formCrearProducto" enctype="multipart/form-data">
+                <input type="hidden" id="idNegocioHidden" name="idNegocio">
+
+                <div class="grupo-campo">
+                    <label for="nombre">Nombre del Producto</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej. Empanada de carne" required>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="precio">Precio de Venta (COP)</label>
+                    <input type="number" id="precio" name="precio" placeholder="Ej. 2500" required>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="stock">Inventario Inicial</label>
+                    <input type="number" id="stock" name="stock" min="0" placeholder="Ej. 50" required>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="imagen_producto">Foto del Producto</label>
+                    <input type="file" id="imagen_producto" name="imagen_producto" accept="image/*" required>
+                </div>
+
+                <button type="submit" class="btn-guardar">Agregar al Negocio</button>
+            </form>
+        </aside>
+
+        <section class="seccion-productos">
+            <h2>Mis Productos Existentes</h2>
+            
+            <div class="contenedor-busqueda">
+                <input type="text" id="buscar-producto" placeholder="🔍 Buscar producto por nombre...">
+            </div>
+
+            <div id="gridProductos" class="grid-productos">
+                </div>
+        </section>
+
+    </main>
+
+    <div id="modalEditarProducto" class="modal-overlay">
+        <div class="modal-contenido">
+            
+            <div class="modal-header">
+                <h3>Modificar Artículo</h3>
+                <button type="button" class="btn-cerrar-modal" onclick="cerrarModalEditar()">&times;</button>
+            </div>
+            
+            <form id="formEditarProducto" enctype="multipart/form-data">
+                <input type="hidden" id="editIdProducto" name="idProducto">
+
+                <div class="grupo-campo">
+                    <label for="editNombre">Nombre del Producto</label>
+                    <input type="text" id="editNombre" name="nombre" required>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="editPrecio">Precio de Venta (COP)</label>
+                    <input type="number" id="editPrecio" name="precio" required>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="editStock">Cantidad en Inventario (Stock)</label>
+                    <input type="number" id="editStock" name="stock" min="0" required>
+                </div>
+
+                <div class="grupo-campo">
+                    <label for="editImagenes">Añadir más fotos a la galería</label>
+                    <input type="file" id="editImagenes" name="imagenes_producto" accept="image/*" multiple>
+                    <small class="texto-ayuda">Opcional. Selecciona una o varias imágenes.</small>
+                </div>
+
+                <div class="modal-acciones">
+                    <button type="button" class="btn-cancelar" onclick="cerrarModalEditar()">Cancelar</button>
+                    <button type="button" class="btn-guardar" onclick="guardarEdicionCompleta()">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../scripts/gestionProductos.js"></script>
+</body>
+</html>

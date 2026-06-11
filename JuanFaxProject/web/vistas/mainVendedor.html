@@ -28,9 +28,19 @@
             <aside class="sideBaar" id="sideBaar">
                 <div class="MiNegocio" id="MiNegocio">
                     <h2>Mi Negocio</h2>
-                    <div class="botones " id="btnSuscripcion">
+                    <div class="botones botonesFocus" id="btnVerMetricas" style="margin-top: 10px;">
+                        <p class="BttnSideBaar"><i class="bx bx-bar-chart-alt-2"></i> Métricas</p>
+                    </div>
+                    <div class="botones " id="btnSuscripcion" style="margin-top: 10px;">
                         <p class="BttnSideBaar">Suscripcion</p>
                     </div>
+                    <div class="botones" id="btnProductos" style="margin-top: 10px;">
+                        <p class="BttnSideBaar">Productos</p>
+                    </div>
+                    <div class="botones" id="btnVerReporteVentas" style="margin-top: 10px;">
+                        <p class="BttnSideBaar">Historial Ventas</p>
+                    </div>
+
                 </div>
             </aside>
             <section class="informacionNegocio" id="informacionNegocio">
@@ -120,6 +130,38 @@
                             <p>Tu suscripción del <strong>Plan Ejecutivo</strong> vence en 12 días.</p>
                         </div>
                     </div>
+                </div>
+            </section>
+            <section class="vistaReporteVentas vistaReporteVentasOculta" id="vistaReporteVentas">
+                <div class="reporte-header-container">
+                    <div>
+                        <h2 class="reporte-titulo-seccion">📊 Historial de Ventas</h2>
+                        <p class="reporte-subtitulo">Consolidado total de productos vendidos en este establecimiento.</p>
+                    </div>
+                    
+                    <div class="tarjeta-recaudacion">
+                        <span class="tarjeta-recaudacion-label">Total Recaudado</span>
+                        <span id="granTotalVentas" class="tarjeta-recaudacion-monto">$0 COP</span>
+                    </div>
+                </div>
+
+                <div class="tabla-reporte-wrapper">
+                    <table class="tabla-dinamica">
+                        <thead>
+                            <tr>
+                                <th>ID Producto</th>
+                                <th>Producto</th>
+                                <th style="text-align: center;">Unidades Vendidas</th> <th style="text-align: right;">Total Ingresos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaResumenVentas">
+                            <tr>
+                                <td colspan="4" class="fila-vacia-mensaje" style="font-style: italic;">
+                                    Cargando estadísticas de venta...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
         </main>
