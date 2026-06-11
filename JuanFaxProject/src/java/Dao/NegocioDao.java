@@ -196,11 +196,15 @@ public class NegocioDao {
         List<NegocioDTO> lista = new ArrayList<>();
 
         // Consulta que trae hasta 5 negocios que ya estén aprobados en el sistema
-        String sql = "SELECT n.id_negocio, n.nombre_establecimiento, i.url_imagen " +
-                     "FROM negocios n " +
-                     "LEFT JOIN imagenes i ON n.id_negocio = i.id_negocio " +
-                     "WHERE n.estado_revision = 'APROBADO' " +
-                     "LIMIT 5";
+        String sql = "SELECT n.id_negocio, n.nombre_establecimiento, i.url_imagen, " +
+             "       COALESCE(AVG(CASE WHEN c.tipo_registro = 'calificacion' THEN c.valor_puntuacion END), 0) AS promedio_calificacion " +
+             "FROM negocios n " +
+             "LEFT JOIN imagenes i ON n.id_negocio = i.id_negocio " +
+             "LEFT JOIN calificaciones_sanciones c ON n.id_negocio = c.id_negocio " +
+             "WHERE n.estado_revision = 'APROBADO' " +
+             "GROUP BY n.id_negocio, n.nombre_establecimiento, i.url_imagen " +
+             "ORDER BY promedio_calificacion DESC " +
+             "LIMIT 5";
 
         try (Connection con = conection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
@@ -310,8 +314,7 @@ public class NegocioDao {
         // Definición de las 4 consultas de inserción consecutivas
         String sqlNegocio = "INSERT INTO negocios (id_vendedor, id_categoria, nit, nombre_establecimiento, descripcion) VALUES (?, ?, ?, ?, ?)";
         String sqlImagen = "INSERT INTO imagenes (id_negocio, url_imagen, descripcion, es_portada) VALUES (?, ?, ?, TRUE)";
-        String sqlUbicacion = "INSERT INTO puntos_ubicacion (id_negocio, id_destino, latitud, longitud) VALUES (?, 1, ?, ?)";
-        // Inserción automatizada con fechas calculadas desde MySQL usando NOW() y DATE_ADD para añadir un mes de vigencia
+        String sqlUbicacion = "INSERT INTO puntos_ubicacion (id_negocio, latitud, longitud) VALUES (?, ?, ?)";
         String sqlSuscripcion = "INSERT INTO suscripciones (id_negocio, tipo_plan, estado_plan, fecha_inicio, fecha_fin) " +
                                 "VALUES (?, ?, 'ACTIVO', NOW(), DATE_ADD(NOW(), INTERVAL 1 MONTH))";
 
@@ -454,7 +457,7 @@ public class NegocioDao {
 
     public boolean eliminarNegocio(int idNegocio) {
         // Consultas estructuradas de eliminación ordenadas de forma rigurosa según dependencias FK
-        String sqlPagos = "DELETE FROM pagos_historial WHERE id_suscripcion IN (SELECT id_suscripcion FROM suscripciones WHERE id_negocio = ?)";
+        String sqlPagos = "DELETE FROM pagos WHERE id_suscripcion IN (SELECT id_suscripcion FROM suscripciones WHERE id_negocio = ?)";
         String sqlSuscripciones = "DELETE FROM suscripciones WHERE id_negocio = ?";
         String sqlUbicaciones = "DELETE FROM puntos_ubicacion WHERE id_negocio = ?";
         String sqlSanciones = "DELETE FROM calificaciones_sanciones WHERE id_negocio = ?";
