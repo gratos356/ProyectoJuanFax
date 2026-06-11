@@ -1,0 +1,366 @@
+@import url("../customProperties/CustomProperties.css");
+/* 1. Header del Módulo */
+.header-modulo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 12vh;
+    background-color: var(--FondoSecundario);
+    border-bottom: 1px solid var(--ColorBotonesDeAccionGris);
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.header-modulo h1 {
+    color: var(--ColorBotonesDeAccionDorado);
+    font-family: var(--Fuente-General);
+    font-size: 1.4rem;
+    margin-bottom: 5px;
+}
+
+.header-modulo p {
+    color: var(--ColorLetraNav);
+    font-size: 0.9rem;
+}
+
+#labelIdNegocio {
+    color: var(--ColorLetra);
+    font-weight: bold;
+}
+
+/* 2. Layout Principal del Módulo */
+.contenedor-modulo {
+    display: flex;
+    gap: 30px;
+    padding: var(--SeparacionSecciones);
+    background-color: var(--FondoPrincipal);
+    min-height: 88vh;
+    align-items: flex-start;
+}
+
+/* 3. Sección Izquierda: Formulario de Creación */
+.seccion-formulario {
+    width: 30vw;
+    background-color: var(--FondoSecundario);
+    border: 1px solid var(--ColorBotonesDeAccionGris);
+    box-shadow: 0px 0px 10px var(--ColorBotonesDeAccionGris);
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.seccion-formulario h2, 
+.seccion-productos h2 {
+    color: var(--ColorLetraTitulos);
+    font-family: var(--Fuente-General);
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--ColorBotonesDeAccionGris);
+    padding-bottom: 8px;
+}
+
+/* Grupos de campos del Formulario */
+.grupo-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.grupo-campo label {
+    color: var(--ColorLetraNav);
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.grupo-campo input {
+    background-color: var(--FondoPrincipal);
+    border: 1px solid var(--ColorBotonesDeAccionGris);
+    color: var(--ColorLetra);
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.grupo-campo input:focus {
+    border-color: var(--ColorBotonesDeAccionDorado);
+}
+
+/* Estilo para el input de tipo archivo (File) */
+.grupo-campo input[type="file"] {
+    padding: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+/* Botón Guardar Producto */
+.btn-guardar {
+    width: 100%;
+    background-color: var(--ColorFondoBotones);
+    color: var(--ColorBotonesDeAccionDorado);
+    border: 1px solid var(--ColorBotonesDeAccionDorado);
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-family: var(--Fuente-General);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-guardar:hover {
+    background-color: var(--ColorBotonesDeAccionDorado);
+    color: var(--FondoPrincipal);
+    box-shadow: 0px 0px 12px var(--ColorBotonesDeAccionDorado);
+}
+
+/* 4. Sección Derecha: Catálogo e Inventario */
+.seccion-productos {
+    width: 70vw;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Barra de Búsqueda */
+.contenedor-busqueda {
+    width: 100%;
+}
+
+.contenedor-busqueda input {
+    width: 100%;
+    background-color: var(--FondoSecundario);
+    border: 1px solid var(--ColorBotonesDeAccionGris);
+    color: var(--ColorLetra);
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    outline: none;
+    box-shadow: 0px 0px 10px var(--ColorBotonesDeAccionGris);
+    transition: border-color 0.3s ease;
+}
+
+.contenedor-busqueda input:focus {
+    border-color: var(--ColorBotonesDeAccionDorado);
+}
+
+/* Grid Dinámico de Productos */
+.grid-productos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+/* ============================================================================
+   ➕ TARJETAS INTERNAS DE PRODUCTO (Para cuando las inyectes con JS)
+   ============================================================================ */
+.tarjeta-producto {
+    background-color: var(--FondoSecundario);
+    border: 1px solid var(--ColorBotonesDeAccionGris);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.tarjeta-producto:hover {
+    transform: translateY(-4px);
+    border-color: var(--ColorBotonesDeAccionDorado);
+}
+
+.imagen-producto-wrapper {
+    width: 100%;
+    height: 150px;
+    background-color: var(--FondoPrincipal);
+    overflow: hidden;
+}
+
+.imagen-producto-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.info-producto {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-grow: 1;
+}
+
+.info-producto h3 {
+    color: var(--ColorLetra);
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.info-producto .precio-tag {
+    color: var(--ColorBotonesDeAccionDorado);
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.info-producto .stock-tag {
+    color: var(--ColorLetraNav);
+    font-size: 0.85rem;
+}
+
+/* Botón de acción opcional dentro de la tarjeta (Ej: Eliminar/Dar de baja) */
+.btn-eliminar-producto {
+    background-color: var(--ColorFondoBotonesRojo);
+    color: #e07070;
+    border: var(--ColorBordeRechazar);
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: auto;
+    transition: all 0.2s ease;
+}
+
+.btn-eliminar-producto:hover {
+    background-color: #e07070;
+    color: var(--ColorLetra);
+}
+
+.producto-card{
+    background-color: var(--FondoSecundario);
+    width: 250px;
+    border: 1px dotted var(--ColorBotonesDeAccionDorado);
+    
+}
+.producto-info{
+    padding: 10px;
+    color: var(--ColorLetra);
+    font-family: var(--Fuente-General);
+}
+.producto-imagen-contenedor{
+    width: 100%;
+    height: 150px;
+    background-color: var(--FondoPrincipal);
+    overflow: hidden;
+}
+.control-stock{
+    color: var(--ColorLetraNav);
+    font-size: 0.85rem;
+    
+}
+.btn-stock,.btn-baja{
+    background-color: var(--ColorFondoBotones);
+    color: var(--ColorBotonesDeAccionDorado);
+    border: 1px solid var(--ColorBotonesDeAccionDorado);
+    padding: 8px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-family: var(--Fuente-General);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+.control-stock input{
+    background-color: var(--FondoPrincipal);
+    border: 1px solid var(--ColorBotonesDeAccionGris);
+    border-radius: 8px;
+    padding: 8px;
+    color: var(--ColorLetra);
+}
+
+
+/* =================================================================== */
+/* Estilos para el Modal de Edición de Productos                      */
+/* =================================================================== */
+
+.modal-overlay {
+    display: none; /* Se controla desde JS cambiando a 'flex' */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-contenido {
+    background-color: var(--FondoSecundario);
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--ColorBotonesDeAccionGris);
+    padding-bottom: 10px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: var(--ColorLetra);
+}
+
+.btn-cerrar-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--ColorLetra);
+    transition: color 0.2s ease;
+}
+
+.btn-cerrar-modal:hover {
+    color: #ff0000;
+}
+
+.texto-ayuda {
+    color: var(--ColorLetra);
+    display: block;
+    margin-top: 4px;
+    font-size: 0.85rem;
+}
+
+.modal-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+    border-top: 1px solid var(--ColorBotonesDeAccionGris);
+    padding-top: 15px;
+}
+
+.btn-cancelar {
+    background-color: red;
+    color: var(--ColorLetra);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.btn-cancelar:hover {
+    background-color: var(--ColorFondoBotonesRojo);
+}
+
+/* Reutiliza tu .btn-guardar existente, eliminando márgenes raros dentro del modal */
+.modal-acciones .btn-guardar {
+    margin: 0;
+}

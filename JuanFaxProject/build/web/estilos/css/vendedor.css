@@ -67,18 +67,13 @@ body{
     padding: 10px;
     transition: 0.5s;
 }
-.botones{
+/* .botones{
     border: 1px solid var(--ColorBotonesDeAccionGris);
-}
+} */
 .botonesFocus{
-    display: flex;
-    align-items: center;
     background-color: var(--ColorFondoBotones);
     color: var(--ColorBotonesDeAccionDorado);
     border-right: 3px solid var(--ColorBotonesDeAccionDorado);
-    padding: 11px;
-    /* height: 10%; */
-    width: 100%;
 }
 /* _____________________ */
 /*        Main           */
@@ -245,6 +240,7 @@ body{
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-width: 100%;
 }
 
 .comentario-mini {
@@ -252,6 +248,7 @@ body{
     padding: 10px;
     border-radius: 6px;
     border-left: 3px solid #e5c158;
+    max-width:100%;
 }
 
 .meta-comentario {
@@ -848,3 +845,103 @@ body{
     font-weight: 600;
 }
 
+/* ==================================================================== */
+/* 📊 SECCIÓN: HISTORIAL DE VENTAS POR PRODUCTO                         */
+/* ==================================================================== */
+.vistaReporteVentasOculta{
+    display: none;
+}
+.vistaReporteVentas {
+    padding: 20px;
+    width: 100%;
+}
+
+.reporte-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.reporte-titulo-seccion {
+    color: var(--ColorLetra);
+    font-family: var(--Fuente-General);
+    margin: 0;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+
+.reporte-subtitulo {
+    color: var(--ColorLetraNav);
+    margin: 5px 0 0 0;
+    font-size: 0.85rem;
+}
+
+/* Tarjeta de Ingresos Estilo Premium Juanfax */
+.tarjeta-recaudacion {
+    background-color: var(--FondoSecundario);
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--ColorBotonesDeAccionDorado);
+    box-shadow: 0 4px 12px rgba(201, 162, 39, 0.15);
+}
+
+.tarjeta-recaudacion-label {
+    font-size: 0.75rem;
+    color: var(--ColorLetraNav);
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tarjeta-recaudacion-monto {
+    font-size: 1.35rem;
+    font-weight: bold;
+    color: var(--ColorBotonesDeAccionDorado);
+}
+
+/* Contenedor y ajustes específicos de la tabla */
+.tabla-reporte-wrapper {
+    overflow-x: auto;
+    background-color: var(--FondoSecundario);
+    border-radius: 8px;
+    border: 1px solid var(--ColorBotonesDeAccionGris);
+}
+
+.col-id {
+    font-family: monospace;
+    color: var(--ColorLetraNav);
+}
+
+.col-producto {
+    font-weight: 600;
+}
+
+.badge-unidades {
+    background-color: var(--ColorBotonesDeAccionGris);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: var(--ColorLetra);
+}
+
+.col-ingresos {
+    text-align: right;
+    color: var(--ColorBotonesDeAccionDorado);
+    font-weight: bold;
+}
+
+.fila-vacia-mensaje {
+    text-align: center;
+    padding: 40px;
+    color: var(--ColorLetraNav);
+}
+
+.fila-error-mensaje {
+    text-align: center;
+    padding: 30px;
+    color: var(--ColorFondoBotonesRojo);
+    font-weight: 500;
+}

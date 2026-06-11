@@ -43,15 +43,24 @@ function renderizarCarruselHero() {
         const indiceDato = (indiceBase + posicionFisica) % destinos.length;
         const destino = destinos[indiceDato];
         
-        // VALIDACIÓN INTELIGENTE DE RUTA DE IMAGEN
-        let rutaFinalImagen = "";
-        if (destino.urlImagen.startsWith("http://") || destino.urlImagen.startsWith("https://")) {
-            rutaFinalImagen = destino.urlImagen;
+        // 🌟 VALIDACIÓN SEGURA E IDENTICA A LAS EXPANDING CARDS
+        const rutaImagen = destino.urlImagen || destino.url_imagen; 
+        let rutaFinalImagen = '../imagenes/default-negocio.jpg'; // Tu fallback físico real por si todo falla
+
+        if (rutaImagen && rutaImagen !== "defecto.jpg") {
+            // Si la ruta ya es un enlace web completo (HTTP/HTTPS)
+            if (rutaImagen.startsWith("http://") || rutaImagen.startsWith("https://")) {
+                rutaFinalImagen = rutaImagen;
+            } else {
+                // Si es un archivo local del servidor, lo canalizamos de forma segura por el Servlet 🌟
+                rutaFinalImagen = `../verImagen?nombre=${rutaImagen}`;
+            }
         } else {
-            rutaFinalImagen = `../imagenes/${destino.urlImagen}`;
+            // Si vino "defecto.jpg" o nulo desde el DAO, usamos tu imagen por defecto del proyecto
+            rutaFinalImagen = '../imagenes/default-negocio.jpg'; 
         }
         
-        // Inyectamos el fondo con la ruta corregida
+        // Inyectamos el fondo con la ruta corregida por el Servlet
         caja.style.backgroundImage = `linear-gradient(rgba(3, 12, 26, 0.65), rgba(3, 12, 26, 0.85)), url('${rutaFinalImagen}')`;
         caja.style.backgroundSize = "cover";
         caja.style.backgroundPosition = "center";
@@ -68,13 +77,14 @@ function renderizarCarruselHero() {
 
         // REDIRECCIÓN DIRECTA AL HACER CLIC EN UNA TARJETA DEL HERO
         caja.onclick = () => {
-            // ESTO ES LO QUE NECESITO QUE MIRES EN TU CONSOLA (F12)
             console.log("DEBUG: Objeto 'destino' completo:", destino);
             console.log("DEBUG: Valor de 'destino.idNegocio':", destino.idNegocio);
             
-            // Si al hacer clic aquí, el console.log dice 'undefined' o '0',
-            // entonces el error está en el archivo donde se llenó el array 'destinos'.
-            window.location.href = `usuarioInformacionNegocio.html?id=${destino.idNegocio}`;
+            if (destino.idNegocio) {
+                window.location.href = `usuarioInformacionNegocio.html?id=${destino.idNegocio}`;
+            } else {
+                console.error("Error: El destino del Hero no cuenta con un idNegocio válido.", destino);
+            }
         };
     });
 }

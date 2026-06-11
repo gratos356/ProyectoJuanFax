@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Detalle del Establecimiento</title>
     <link rel="stylesheet" href="../estilos/css/usuarioInformacionNegocio.css">
-    <!-- Basic Icons -->
     <link href="https://cdn.boxicons.com/3.0.8/fonts/basic/boxicons.min.css" rel="stylesheet">
-    <!-- Filled Icons -->
     <link href="https://cdn.boxicons.com/3.0.8/fonts/filled/boxicons-filled.min.css" rel="stylesheet">
-    <!-- Brand Icons -->
     <link href="https://cdn.boxicons.com/3.0.8/fonts/brands/boxicons-brands.min.css" rel="stylesheet">
 </head>
 <body>
     <header class="headerContainer" id="headerContainer">
         <div class="logo"></div>
         <nav class="navContainer" id="navContainer">
-            <button class="back bx-reply-big" id="back">
+            <button class="back bx-reply-big" id="back" title="Volver"></button>
+            
+            <button class="btn-abrir-carrito" onclick="alternarModalCarrito()">
+                🛒 <span id="contadorCarrito" class="contador-carrito-badge">0</span>
             </button>
         </nav>
     </header>
+
     <main class="principalContainer" id="principalContainer">
         <input type="hidden" id="idNegocioActual" value="">
 
@@ -28,19 +29,52 @@
         <div class="descripcionNegocio" id="descripcionNegocio"></div>
         <div class="showMap" id="showMap"></div>
     </main>
+
+    <section class="Productos" id="productos">
+        <h2 class="titulo-seccion-productos">Nuestro Catálogo de Productos</h2>
+        <div id="gridProductosUsuario" class="grid-productos-usuario"></div>
+    </section>
+
+    <div id="modalCarrito" class="modal-carrito container-oculto">
+        <div class="modal-carrito-header">
+            <h3>🛒 Mi Carrito</h3>
+            <button class="btn-cerrar-modal" onclick="alternarModalCarrito()">✕</button>
+        </div>
+
+        <div id="elementosCarrito" class="modal-carrito-cuerpo"></div>
+
+        <div class="modal-carrito-footer">
+            <div class="modal-carrito-total">
+                <span>Total:</span>
+                <span id="totalCarrito" class="total-monto-resaltado">$0 COP</span>
+            </div>
+
+            <div class="modal-carrito-formulario">
+                <button class="btn-juanfax btn-confirmar-pedido" onclick="enviarPedidoAlServidor()">
+                    Confirmar Orden ✅
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <section class="historialPedidosContainer" id="historialPedidosContainer">
+        <h2>Consultar Mis Compras</h2>
+        <div id="contenedorHistorial" class="contenedor-historial-lista"></div>
+    </section>
+
     <section class="comentariosContainer" id="comentariosContainer">
         <h2>Comentarios y Reseñas</h2>
         
         <form id="formComentario" class="formComentario">
             <div class="estrellas-rating">
                 <input type="radio" id="star5" name="puntuacion" value="5">
-                <label for="star5"  title="5 estrellas"><i class="bx-star"></i></label>
+                <label for="star5" title="5 estrellas"><i class="bx-star"></i></label>
                 
                 <input type="radio" id="star4" name="puntuacion" value="4">
-                <label for="star4"  title="4 estrellas"><i class="bx-star"></i></label>
+                <label for="star4" title="4 estrellas"><i class="bx-star"></i></label>
                 
                 <input type="radio" id="star3" name="puntuacion" value="3">
-                <label for="star3"  title="3 estrellas"><i class="bx-star"></i></label>
+                <label for="star3" title="3 estrellas"><i class="bx-star"></i></label>
                 
                 <span class="ayuda-rating">(Selecciona tu puntuación)</span>
             </div>
@@ -49,16 +83,11 @@
             <button type="submit">Publicar Comentario</button>
         </form>
 
-        <div class="listaComentarios" id="listaComentarios">
-            <div class="comentarioCard">
-                <p class="usuarioNombre"><strong>Juan David</strong> <span class="fecha">24/05/2026</span></p>
-                <p class="comentarioTexto">¡Los mejores raspados de Girón! Súper recomendado.</p>
-            </div>
-        </div>
+        <div class="listaComentarios" id="listaComentarios"></div>
     </section>
-    <footer class="footerContainer" id="footerContainer">
 
-    </footer>
+    <!-- <footer class="footerContainer" id="footerContainer"></footer> -->
+
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCe5D2_FnExQjPtuVccNEwFURjB7RKdLlY"></script>
     <script src="../scripts/usuarioInformacionnegocio.js"></script>
 </body>
