@@ -9,10 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
     
-    
-    // Si existe, cargamos los datos del negocio seleccionado (ej. el 64)
+    // Convertimos a entero de forma segura desde la inicialización
     cargarDatosSuscripcion(parseInt(ID_NEGOCIO_ACTUAL));
-
 });
 
 // 1. Función para cargar los datos de suscripción al abrir la sección
@@ -28,12 +26,16 @@ function cargarDatosSuscripcion(idNegocio) {
         document.getElementById("nombrePlan").innerText = data.tipoPlan;
         
         const estadoElem = document.getElementById("estadoPlan");
-        estadoElem.innerText = data.estado;
+        const estadoTexto = data.estado ? data.estado.toUpperCase().trim() : "";
+        estadoElem.innerText = estadoTexto;
         
-        if (data.estado === 'ACTIVO') {
-            estadoElem.style.color = '#22c55e'; // Verde
+        // 🎨 RENDERIZADO VISUAL COMPLETO SEGÚN EL ENUM DE LA BASE DE DATOS
+        if (estadoTexto === 'ACTIVO') {
+            estadoElem.style.color = '#22c55e'; // Verde Esmeralda (Éxito)
+        } else if (estadoTexto === 'SUSPENDIDO' || estadoTexto === 'INACTIVO' || estadoTexto === 'RECHAZADO') {
+            estadoElem.style.color = '#ef4444'; // Rojo (Bloqueos o Revocaciones)
         } else {
-            estadoElem.style.color = '#eab308'; // Dorado/Amarillo para TRIAL
+            estadoElem.style.color = '#eab308'; // Dorado/Amarillo (Trial, Pendiente)
         }
         
         document.getElementById("fechaVencimiento").innerText = data.fechaFin;
@@ -52,7 +54,8 @@ function gestionarPlan() {
     .then(data => {
         if (data.success) {
             alert(data.mensaje);
-            cargarDatosSuscripcion(ID_NEGOCIO_ACTUAL); // Refresca con el mismo ID
+            // 🎯 CORRECCIÓN: Volvemos a parsear el ID para mantener consistencia numérica
+            cargarDatosSuscripcion(parseInt(ID_NEGOCIO_ACTUAL)); 
         } else {
             alert("Hubo un error: " + data.mensaje);
         }

@@ -31,86 +31,129 @@ function configurarAlternanciaVistas() {
 // ===========================================================================
 const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,50}$/; // Letras, acentos y espacios (3-50 caracteres)
+const regexContrasena = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
-// Envío del registro mediante Fetch
+// ===========================================================================
+// HELPER VISUAL: INYECTOR DE ERRORES EN EL DOM
+// ===========================================================================
+function mostrarErrorFormulario(formulario, mensaje) {
+    // Limpiar cualquier alerta previa dentro de este formulario específico
+    const errorPrevio = formulario.querySelector(".feedback-error-inline");
+    if (errorPrevio) {
+        errorPrevio.remove();
+    }
+
+    // Crear el contenedor adaptado para el ecosistema de componentes Boxicons
+    const contenedorError = document.createElement("div");
+    contenedorError.className = "feedback-error-inline";
+    contenedorError.innerHTML = `<i class='bx bx-error-circle'></i> <span>${mensaje}</span>`;
+
+    // Buscar el botón del formulario para posicionar el error exactamente arriba de él
+    const botonEnvio = formulario.querySelector("button[type='submit']") || formulario.querySelector(".formulario-login__boton");
+    
+    if (botonEnvio) {
+        formulario.insertBefore(contenedorError, botonEnvio);
+    } else {
+        formulario.appendChild(contenedorError);
+    }
+
+    // Desvanecimiento controlado automático tras 4 segundos
+    setTimeout(() => {
+        contenedorError.style.opacity = "0";
+        contenedorError.style.transform = "translateY(-4px)";
+        setTimeout(() => contenedorError.remove(), 300);
+    }, 4000);
+}
+
+// Envío del registro
+// Envío del registro
 function configurarFormularioRegistro() {
-    const formRegistro = document.getElementById("formRegistro");
+    const formRegistro = document.querySelector("#bloqueRegistro form");
     if (!formRegistro) return;
 
+    // Forzar desactivación de alertas nativas de forma segura
+    formRegistro.setAttribute("novalidate", "true");
+
     formRegistro.addEventListener("submit", (e) => {
-        e.preventDefault();
+        // 1. Captura de elementos del DOM
+        const inputNombre = formRegistro.querySelector("[name='nombre_completo']") || formRegistro.querySelector("input[type='text']");
+        const inputCorreo = formRegistro.querySelector("[name='correo']") || formRegistro.querySelector("input[type='email']");
+        const inputPass = formRegistro.querySelector("[name='contrasena']") || formRegistro.querySelector("input[type='password']");
+        const selectRol = formRegistro.querySelector("select");
+        const checkboxTerminos = document.getElementById("regTerminos");
 
-        const nombre = document.getElementById("regNombre").value.trim();
-        const correo = document.getElementById("regCorreo").value.trim();
-        const contrasena = document.getElementById("regPass").value;
-        const rolSeleccionado = document.getElementById("regRol").value;
-        const terminos = document.getElementById("regTerminos").checked;
+        // 🔍 CONTROL DE SEGURIDAD: Si algo falta, frenamos el envío y avisamos en consola
+        if (!inputNombre || !inputCorreo || !inputPass || !selectRol || !checkboxTerminos) {
+            e.preventDefault(); 
+            console.error("❌ Error en Juanfax: No se pudo mapear algún input en el HTML.", {
+                inputNombre, inputCorreo, inputPass, selectRol, checkboxTerminos
+            });
+            alert("⚠️ Error interno en el formulario de registro. Revisa la consola del desarrollador (F12).");
+            return;
+        }
 
-        // Validaciones previas en cliente
+        // Extraer valores limpios
+        const nombre = inputNombre.value.trim();
+        const correo = inputCorreo.value.trim();
+        const contrasena = inputPass.value.trim();
+        const rol = selectRol.value;
+
+        // 2. Batería de validaciones secuenciales en orden estricto
+        
+        // A. Campos vacíos principales
+        if (nombre === "" || correo === "" || contrasena === "") {
+            e.preventDefault();
+            mostrarErrorFormulario(formRegistro, "Todos los campos son obligatorios. Por favor, completa el formulario.");
+            return;
+        }
+
+        // B. Formato del Nombre (Regex)
         if (!regexNombre.test(nombre)) {
-            alert("⚠️ El Nombre Completo solo debe contener letras y espacios (entre 3 y 50 caracteres).");
+            e.preventDefault();
+            mostrarErrorFormulario(formRegistro, "El nombre no es válido. Solo se permiten letras y espacios.");
             return;
         }
 
+        // C. Formato del Correo (Regex)
         if (!regexCorreo.test(correo)) {
-            alert("⚠️ El formato del correo electrónico no es válido.");
+            e.preventDefault();
+            mostrarErrorFormulario(formRegistro, "El formato del correo electrónico no es válido deve llevar @###.");
             return;
         }
 
+        // D. Longitud de contraseña
         if (contrasena.length < 6) {
-            alert("⚠️ La contraseña debe contar con una longitud mínima de 6 caracteres.");
+            e.preventDefault();
+            mostrarErrorFormulario(formRegistro, "La contraseña de registro debe tener al menos 6 caracteres.");
             return;
         }
 
-        if (!terminos) {
-            alert("⚠️ Debe aceptar los términos y condiciones para continuar.");
+        // E. Selección de Rol válida (Frena el envío si se quedó en la opción por defecto)
+        if (rol === "" || rol === null) {
+            e.preventDefault();
+            mostrarErrorFormulario(formRegistro, "Por favor, selecciona un rol (Cliente o Vendedor) para continuar.");
             return;
         }
 
-        // --- SI PASA LAS VALIDACIONES, SE ENVÍA AL SERVLET ---
-        const datos = new URLSearchParams();
-        datos.append("accion", "registrarUsuario");
-        datos.append("nombreCompleto", nombre);
-        datos.append("correoElectronico", correo);
-        datos.append("contrasena", contrasena);
-        datos.append("idRol", rolSeleccionado); // Envía el rol real elegido por el usuario (Turista o Vendedor)
-        datos.append("aceptaTerminos", "1");
-
-        fetch("LoginServlet", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: datos.toString()
-        })
-        .then(response => {
-            if (!response.ok) throw new Error("Error en la respuesta de red del servidor.");
-            return response.json();
-        })
-        .then(resultado => {
-            if (resultado.status === "success") {
-                alert(resultado.message || "¡Registro exitoso!");
-                formRegistro.reset();
-                
-                // Volver automáticamente a la vista de login
-                document.getElementById("bloqueRegistro").classList.add("oculto");
-                document.getElementById("bloqueLogin").classList.remove("oculto");
-            } else {
-                alert("Error al registrarse: " + (resultado.message || resultado.error));
-            }
-        })
-        .catch(error => {
-            console.error("Error en la petición de registro:", error);
-            alert("Error de conexión con el servidor de Juanfax.");
-        });
+        // F. Checkbox de términos obligatorios
+        if (!checkboxTerminos.checked) {
+            e.preventDefault();
+            mostrarErrorFormulario(formRegistro, "Debes aceptar los términos y condiciones para poder registrarte.");
+            return;
+        }
+        
+        // Si el flujo llega aquí sin retornar, los datos viajan limpios al Servlet de Java
     });
 }
 
-// Colocar al final de login.js o junto a las demás funciones de configuración
+// Envío del login
 function configurarFormularioLogin() {
     const formLogin = document.getElementById("formulario_login");
     if (!formLogin) return;
 
+    formRegistro.setAttribute("novalidate", "true");
+
     formLogin.addEventListener("submit", (e) => {
-        // Seleccionamos los inputs de manera flexible por su tipo o atributos
         const inputCorreo = formLogin.querySelector("input[type='email']") || formLogin.querySelector("[name='correo']");
         const inputPass = formLogin.querySelector("input[type='password']") || formLogin.querySelector("[name='contrasena']");
 
@@ -119,24 +162,21 @@ function configurarFormularioLogin() {
         const correo = inputCorreo.value.trim();
         const contrasena = inputPass.value.trim();
 
-        // A. Validar que no existan campos vacíos o con puros espacios
         if (correo === "" || contrasena === "") {
-            e.preventDefault(); // Frena el envío tradicional al servlet
-            alert("⚠️ Por favor, ingresa tu correo electrónico y contraseña para continuar.");
+            e.preventDefault();
+            mostrarErrorFormulario(formLogin, "Por favor, ingresa tu correo electrónico y contraseña para continuar.");
             return;
         }
 
-        // B. Reutilizar la expresión regular existente para validar la estructura del correo
         if (!regexCorreo.test(correo)) {
             e.preventDefault();
-            alert("⚠️ El formato del correo electrónico ingresado no es válido.");
+            mostrarErrorFormulario(formLogin, "El formato del correo electrónico ingresado no es válido.");
             return;
         }
 
-        // C. Validación de longitud básica preventiva antes de consultar la BD
-        if (contrasena.length < 4) {
+        if (!regexContrasena.test(contrasena)) {
             e.preventDefault();
-            alert("⚠️ La contraseña es demasiado corta.");
+            mostrarErrorFormulario(formLogin, "Credenciales inválidas. Recuerda que la contraseña debe tener al menos 8 caracteres, letras y números.");
             return;
         }
     });
