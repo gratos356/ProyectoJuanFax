@@ -136,6 +136,7 @@ body {
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 2px;
+    margin-bottom: 30px;
 }
 .formulario-login__boton:hover {
     background: var(--ColorBotonesDeAccionDorado);
@@ -205,6 +206,59 @@ body {
     font-size: 12px;
     border-top: 1px solid var(--ColorBotonesDeAccionGris);
 }
+
+/* ===========================================================================
+   COMPONENTE DE ALERTA DINÁMICA (JUANFAX UI)
+   =========================================================================== */
+.feedback-error-inline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    /* Paleta oscura: Fondo rojizo translúcido y bordes definidos */
+    background-color: rgba(239, 68, 68, 0.08); 
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-left: 4px solid #ef4444; /* Línea de acento rígida */
+    
+    /* Tipografía */
+    color: #fca5a5; 
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.4;
+    
+    /* Espaciado y estructura */
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    
+    /* Animaciones y transiciones de salida */
+    animation: alertSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Ajustes para el icono de Boxicons integrado */
+.feedback-error-inline i {
+    font-size: 18px;
+    color: #ef4444;
+    flex-shrink: 0; /* Evita que el icono se deforme en textos largos */
+}
+
+
+
+/* Animación de entrada: Desplazamiento sutil hacia abajo con desvanecimiento */
+@keyframes alertSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @media (max-width: 768px) {
     .tarjeta-login {
         padding: 30px 25px;

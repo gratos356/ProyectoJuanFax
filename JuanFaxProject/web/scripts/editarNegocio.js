@@ -15,7 +15,12 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(data => {
             if (data.success) {
                 document.getElementById("idNegocio").value = data.id;
-                document.getElementById("nit").value = data.nit;
+                
+                // Asignar el valor y bloquear el campo NIT para que no sea editable
+                const nitInput = document.getElementById("nit");
+                nitInput.value = data.nit;
+                nitInput.readOnly = true; // 👈 Bloquea la edición pero permite el envío de datos
+                
                 document.getElementById("nombre").value = data.nombre;
                 document.getElementById("descripcion").value = data.descripcion;
                 document.getElementById("idCategoria").value = data.idCategoria;
