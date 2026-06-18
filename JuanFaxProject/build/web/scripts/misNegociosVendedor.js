@@ -103,7 +103,7 @@ function cargarMisNegocios() {
 
 // 🌟 NUEVA FUNCIÓN: Se conecta al controlador para remover el negocio
 function eliminarNegocioVendedor(id, nombre) {
-    if (confirm(`⚠️ ¿Estás completamente seguro de que deseas eliminar permanentemente el establecimiento "${nombre}"? Esta acción no se puede deshacer.`)) {
+    if (confirm(`⚠️ ¿Estás completamente seguro de que deseas eliminar permanentemente el establecimiento "${nombre}"? !ten en cuenta que tambien se eliminaran todos sus productos vinculaados! Esta acción no se puede deshacer.`)) {
         
         // Petición al servlet con la acción que creamos previamente
         fetch(`../LoginServlet?accion=eliminarNegocio&id=${id}`, { method: 'POST' })

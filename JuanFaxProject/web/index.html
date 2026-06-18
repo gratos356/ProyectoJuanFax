@@ -30,26 +30,11 @@
                         <label class="formulario-login__etiqueta" for="formularioContraseña">Contraseña</label>
                         <input class="formulario-login__campo" id="formularioContraseña" name="txtPass" type="password" placeholder="••••••••" required>
                     </div>
-                    <div class="formulario-login__opciones">
-                        <div class="formulario-login__recordar">
-                            <input type="checkbox" id="recordar">
-                            <label for="recordar">Recordarme</label>
-                        </div>
-                        <a href="#" class="formulario-login__enlace">¿Olvidaste tu contraseña?</a>
-                    </div>
                     <button type="submit" name="accion" class="formulario-login__boton" id="formulario-login__boton" value="Ingresar">
                         Iniciar Sesión
                     </button>
                 </form>
 
-                <div class="divisor">
-                    <span class="divisor__texto">O continúa con</span>
-                </div>
-
-                <div class="login-social">
-                    <button class="login-social__boton">Google</button>
-                    <button class="login-social__boton">GitHub</button>
-                </div>
 
                 <div class="enlace-registro">
                     ¿No tienes cuenta? <a href="#" id="enlaceIrARegistro" class="enlace-registro__link">Regístrate aquí</a>
@@ -64,25 +49,26 @@
                     <p class="tarjeta-login__subtitulo">Crea tu cuenta en Juanfax</p>
                 </div>
 
-                <form class="formulario-login" id="formRegistro">
+                <form class="formulario-login" id="formRegistro" action="LoginServlet" method="POST">
+                    
                     <div class="formulario-login__grupo">
                         <label class="formulario-login__etiqueta" for="regNombre">Nombre Completo</label>
-                        <input class="formulario-login__campo" id="regNombre" type="text" placeholder="Ej. Juan David" required>
+                        <input class="formulario-login__campo" id="regNombre" name="nombre_completo" type="text" placeholder="Ej. Juan David" required>
                     </div>
                     
                     <div class="formulario-login__grupo">
                         <label class="formulario-login__etiqueta" for="regCorreo">Correo electrónico</label>
-                        <input class="formulario-login__campo" id="regCorreo" type="email" placeholder="tu@correo.com" required>
+                        <input class="formulario-login__campo" id="regCorreo" name="correo" type="email" placeholder="tu@correo.com" required>
                     </div>
                     
                     <div class="formulario-login__grupo">
                         <label class="formulario-login__etiqueta" for="regPass">Contraseña</label>
-                        <input class="formulario-login__campo" id="regPass" type="password" placeholder="••••••••" required>
+                        <input class="formulario-login__campo" id="regPass" name="contrasena" type="password" placeholder="••••••••" required>
                     </div>
 
                     <div class="formulario-login__grupo">
                         <label class="formulario-login__etiqueta" for="regRol">¿Cómo quieres usar Juanfax?</label>
-                        <select class="formulario-login__campo" id="regRol" required style="cursor: pointer; background-color: transparent;">
+                        <select class="formulario-login__campo" id="regRol" name="idRol" required style="cursor: pointer; background-color: transparent;">
                             <option value="" disabled selected hidden>Selecciona tu rol...</option>
                             <option value="3" style="color: #000;">Quiero buscar negocios (Cliente)</option>
                             <option value="2" style="color: #000;">Quiero registrar mi negocio (Vendedor)</option>
@@ -100,15 +86,6 @@
                         Registrarse
                     </button>
                 </form>
-
-                <div class="divisor">
-                    <span class="divisor__texto">O regístrate con</span>
-                </div>
-
-                <div class="login-social">
-                    <button class="login-social__boton">Google</button>
-                    <button class="login-social__boton">GitHub</button>
-                </div>
 
                 <div class="enlace-registro">
                     ¿Ya tienes cuenta? <a href="#" id="enlaceIrALogin" class="enlace-registro__link">Inicia sesión aquí</a>

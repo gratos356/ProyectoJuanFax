@@ -2,7 +2,6 @@
 // 🕹️ CONTROLADOR CENTRAL DE INTERFAZ (SPA) - JUANFAX ADMIN
 // ====================================================================
 
-// Variable global para recordar la plantilla de contenedores original de Negocios
 let plantillaOriginalNegocios = "";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -27,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnUsuarios.addEventListener("click", () => navegarAdmin('usuarios'));
     }
 
-    // 4️⃣ ⚡ DELEGACIÓN CENTRAL DE EVENTOS (Captura clicks e interacciones dinámicas)
+    // 4️⃣ ⚡ DELEGACIÓN CENTRAL DE EVENTOS
     if (contenedorPrincipal) {
         // --- Escuchador de Clicks ---
         contenedorPrincipal.addEventListener('click', (evento) => {
@@ -36,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Solicitudes del Dashboard (Aprobar / Rechazar)
             if (target.matches('[data-action="solicitud-gestionar"]')) {
                 const id = target.getAttribute('data-id');
-                const estado = target.getAttribute('data-estado');
+                const estado = target.getAttribute('data-estado'); // Envía 'APROBAR' o 'RECHAZAR'
                 gestionarNegocio(id, estado);
             }
 
@@ -60,12 +59,10 @@ document.addEventListener('DOMContentLoaded', () => {
         contenedorPrincipal.addEventListener('change', (evento) => {
             const target = evento.target;
 
-            // Importación Masiva (Carga de archivo)
             if (target.id === 'csvFile') {
                 procesarArchivoMasivo();
             }
 
-            // Cambio de estado de un Usuario en la tabla
             if (target.classList.contains('select-cambio-estado')) {
                 const idUsuario = target.getAttribute('data-id');
                 const nuevoEstado = target.value;
@@ -89,7 +86,6 @@ function navegarAdmin(seccion) {
 
     if (seccion === 'negocios') {
         document.getElementById("btnNavNegocios").classList.add("botonesFocus");
-        // Restauramos los contenedores originales y volvemos a inyectar la data fresca
         contenedorPrincipal.innerHTML = plantillaOriginalNegocios;
         cargarDatosDashboard();
         cargarGestionDeNegocios();
@@ -301,7 +297,6 @@ function cargarGestionDeNegocios() {
                     if (estadoLower === 'bloqueado' || estadoLower === 'rechazado') {
                         accionHtml = `<a href="#" class="link-accion link-rojo" data-action="negocio-ver-motivo" data-id="${negocio.idNegocio}">Ver motivo</a>`;
                     } else {
-                        // Escapamos comillas dobles de forma segura para colocarlo en la propiedad HTML data-nombre
                         const nombreLimpio = negocio.nombre.replace(/"/g, '&quot;');
                         accionHtml = `<a href="#" class="link-accion link-dorado" data-action="negocio-gestionar" data-id="${negocio.idNegocio}" data-nombre="${nombreLimpio}">Gestionar</a>`;
                     }
@@ -332,7 +327,7 @@ function cargarGestionDeNegocios() {
 }
 
 // ====================================================================
-// --- SECCIÓN 3: GESTIÓN DE USUARIOS REGISTRADOS (NUEVO) ---
+// --- SECCIÓN 3: GESTIÓN DE USUARIOS REGISTRADOS ---
 // ====================================================================
 function cargarGestionUsuarios() {
     const contenedorPrincipal = document.getElementById("informacionNegocio");
@@ -362,7 +357,7 @@ function cargarGestionUsuarios() {
                             <th>ACCIONES</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="tbodyUsuarios">
         `;
 
         if (usuarios.length === 0) {
@@ -403,25 +398,30 @@ function cargarGestionUsuarios() {
 // ====================================================================
 function abrirMenuGestion(id, nombre) {
     const opcion = prompt(`Gestionar negocio: "${nombre}"\n\nEscribe el número de la acción:\n1. Aprobar / Activar\n2. Bloquear Negocio\n3. Cancelar`);
+    
     if (opcion === "1") {
-        gestionarNegocio(id, 'Activo');
+        // 🎯 ESTANDARIZADO: 'APROBAR' para alinearse con los botones del dashboard
+        gestionarNegocio(id, 'APROBAR');
     } else if (opcion === "2") {
         const motivo = prompt("Introduce el motivo del bloqueo:");
-        if (motivo) {
-            gestionarNegocio(id, 'Bloqueado'); 
+        if (motivo && motivo.trim() !== "") {
+            // 🎯 ESTANDARIZADO: 'BLOQUEAR' y guardamos el motivo en la sesión/alerta si lo requieres luego
+            gestionarNegocio(id, 'BLOQUEAR'); 
+        } else if (motivo !== null) {
+            alert("⚠️ Debes especificar un motivo para efectuar el bloqueo del establecimiento.");
         }
     }
 }
 
 function verMotivoBloqueo(id) {
-    alert("Este negocio fue bloqueado por el administrador debido al vencimiento de términos o reportes.");
+    alert("Este negocio fue suspendido por el administrador debido al incumplimiento de las políticas del servicio o a la revocación de su suscripción.");
 }
 
 function gestionarNegocio(id, estado) {
     const params = new URLSearchParams();
     params.append('accion', 'actualizarEstado');
     params.append('idNegocio', id);
-    params.append('estado', estado);
+    params.append('estado', estado); // Viaja limpio como 'APROBAR', 'RECHAZAR' o 'BLOQUEAR'
 
     fetch('../LoginServlet', {
         method: 'POST',
@@ -431,11 +431,11 @@ function gestionarNegocio(id, estado) {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            alert('¡Acción realizada con éxito!');
+            alert('¡Estado de establecimiento actualizado con éxito!');
             cargarDatosDashboard(); 
             cargarGestionDeNegocios();
         } else {
-            alert('Error: ' + data.message);
+            alert('Error en pasarela: ' + data.message);
         }
     })
     .catch(error => {
@@ -470,7 +470,6 @@ function cambiarEstadoUsuario(idUsuario, nuevoEstado) {
     }
 }
 
-
 // ============================================================================
 // CONTROL DE CIERRE DE SESIÓN PARA EL ADMINISTRADOR
 // ============================================================================
@@ -478,13 +477,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const profileAdmin = document.getElementById("profile");
     
     if (profileAdmin) {
-        // Le cambiamos el cursor para que el usuario sepa que es cliqueable
         profileAdmin.style.cursor = "pointer";
-        
         profileAdmin.addEventListener("click", () => {
             const seguro = confirm("🔒 ¿Estás seguro de que deseas cerrar la sesión de Administrador?");
             if (seguro) {
-                // Redirige directo a la acción de salida del LoginServlet
                 window.location.href = "../LoginServlet?accion=cerrarSesion";
             }
         });

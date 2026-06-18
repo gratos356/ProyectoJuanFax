@@ -827,46 +827,83 @@ public class LoginServlet extends HttpServlet {
             response.setCharacterEncoding("UTF-8");
 
             String idNegocioStr = request.getParameter("idNegocio");
-            String estadoRecibido = request.getParameter("estado"); // Captura lo que viene del frontend ("APROBAR" o "RECHAZAR")
+            String estadoRecibido = request.getParameter("estado"); 
 
             if (idNegocioStr != null && estadoRecibido != null) {
-                int idNegocio = Integer.parseInt(idNegocioStr);
-                
-                // 🌟 FILTRO CORRECTOR PARA EL ENUM DE LA BASE DE DATOS
-                String nuevoEstado = "PENDIENTE"; // Valor por defecto seguro
-                String estadoUpper = estadoRecibido.toUpperCase().trim();
+                try {
+                    int idNegocio = Integer.parseInt(idNegocioStr);
 
-                if ("APROBAR".equals(estadoUpper)) {
-                    nuevoEstado = "APROBADO";
-                } else if ("RECHAZAR".equals(estadoUpper)) {
-                    nuevoEstado = "RECHAZADO";
-                } else {
-                    nuevoEstado = estadoUpper; // Por si en algún momento ya viene como APROBADO/RECHAZADO
+                    // 🌟 FILTRO CORRECTOR PARA EL ENUM DE LA BASE DE DATOS
+                    String nuevoEstado = "PENDIENTE"; 
+                    String estadoUpper = estadoRecibido.toUpperCase().trim();
+
+                    if ("APROBAR".equals(estadoUpper)) {
+                        nuevoEstado = "APROBADO";
+                    } else if ("RECHAZAR".equals(estadoUpper)) {
+                        nuevoEstado = "RECHAZADO";
+                    } else if ("BLOQUEAR".equals(estadoUpper)) {
+                        // 🛠️ CORRECCIÓN: Si el frontend envía la acción en infinitivo, la homologamos al ENUM 'BLOQUEADO'
+                        nuevoEstado = "BLOQUEADO";
+                    } else {
+                        nuevoEstado = estadoUpper; 
+                    }
+
+                    System.out.println("Executing UPDATE - ID: " + idNegocio + " - Estado Frontend: " + estadoRecibido + " -> Convertido a: " + nuevoEstado);
+
+                    NegocioDao dao = new NegocioDao();
+                    boolean exito = dao.actualizarEstadoNegocio(idNegocio, nuevoEstado);
+
+                    if (exito) {
+                        System.out.println(" Estado del negocio ID " + idNegocio + " cambiado a " + nuevoEstado);
+
+                        // 💰 REVERSIÓN DE FONDOS AUTOMÁTICA (REGLA DE NEGOCIO A)
+                        // Se dispara si el nuevo estado mapeado termina siendo RECHAZADO o BLOQUEADO
+                        if ("RECHAZADO".equals(nuevoEstado) || "BLOQUEADO".equals(nuevoEstado)) {
+                            System.out.println("⚠️ Detectado estado restrictivo. Iniciando proceso transaccional de reembolso para el negocio ID: " + idNegocio);
+
+                            // Obtenemos el id_vendedor asociado a este negocio
+                            int idVendedor = dao.obtenerIdVendedorPorNegocio(idNegocio); 
+
+                            if (idVendedor > 0) {
+                                SuscripcionDao suscripcionDao = new SuscripcionDao();
+                                // Ejecuta la transacción de forma atómica en MySQL
+                                boolean reembolsoExitoso = suscripcionDao.procesarReembolsoPorBloqueo(idNegocio, idVendedor);
+
+                                if (reembolsoExitoso) {
+                                    System.out.println("✅ Reembolso transaccional aplicado con éxito en la base de datos.");
+                                } else {
+                                    System.err.println("❌ Alerta: El negocio se actualizó, pero falló la reversión transaccional de fondos.");
+                                }
+                            } else {
+                                System.err.println("❌ No se pudo encontrar un vendedor válido para el negocio ID: " + idNegocio + ". Reembolso omitido.");
+                            }
+                        }
+
+                        // 🔔 REGISTRAR ALERTA AUTOMÁTICA EN LA BASE DE DATOS
+                        AlertaDao alertaDao = new AlertaDao();
+                        String tipoAlerta = "APROBADO".equals(nuevoEstado) ? "success" : "error";
+                        String mensajeAlerta = "El establecimiento con ID: " + idNegocio + " ha sido cambiado al estado: " + nuevoEstado;
+
+                        if ("RECHAZADO".equals(nuevoEstado) || "BLOQUEADO".equals(nuevoEstado)) {
+                            mensajeAlerta += " (Suscripción revocada y fondos en proceso de reembolso).";
+                        }
+
+                        // Recuperamos el ID del administrador de la sesión de forma segura
+                        Integer idAdminLogueado = (Integer) request.getSession().getAttribute("idUsuario"); 
+
+                        alertaDao.registrarAlerta(tipoAlerta, mensajeAlerta, idAdminLogueado, idNegocio);
+                        // 🔔 FIN REGISTRAR ALERTA
+
+                        response.getWriter().print("{\"status\":\"success\", \"message\":\"Estado actualizado correctamente\"}");
+                    } else {
+                        response.getWriter().print("{\"status\":\"error\", \"message\":\"No se pudo actualizar el estado en el almacenamiento\"}");
+                    }
+                } catch (NumberFormatException e) {
+                    System.err.println("🚨 Error de casteo: El parámetro idNegocio no es un entero válido -> " + idNegocioStr);
+                    response.getWriter().print("{\"status\":\"error\", \"message\":\"El ID del negocio provisto es inválido\"}");
                 }
-
-                // Impresión de control para que verifiques el cambio en la consola de NetBeans
-                System.out.println("Executing UPDATE - ID: " + idNegocio + " - Estado Frontend: " + estadoRecibido + " -> Convertido a: " + nuevoEstado);
-
-                NegocioDao dao = new NegocioDao();
-                // Pasamos 'nuevoEstado' que ya contiene el valor corregido apto para el ENUM
-                boolean exito = dao.actualizarEstadoNegocio(idNegocio, nuevoEstado);
-
-                if (exito) {
-                    System.out.println(" Estado del negocio ID " + idNegocio + " cambiado a " + nuevoEstado);
-                    //  NUEVO: REGISTRAR ALERTA AUTOMÁTICA EN LA BASE DE DATOS
-                    AlertaDao alertaDao = new AlertaDao();
-                    String tipoAlerta = "success".equals(nuevoEstado.toLowerCase()) || "aprobado".equals(nuevoEstado.toLowerCase()) ? "success" : "error";
-                    String mensajeAlerta = "El establecimiento con ID: " + idNegocio + " ha sido cambiado al estado: " + nuevoEstado;
-    
-                    
-                    Integer idAdminLogueado = (Integer) request.getSession().getAttribute("idUsuario"); 
-
-                    alertaDao.registrarAlerta(tipoAlerta, mensajeAlerta, idAdminLogueado, idNegocio);
-                    //  FIN REGISTRO ALERTA
-                    response.getWriter().print("{\"status\":\"success\", \"message\":\"Estado actualizado correctamente\"}");
-                } else {
-                    response.getWriter().print("{\"status\":\"error\", \"message\":\"No se pudo actualizar el estado\"}");
-                }
+            } else {
+                response.getWriter().print("{\"status\":\"error\", \"message\":\"Faltan parámetros requeridos en la petición\"}");
             }
             return; 
         }
@@ -1038,7 +1075,7 @@ public class LoginServlet extends HttpServlet {
             } catch (Exception e) {
                 response.getWriter().write("{\"success\": false, \"message\": \"Error crítico en el servidor: " + e.getMessage() + "\"}");
             }
-            return; // Importante para que no siga ejecutando código de abajo
+            return; 
         }
         else if ("actualizarNegocio".equals(accion)) {
             response.setContentType("application/json");
