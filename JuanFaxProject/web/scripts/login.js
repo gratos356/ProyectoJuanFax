@@ -65,8 +65,8 @@ function mostrarErrorFormulario(formulario, mensaje) {
     }, 4000);
 }
 
-// Envío del registro
-// Envío del registro
+
+// Envío del registro asíncrono (Evita la pantalla negra)
 function configurarFormularioRegistro() {
     const formRegistro = document.querySelector("#bloqueRegistro form");
     if (!formRegistro) return;
@@ -74,7 +74,7 @@ function configurarFormularioRegistro() {
     // Forzar desactivación de alertas nativas de forma segura
     formRegistro.setAttribute("novalidate", "true");
 
-    formRegistro.addEventListener("submit", (e) => {
+    formRegistro.addEventListener("submit", async (e) => { // 1. Agregamos async aquí
         // 1. Captura de elementos del DOM
         const inputNombre = formRegistro.querySelector("[name='nombre_completo']") || formRegistro.querySelector("input[type='text']");
         const inputCorreo = formRegistro.querySelector("[name='correo']") || formRegistro.querySelector("input[type='email']");
@@ -82,7 +82,7 @@ function configurarFormularioRegistro() {
         const selectRol = formRegistro.querySelector("select");
         const checkboxTerminos = document.getElementById("regTerminos");
 
-        // 🔍 CONTROL DE SEGURIDAD: Si algo falta, frenamos el envío y avisamos en consola
+        // 🔍 CONTROL DE SEGURIDAD
         if (!inputNombre || !inputCorreo || !inputPass || !selectRol || !checkboxTerminos) {
             e.preventDefault(); 
             console.error("❌ Error en Juanfax: No se pudo mapear algún input en el HTML.", {
@@ -117,18 +117,18 @@ function configurarFormularioRegistro() {
         // C. Formato del Correo (Regex)
         if (!regexCorreo.test(correo)) {
             e.preventDefault();
-            mostrarErrorFormulario(formRegistro, "El formato del correo electrónico no es válido deve llevar @###.");
+            mostrarErrorFormulario(formRegistro, "El formato del correo electrónico no es válido debe llevar @.");
             return;
         }
 
         // D. Longitud de contraseña
-        if (contrasena.length < 6) {
+        if (!regexContrasena.test(contrasena) && contrasena.length < 8) {
             e.preventDefault();
-            mostrarErrorFormulario(formRegistro, "La contraseña de registro debe tener al menos 6 caracteres.");
+            mostrarErrorFormulario(formRegistro, "La contraseña debe tener al menos 8 caracteres, letras y números.");
             return;
         }
 
-        // E. Selección de Rol válida (Frena el envío si se quedó en la opción por defecto)
+        // E. Selección de Rol válida
         if (rol === "" || rol === null) {
             e.preventDefault();
             mostrarErrorFormulario(formRegistro, "Por favor, selecciona un rol (Cliente o Vendedor) para continuar.");
@@ -142,7 +142,45 @@ function configurarFormularioRegistro() {
             return;
         }
         
-        // Si el flujo llega aquí sin retornar, los datos viajan limpios al Servlet de Java
+        // ===========================================================================
+        // NUEVO: INTERCEPCIÓN DEL ENVÍO AL SERVLET VIA FETCH
+        // ===========================================================================
+        e.preventDefault(); // Evitamos por completo que la página viaje y se ponga negra
+
+        // Preparamos los parámetros exactamente como los espera recibir el Servlet de Java
+        const formData = new URLSearchParams();
+        formData.append("accion", "registrarUsuario");
+        formData.append("nombreCompleto", nombre);
+        formData.append("correoElectronico", correo);
+        formData.append("contrasena", contrasena);
+        formData.append("idRol", rol);
+
+        try {
+            // Realizamos la petición al servlet de manera silenciosa
+            const respuesta = await fetch("LoginServlet", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: formData.toString()
+            });
+
+            // Parseamos el JSON ("{"status":"error", ...}")
+            const resultado = await respuesta.json();
+
+            if (resultado.status === "error") {
+                // ¡Aquí ocurre la magia! Reutilizamos tu función inyectora de errores estética
+                mostrarErrorFormulario(formRegistro, resultado.message);
+            } else {
+                // Si el registro es exitoso, puedes redirigirlo a su panel o login
+                alert("¡Registro exitoso! Ya puedes iniciar sesión.");
+                window.location.reload(); 
+            }
+
+        } catch (error) {
+            console.error("Error en la comunicación con el servidor:", error);
+            mostrarErrorFormulario(formRegistro, "No se pudo conectar con el servidor. Inténtalo más tarde.");
+        }
     });
 }
 

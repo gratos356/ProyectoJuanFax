@@ -5,10 +5,9 @@
         <group>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Dao/NegocioDao.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Model/NegocioDTO.java</file>
-            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Dao/SuscripcionDao.java</file>
+            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Controller/PedidoServlet.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Controller/LoginServlet.java</file>
             <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Config/conection.java</file>
-            <file>file:/D:/DOC/Desktop/ProyectoSena-Juan_David_Ramirez_Saavedra/JuanFax/JuanFaxProject/src/java/Controller/MetricasServlet.java</file>
         </group>
     </open-files>
 </project-private>

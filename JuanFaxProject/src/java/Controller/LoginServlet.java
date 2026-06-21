@@ -947,7 +947,7 @@ public class LoginServlet extends HttpServlet {
 
             int registrosInsertados = 0;
 
-            // QUERIES AJUSTADAS:
+        
             // 1. Insertamos en 'negocios'
             String sqlNegocio = "INSERT INTO negocios (id_vendedor, id_categoria, nit, nombre_establecimiento, descripcion, estado_revision) VALUES (?, ?, ?, ?, ?, 'APROBADO')";
             
@@ -979,7 +979,7 @@ public class LoginServlet extends HttpServlet {
 
                         String[] columnas = linea.split(",");
                         
-                        // Valida tus 8 columnas originales del archivo
+                        
                         if (columnas.length >= 8) {
                             int idVendedor   = Integer.parseInt(columnas[0].trim());
                             int idCategoria  = Integer.parseInt(columnas[1].trim());
